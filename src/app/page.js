@@ -7,7 +7,7 @@ import Script from 'next/script';
 // --- DONNÉES STATIQUES ---
 const ecoData = [
   {
-    title: 'Avec Le Pass <span class="text-riviera-navy">Explorer (9,90€/m)</span>',
+    title: 'Avec Le Pass <span class="text-sky-400">Explorer (9,90€/m)</span>',
     details: `
       <div class="flex justify-between items-center text-sm"><span class="text-gray-300">Dîner pour deux <span class="text-riviera-azure text-xs font-bold bg-blue-500/20 px-2 py-0.5 rounded ml-1">-50% (1 seule fois)</span></span><span class="text-white font-mono">60 €</span></div>
       <div class="flex justify-between items-center text-sm mt-4"><span class="text-gray-300">Activité de loisir <span class="text-gray-400 text-xs font-bold bg-gray-500/20 px-2 py-0.5 rounded ml-1">-10% (Permanent)</span></span><span class="text-white font-mono">90 €</span></div>
@@ -223,14 +223,32 @@ export default function Home() {
     setCurrentPin("");
     setBillAmount("");
     setModalStep("amount");
+
+    // Upfront check: has this user already used this découverte offer?
+    if (user && offerType === 'decouverte') {
+      const { data: existing } = await supabase
+        .from('usage_history')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('partner_name', partnerName)
+        .eq('offer_type', 'Découverte')
+        .maybeSingle();
+      if (existing) {
+        setCurrentOfferStatus('used');
+        setIsPinModalOpen(true);
+        return;
+      }
+    }
+
     const status = await checkOfferStatus(partnerName, offerType);
     setCurrentOfferStatus(status);
     setIsPinModalOpen(true);
-  }, [checkOfferStatus]);
+  }, [checkOfferStatus, user]);
 
   const handleUseOffer = async () => {
     const currentPartner = partners.find(p => p.name === activePartnerName);
 
+    // 1. Vérification PIN
     if (!currentPartner || currentPin !== currentPartner.pin_code) {
       setCurrentOfferStatus('wrong_pin');
       setCurrentPin("");
@@ -240,6 +258,23 @@ export default function Home() {
     const amount = parseFloat(billAmount);
     if (isNaN(amount) || amount <= 0) return;
 
+    // 2. Si offre découverte, vérifier qu'elle n'a pas déjà été utilisée
+    if (activeOfferType === 'decouverte' && user) {
+      const { data: existingOffer } = await supabase
+        .from('usage_history')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('partner_name', activePartnerName)
+        .eq('offer_type', 'Découverte')
+        .maybeSingle();
+      if (existingOffer) {
+        setCurrentOfferStatus('used');
+        setCurrentPin("");
+        return;
+      }
+    }
+
+    // 3. Calcul du montant économisé
     let saved = 0;
     if (activeOfferType === 'decouverte') {
       const rate = currentPartner.discount_decouverte || 50;
@@ -249,13 +284,14 @@ export default function Home() {
       saved = amount * (rate / 100);
     }
 
+    // 4. Enregistrement en base
     try {
       const { error } = await supabase.from('usage_history').insert([{
+        user_id: user.id,
         partner_name: activePartnerName,
         offer_type: activeOfferType === 'decouverte' ? 'Découverte' : 'Permanente',
         original_amount: amount,
         saved_amount: saved,
-        user_id: user.id
       }]);
       if (error) throw error;
 
@@ -304,16 +340,20 @@ export default function Home() {
     if (!user) { setAuthMode('signup'); setIsAuthModalOpen(true); return; }
     setLoading(true);
     try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, userId: user.id }),
+      const domain = window.location.origin;
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          plan,
+          userId: user.id,
+          success_url: `${domain}/success`,
+          cancel_url: `${domain}/cancel`,
+        },
       });
-      const data = await response.json();
-      if (data.checkoutUrl) {
+      if (error) throw error;
+      if (data?.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        throw new Error(data.error || "Impossible de générer le lien de paiement");
+        throw new Error("Impossible de générer le lien de paiement");
       }
     } catch (err) {
       alert("Erreur de paiement : " + err.message);
@@ -575,6 +615,7 @@ export default function Home() {
             THE <span className="text-riviera-gold">CLUB</span>
           </a>
           <div className="hidden lg:flex space-x-8 text-sm font-medium text-gray-600">
+            <a href="#univers" className="hover:text-riviera-azure transition">Univers</a>
             <a href="#economies" className="hover:text-riviera-azure transition">Avantages</a>
             <a href="#tarifs" className="hover:text-riviera-azure transition">Abonnements</a>
             <a href="#faq" className="hover:text-riviera-azure transition">FAQ</a>
@@ -657,6 +698,109 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* Univers */}
+      <section id="univers" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-3 text-riviera-navy">Cinq univers. Une seule carte.</h2>
+            <p className="text-gray-500 text-sm">L'excellence sélectionnée par The Club, en ville et en ligne.</p>
+          </div>
+
+          {/* Row 1 : 3 cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+            {[
+              {
+                id: 'gastronomie',
+                title: 'Gastronomie',
+                description: 'Tables étoilées, bistrots cachés et coffee shops pointus.',
+                label: "JUSQU'À -50%",
+                image: '/gastronomie.jpg',
+                color: 'text-riviera-gold',
+              },
+              {
+                id: 'bien-etre',
+                title: 'Bien-être',
+                description: 'Spas prestigieux, instituts de beauté et salles de sport privées.',
+                label: "JUSQU'À -40%",
+                image: '/spa.jpg',
+                color: 'text-sky-400',
+              },
+              {
+                id: 'loisirs',
+                title: 'Loisirs',
+                description: 'Activités indoor, simulateurs et expériences inédites.',
+                label: "JUSQU'À -50%",
+                image: '/bowling.png',
+                color: 'text-red-500',
+              },
+            ].map((cat) => (
+              <div
+                key={cat.id}
+                className="relative aspect-[4/3] rounded-[1.5rem] overflow-hidden shadow-lg cursor-pointer group transition-all hover:scale-[1.02]"
+              >
+                <img
+                  src={cat.image}
+                  alt={cat.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5">
+                  <p className={`text-[10px] font-black uppercase tracking-[0.15em] mb-1 ${cat.color}`}>{cat.label}</p>
+                  <h3 className="text-2xl font-bold text-white mb-1 tracking-tight">{cat.title}</h3>
+                  <p className="text-xs text-gray-300 leading-relaxed font-medium line-clamp-2">{cat.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2 : 2 wide cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {[
+              {
+                id: 'exclu-web',
+                title: 'Exclu Web',
+                description: 'Réductions exclusives sur vos marques préférées en ligne.',
+                label: 'OFFRES NATIONALES',
+                badge: 'BIENTÔT DISPONIBLE',
+                image: '/sephora.jpg',
+                color: 'text-purple-400',
+              },
+              {
+                id: 'e-billetterie',
+                title: 'E-billetterie',
+                description: "Vos places de spectacles, cinémas et parcs d'attractions à prix réduits.",
+                label: 'CONCERTS & PARCS',
+                badge: 'BIENTÔT DISPONIBLE',
+                image: '/lepal.jpg',
+                color: 'text-green-400',
+              },
+            ].map((cat) => (
+              <div
+                key={cat.id}
+                className="relative aspect-[16/9] rounded-[1.5rem] overflow-hidden shadow-lg cursor-pointer group transition-all hover:scale-[1.01]"
+              >
+                <img
+                  src={cat.image}
+                  alt={cat.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+                {cat.badge && (
+                  <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-full">
+                    <span className="text-[8px] font-black text-white uppercase tracking-tighter">{cat.badge}</span>
+                  </div>
+                )}
+                <div className="absolute bottom-5 left-5 right-5">
+                  <p className={`text-[10px] font-black uppercase tracking-[0.15em] mb-1 ${cat.color}`}>{cat.label}</p>
+                  <h3 className="text-2xl font-bold text-white mb-1 tracking-tight">{cat.title}</h3>
+                  <p className="text-xs text-gray-300 leading-relaxed font-medium line-clamp-2">{cat.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Carte */}
       <section id="carte" className="py-24 bg-riviera-sand relative border-y border-gray-200">
@@ -1061,7 +1205,11 @@ export default function Home() {
                   <button
                     onClick={handleUseOffer}
                     disabled={currentPin.length < 4}
-                    className={`w-full font-bold py-4 rounded-2xl shadow-lg transition-all ${currentPin.length < 4 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-riviera-navy text-white active:scale-95'}`}
+                    className={`w-full font-bold py-4 rounded-2xl shadow-lg transition-all ${
+                      currentPin.length < 4
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-riviera-navy text-white active:scale-95'
+                    }`}
                   >
                     ✨ Valider l'offre avec le code
                   </button>
