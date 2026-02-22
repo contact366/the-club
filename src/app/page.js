@@ -3,14 +3,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import Script from 'next/script';
 
-// --- UNIVERS STATIQUES ---
-const UNIVERSES = [
-  { id: 1, name: "Gastronomie", desc: "Tables étoilées, bistrots cachés et coffee shops pointus.", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80", tag: "JUSQU'À -50%", labelColor: "text-riviera-gold" },
-  { id: 2, name: "Bien-être", desc: "Spas prestigieux, instituts de beauté et salles de sport privées.", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80", tag: "JUSQU'À -40%", labelColor: "text-riviera-azure" },
-  { id: 3, name: "Loisirs", desc: "Activités indoor, simulateurs et expériences inédites.", image: "/bowling.png", tag: "JUSQU'À -50%", labelColor: "text-red-400" },
-  { id: 4, name: "Exclu Web", desc: "Réductions exclusives sur vos marques préférées en ligne.", image: "/sephora.jpg", tag: "BIENTÔT DISPONIBLE", labelColor: "text-purple-400", isComingSoon: true },
-  { id: 5, name: "E-billetterie", desc: "Vos places de spectacles, cinémas et parcs d'attractions à prix réduits.", image: "/lepal.jpg", tag: "BIENTÔT DISPONIBLE", labelColor: "text-gray-300", isComingSoon: true }
-];
 
 // --- DONNÉES STATIQUES ---
 const ecoData = [
@@ -143,6 +135,7 @@ export default function Home() {
   const [partners, setPartners] = useState([]);
   const [partnersLoading, setPartnersLoading] = useState(true);
   const [totalSavings, setTotalSavings] = useState(0);
+  const [userLocation, setUserLocation] = useState(null);
 
   // Savings animation
   const [displayedSavings, setDisplayedSavings] = useState(0);
@@ -176,7 +169,12 @@ export default function Home() {
 
   const fetchTotalSavings = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from('usage_history').select('saved_amount');
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+      const { data, error } = await supabase
+        .from('usage_history')
+        .select('saved_amount')
+        .eq('user_id', currentUser.id);
       if (error) throw error;
       if (data) {
         const total = data.reduce((acc, curr) => acc + (curr.saved_amount || 0), 0);
@@ -256,7 +254,8 @@ export default function Home() {
         partner_name: activePartnerName,
         offer_type: activeOfferType === 'decouverte' ? 'Découverte' : 'Permanente',
         original_amount: amount,
-        saved_amount: saved
+        saved_amount: saved,
+        user_id: user.id
       }]);
       if (error) throw error;
 
@@ -288,6 +287,13 @@ export default function Home() {
         setMessage({ text: error.message, type: "error" });
       } else {
         setMessage({ text: "Connexion réussie !", type: "success" });
+        // Géolocalisation à la connexion
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+            () => {} // silently fail if denied
+          );
+        }
         setTimeout(() => { setIsAuthModalOpen(false); window.location.reload(); }, 1500);
       }
     }
@@ -400,9 +406,19 @@ export default function Home() {
     getProfile();
   }, [user]);
 
+  // Request geolocation for logged-in users on page load
+  useEffect(() => {
+    if (user && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {} // silently ignore if denied
+      );
+    }
+  }, [user]);
+
   useEffect(() => {
     const wordInterval = setInterval(() => setWordIndex(prev => (prev + 1) % words.length), 3000);
-    const ecoInterval = setInterval(() => setEcoIndex(prev => (prev + 1) % ecoData.length), 7000);
+    const ecoInterval = setInterval(() => setEcoIndex(prev => (prev + 1) % ecoData.length), 4000);
     const parrInterval = setInterval(() => setParrIndex(prev => (prev + 1) % parrainageData.length), 5000);
     window.openReactPinModal = openPinModal;
     return () => {
@@ -418,7 +434,7 @@ export default function Home() {
       if (!mapElement || !window.google) return;
 
       const map = new window.google.maps.Map(mapElement, {
-        center: { lat: 43.68, lng: 7.18 },
+        center: userLocation || { lat: 43.68, lng: 7.18 },
         zoom: 12,
         styles: [
           { featureType: "water", elementType: "geometry", stylers: [{ color: "#e9e9e9" }, { lightness: 17 }] },
@@ -480,6 +496,28 @@ export default function Home() {
         });
       });
 
+      // User location marker
+      if (userLocation) {
+        new window.google.maps.Marker({
+          position: userLocation,
+          map,
+          title: "Vous êtes ici",
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#3B82F6',
+            fillOpacity: 1,
+            strokeColor: '#FFFFFF',
+            strokeWeight: 3,
+          },
+          zIndex: 999,
+        });
+        // Small info bubble
+        new window.google.maps.InfoWindow({
+          content: '<div style="font-family:-apple-system,sans-serif;font-size:11px;font-weight:700;color:#0F172A;padding:2px 4px;">📍 Vous êtes ici</div>'
+        }).open(map);
+      }
+
       const searchInput = document.getElementById('search-input');
       const searchResults = document.getElementById('search-results');
       if (searchInput && searchResults) {
@@ -522,7 +560,7 @@ export default function Home() {
       }
     };
     if (window.google && window.google.maps) window.initMap();
-  }, [partners]);
+  }, [partners, userLocation]);
 
   // ============================================================
   // RENDU
@@ -537,7 +575,6 @@ export default function Home() {
             THE <span className="text-riviera-gold">CLUB</span>
           </a>
           <div className="hidden lg:flex space-x-8 text-sm font-medium text-gray-600">
-            <a href="#univers" className="hover:text-riviera-azure transition">Univers</a>
             <a href="#economies" className="hover:text-riviera-azure transition">Avantages</a>
             <a href="#tarifs" className="hover:text-riviera-azure transition">Abonnements</a>
             <a href="#faq" className="hover:text-riviera-azure transition">FAQ</a>
@@ -620,71 +657,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Univers */}
-      <section id="univers" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4 text-riviera-navy">Cinq univers. Une seule carte.</h2>
-            <p className="text-gray-600">L'excellence sélectionnée par The Club, en ville et en ligne.</p>
-          </div>
-          {partnersLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(5)].map((_, i) => <div key={i} className="rounded-3xl overflow-hidden h-96 bg-gray-100 animate-pulse"></div>)}
-            </div>
-          ) : partners.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {partners.map((partner) => (
-                <div key={partner.id} className="group relative rounded-3xl overflow-hidden shadow-lg h-96 cursor-pointer">
-                  <img src={partner.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80'} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={partner.name} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-riviera-navy/90 via-riviera-navy/20 to-transparent"></div>
-                  {partner.badge && (
-                    <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider border border-white/30 z-10">{partner.badge}</div>
-                  )}
-                  <div className="absolute bottom-8 left-8 right-8">
-                    <span className="text-riviera-gold text-xs font-bold uppercase tracking-widest mb-2 block">{partner.discount_label || partner.category}</span>
-                    <h3 className="font-serif text-3xl text-white font-bold mb-2">{partner.name}</h3>
-                    <p className="text-white/80 text-sm">{partner.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {/* Row 1: 3 cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {UNIVERSES.slice(0, 3).map((universe) => (
-                  <div key={universe.id} className="group relative rounded-2xl overflow-hidden shadow-md h-80 cursor-pointer">
-                    <img src={universe.image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={universe.name} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-riviera-navy/85 via-riviera-navy/20 to-transparent"></div>
-                    <div className="absolute bottom-6 left-6 right-6">
-                      <span className={`${universe.labelColor} text-[10px] font-bold uppercase tracking-widest mb-1 block`}>{universe.tag}</span>
-                      <h3 className="font-serif text-2xl text-white font-bold mb-1">{universe.name}</h3>
-                      <p className="text-white/75 text-xs leading-relaxed">{universe.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Row 2: 2 wide cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {UNIVERSES.slice(3).map((universe) => (
-                  <div key={universe.id} className="group relative rounded-2xl overflow-hidden shadow-md h-80 cursor-pointer">
-                    <img src={universe.image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={universe.name} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-riviera-navy/85 via-riviera-navy/20 to-transparent"></div>
-                    {universe.isComingSoon && (
-                      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/25 backdrop-blur-md text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest border border-white/30 z-10 whitespace-nowrap">Bientôt disponible</div>
-                    )}
-                    <div className="absolute bottom-6 left-6 right-6">
-                      <span className={`${universe.labelColor} text-[10px] font-bold uppercase tracking-widest mb-1 block`}>{universe.tag === "BIENTÔT DISPONIBLE" ? (universe.id === 4 ? "OFFRES NATIONALES" : "CONCERTS & PARCS") : universe.tag}</span>
-                      <h3 className="font-serif text-2xl text-white font-bold mb-1">{universe.name}</h3>
-                      <p className="text-white/75 text-xs leading-relaxed">{universe.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Carte */}
       <section id="carte" className="py-24 bg-riviera-sand relative border-y border-gray-200">
@@ -766,7 +738,26 @@ export default function Home() {
             </div>
             {/* Pass Céleste */}
             <div className="bg-riviera-navy text-white rounded-[2rem] p-8 border-2 border-riviera-gold/30 flex flex-col relative transform md:-translate-y-4 shadow-2xl">
-              <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-riviera-gold text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide shadow-lg">Le plus choisi</div>
+              <div
+                className="absolute top-0 right-8 transform -translate-y-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide"
+                style={{
+                  background: 'linear-gradient(135deg, #F5C842, #F59E0B, #F5C842)',
+                  backgroundSize: '200% 200%',
+                  animation: 'neonGlow 2s ease-in-out infinite, shimmer 3s linear infinite',
+                  boxShadow: '0 0 10px #F5C84280, 0 0 20px #F5C84250, 0 0 40px #F5C84230',
+                }}
+              >Le plus choisi</div>
+              <style>{`
+                @keyframes neonGlow {
+                  0%, 100% { box-shadow: 0 0 8px #F5C84290, 0 0 18px #F5C84260, 0 0 35px #F5C84240; }
+                  50% { box-shadow: 0 0 15px #F5C842cc, 0 0 30px #F5C84299, 0 0 55px #F5C84266; }
+                }
+                @keyframes shimmer {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                  100% { background-position: 0% 50%; }
+                }
+              `}</style>
               <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-gold">Pass Céleste</h3>
               <p className="text-gray-300 text-sm mb-6 h-10">L'accès illimité. Conçu pour les résidents qui sortent souvent.</p>
               <div className="mb-8"><span className="text-5xl font-bold tracking-tight">59€</span><span className="text-gray-400">/ an</span></div>
