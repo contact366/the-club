@@ -11,8 +11,17 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'The Club',
-  description: 'Votre pass pour les meilleures offres',
+  title: "The Club",
+  description: "Pass Privilège",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "The Club",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({ children }) {

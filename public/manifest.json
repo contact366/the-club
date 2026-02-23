@@ -1,19 +1,19 @@
 {
-  "name": "The Club - Instant&You",
+  "name": "The Club - Pass Privilège",
   "short_name": "The Club",
-  "description": "Le club privilège par Instant&You",
+  "description": "Votre accès exclusif aux meilleurs établissements.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#001F3F",
+  "background_color": "#F5F5F7",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "/public/icon-192x192.png",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/public/icon-512x512.png",
+      "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
