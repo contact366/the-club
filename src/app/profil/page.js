@@ -103,8 +103,13 @@ export default function EspaceMembre() {
     );
   }
 
-  const isCeleste = profil?.subscription?.toLowerCase() === 'céleste' || profil?.subscription?.toLowerCase() === 'celeste';
-  const neonThemeClass = isCeleste ? 'theme-celeste' : 'theme-explorer';
+  const planName = profil?.subscription?.toLowerCase() || '';
+  const isCercle = planName.includes('cercle');
+  const isCeleste = planName.includes('celeste') || planName.includes('céleste');
+
+  let neonThemeClass = 'theme-explorer';
+  if (isCercle) neonThemeClass = 'theme-cercle';
+  else if (isCeleste) neonThemeClass = 'theme-celeste';
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] p-6 md:p-12">
@@ -113,6 +118,15 @@ export default function EspaceMembre() {
       <style dangerouslySetInnerHTML={{__html: `
         .theme-celeste { --neon-color-head: #ffffff; --neon-color-tail: #EAB308; }
         .theme-explorer { --neon-color-head: #ffffff; --neon-color-tail: #3B82F6; }
+        .theme-cercle { --neon-color-head: #ffffff; --neon-color-tail: #94a3b8; }
+        .bg-carbon {
+          background-color: #0a0a0a;
+          background-image: linear-gradient(45deg, #111 25%, transparent 25%),
+                            linear-gradient(-45deg, #111 25%, transparent 25%),
+                            linear-gradient(45deg, transparent 75%, #111 75%),
+                            linear-gradient(-45deg, transparent 75%, #111 75%);
+          background-size: 4px 4px;
+        }
         .neon-rotating-container { position: relative; border-radius: 9999px; padding: 2px; overflow: hidden; isolation: isolate; }
         .neon-rotating-container::before {
           content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
@@ -167,8 +181,11 @@ export default function EspaceMembre() {
           </div>
 
           {/* 2. LA CARTE VIP */}
-          <div className="relative bg-gradient-to-tr from-gray-900 via-gray-800 to-black rounded-3xl p-6 md:p-8 text-white shadow-xl overflow-hidden min-h-[140px] flex items-center">
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+          <div className={`relative ${isCercle ? 'bg-carbon border border-white/20' : 'bg-[#0A0A0A]'} rounded-3xl p-6 md:p-8 text-white shadow-xl overflow-hidden min-h-[140px] flex items-center`}>
+            {/* Reflet argenté exclusif au Cercle */}
+            {isCercle && <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-0"></div>}
+
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full"></div>
             <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
 
             <div className="relative z-10 flex flex-col md:flex-row justify-between w-full items-start md:items-center gap-8">
@@ -176,7 +193,7 @@ export default function EspaceMembre() {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Statut du membre</p>
                 <div className={`neon-rotating-container inline-block ${neonThemeClass}`}>
                   <div className="relative z-10 flex items-center gap-3 px-5 py-2 rounded-full">
-                    <span className={`text-xl font-bold tracking-tight capitalize ${isCeleste ? 'text-yellow-400' : 'text-blue-400'}`}>
+                    <span className={`text-xl font-bold tracking-tight capitalize ${isCercle ? 'text-slate-300' : isCeleste ? 'text-yellow-400' : 'text-blue-400'}`}>
                       Pass {profil?.subscription || 'Aucun'}
                     </span>
                     <span className="flex w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
@@ -224,14 +241,14 @@ export default function EspaceMembre() {
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Offres Découverte du mois</h3>
             <p className="text-sm text-gray-500">
-              {isCeleste ? "Votre pass vous donne un accès illimité." : "Passez Céleste pour débloquer l'illimité."}
+              {isCercle ? "Accès illimité et prioritaire — Pass Le Cercle." : isCeleste ? "Votre pass vous donne un accès illimité." : "Passez Céleste pour débloquer l'illimité."}
             </p>
           </div>
           
           <div className="flex items-center gap-4">
-            {isCeleste ? (
+            {isCercle || isCeleste ? (
               // Affichage Céleste : Infini
-              <div className="flex items-center gap-2 text-yellow-500 bg-yellow-50 px-4 py-2 rounded-full font-semibold">
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${isCercle ? 'text-slate-500 bg-slate-100' : 'text-yellow-500 bg-yellow-50'}`}>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
                 </svg>

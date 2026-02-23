@@ -3,18 +3,21 @@ import { NextResponse } from 'next/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const PRICE_IDS = {
-  explorer: 'price_1T3olEJzvSvGGuRTdVsN0i3C',
-  celeste:  'price_1T3olZJzvSvGGuRTyl5ZWA8r',
-};
-
 export async function POST(req) {
   try {
     const { plan, userId } = await req.json();
 
-    const priceId = PRICE_IDS[plan];
+    let priceId = "";
+    if (plan === 'celeste') {
+      priceId = process.env.STRIPE_PRICE_CELESTE;
+    } else if (plan === 'cercle') {
+      priceId = process.env.STRIPE_PRICE_CERCLE;
+    } else {
+      priceId = process.env.STRIPE_PRICE_EXPLORER;
+    }
+
     if (!priceId) {
-      return NextResponse.json({ error: `Plan inconnu : ${plan}` }, { status: 400 });
+      return NextResponse.json({ error: `Prix non configuré pour le plan : ${plan}` }, { status: 400 });
     }
 
     // Détection de l'URL de base (prod ou local) depuis la requête

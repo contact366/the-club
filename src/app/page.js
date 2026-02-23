@@ -392,6 +392,9 @@ export default function Home() {
     }
   };
 
+  // Alias pour les boutons de la carte Le Cercle
+  const handleCheckout = (plan) => handleSubscription(plan);
+
   const handleUpgrade = async () => {
     const { error } = await supabase
       .from('profiles')
@@ -887,13 +890,14 @@ export default function Home() {
 
       {/* Abonnements */}
       <section id="tarifs" className="py-24 bg-riviera-sand">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-riviera-azure font-semibold tracking-wider text-sm uppercase mb-2 block">Accès Membre</span>
             <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4 text-riviera-navy">Choisissez votre privilège.</h2>
             <p className="text-gray-600">Rejoignez le cercle et commencez à économiser aujourd'hui.</p>
           </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
+
             {/* Pass Explorer */}
             <div className="bg-white rounded-[2rem] p-8 border border-gray-200 flex flex-col hover:shadow-xl transition-shadow">
               <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy">Pass Explorer</h3>
@@ -908,6 +912,7 @@ export default function Home() {
                 {subscription === 'explorer' ? "✓ Pass Actif" : (user ? "Prendre ce Pass" : "Se connecter pour choisir")}
               </button>
             </div>
+
             {/* Pass Céleste */}
             <div className="bg-riviera-navy text-white rounded-[2rem] p-8 border-2 border-riviera-gold/30 flex flex-col relative transform md:-translate-y-4 shadow-2xl">
               <div
@@ -944,6 +949,31 @@ export default function Home() {
               </button>
               <p className="text-center text-xs text-gray-400 mt-4">Soit seulement 4,91€ / mois. Rentabilisé à la 1ère sortie.</p>
             </div>
+
+            {/* CARTE LE CERCLE */}
+            <div className="bg-[#0A0A0A] p-8 rounded-3xl text-white shadow-2xl flex flex-col border border-white/10 relative overflow-hidden group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-gray-800 to-gray-900 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative flex-1">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-black tracking-tighter italic">LE CERCLE</h3>
+                  <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
+                </div>
+                <p className="text-4xl font-black mt-4">39,90€<span className="text-sm font-normal text-gray-400">/mois</span></p>
+                <ul className="mt-6 space-y-4 flex-1 text-sm text-gray-300">
+                  <li className="flex items-center gap-2">💎 <span className="font-bold text-white">Avantage +1 inclus</span></li>
+                  <li className="flex items-center gap-2">📱 Conciergerie VIP 24/7</li>
+                  <li className="flex items-center gap-2">🥂 Invitations privées</li>
+                </ul>
+              </div>
+              {/* BOUTON BLOQUÉ - TEASING */}
+          <button 
+            disabled
+            className="relative mt-8 w-full py-4 bg-white/5 text-white/40 border border-white/10 rounded-2xl font-black uppercase tracking-widest cursor-not-allowed"
+          >
+            Bientôt disponible
+          </button>
+            </div>
+
           </div>
         </div>
       </section>
