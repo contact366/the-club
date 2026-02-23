@@ -301,36 +301,22 @@ export default function Home() {
   };
 
   const handleSubscription = async (plan) => {
-    // Si non connecté, ouvrir la modale d'inscription
     if (!user) { setAuthMode('signup'); setIsAuthModalOpen(true); return; }
     setLoading(true);
     try {
-      // Récupération de l'utilisateur Supabase à jour
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (!currentUser) {
-        alert("Vous devez être connecté pour vous abonner.");
-        return;
-      }
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: currentUser.id,
-          email: currentUser.email,
-          priceId: 'price_1Qx...', // <-- REMPLACER PAR L'ID STRIPE DU PLAN
-          plan,
-        }),
+        body: JSON.stringify({ plan, userId: user.id }),
       });
       const data = await response.json();
-      // Redirection vers la page de paiement Stripe sécurisée
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        throw new Error(data.error || "Erreur lors de la création de la session");
+        throw new Error(data.error || "Impossible de générer le lien de paiement");
       }
     } catch (err) {
-      console.error("Erreur de paiement :", err);
-      alert("Impossible de lancer le paiement. Vérifiez votre connexion.");
+      alert("Erreur de paiement : " + err.message);
     } finally {
       setLoading(false);
     }

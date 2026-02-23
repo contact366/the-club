@@ -1,29 +1,33 @@
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabase';
+import { NextResponse } from 'next/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+const PRICE_IDS = {
+  explorer: 'price_1T3olEJzvSvGGuRTdVsN0i3C',
+  celeste:  'price_1T3olZJzvSvGGuRTyl5ZWA8r',
+};
+
 export async function POST(req) {
-  const payload = await req.text();
-  const sig = req.headers.get('stripe-signature');
-
-  let event;
   try {
-    event = stripe.webhooks.constructEvent(payload, sig, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    const { plan, userId } = await req.json();
+
+    const priceId = PRICE_IDS[plan];
+    if (!priceId) {
+      return NextResponse.json({ error: `Plan inconnu : ${plan}` }, { status: 400 });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/?status=success`,
+      cancel_url:  `${process.env.NEXT_PUBLIC_BASE_URL}/?status=cancel`,
+      metadata: { userId, plan },
+    });
+
+    return NextResponse.json({ checkoutUrl: session.url });
+  } catch (error) {
+    console.error('Erreur Stripe:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const userId = session.metadata.userId;
-
-    // Mise à jour du profil vers Céleste
-    await supabase
-      .from('profiles')
-      .update({ subscription: 'celeste' })
-      .eq('id', userId);
-  }
-
-  return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
