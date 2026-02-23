@@ -17,11 +17,17 @@ export async function POST(req) {
       return NextResponse.json({ error: `Plan inconnu : ${plan}` }, { status: 400 });
     }
 
+    // Détection de l'URL de base (prod ou local) depuis la requête
+    const host = req.headers.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const origin = `${protocol}://${host}`;
+
     const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/?status=success`,
-      cancel_url:  `${process.env.NEXT_PUBLIC_BASE_URL}/?status=cancel`,
+      success_url: `${origin}/profil?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/#pricing`,
       metadata: { userId, plan },
     });
 
