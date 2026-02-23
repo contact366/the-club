@@ -25,10 +25,21 @@ export async function POST(req) {
       );
     }
 
-    // 3. On demande à Stripe de générer un lien d'accès unique et sécurisé
+    // 3. On détermine l'URL de retour de façon robuste
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    // Fallback : si la variable d'env est absente, on reconstruit l'URL depuis la requête
+    if (!siteUrl) {
+      const host = req.headers.get('host');
+      const protocol = host.includes('localhost') ? 'http' : 'https';
+      siteUrl = `${protocol}://${host}`;
+    }
+    // On s'assure qu'il n'y a pas de slash final pour éviter les doubles //
+    siteUrl = siteUrl.replace(/\/$/, "");
+
+    // On demande à Stripe de générer un lien d'accès unique et sécurisé
     const session = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/profil`, // L'URL où l'utilisateur reviendra après avoir géré son pass
+      return_url: `${siteUrl}/profil`,
     });
 
     // 4. On renvoie ce lien magique au site web
