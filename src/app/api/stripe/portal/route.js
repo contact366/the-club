@@ -1,52 +1,40 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabase'; // Ajuste le chemin si ton fichier supabase.js est ailleurs
 
-// On initialise Stripe avec ta clé secrète (celle qui commence par sk_test_...)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    // 1. On récupère l'ID de l'utilisateur envoyé par le bouton
-    const { userId } = await req.json();
+    const { plan, userEmail, userId } = await req.json();
 
-    // 2. On va chercher son numéro de client Stripe dans Supabase
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', userId)
-      .single();
+    // On choisit l'ID du prix en fonction du plan reçu
+    const priceId = plan === 'celeste'
+      ? process.env.STRIPE_PRICE_CELESTE
+      : process.env.STRIPE_PRICE_EXPLORER;
 
-    // Si on ne trouve pas le client, on bloque
-    if (!profile || !profile.stripe_customer_id) {
-      return NextResponse.json(
-        { error: "Aucun compte Stripe associé à ce profil." }, 
-        { status: 400 }
-      );
+    if (!priceId) {
+      return NextResponse.json({ error: `Plan inconnu ou prix non configuré : ${plan}` }, { status: 400 });
     }
 
-    // 3. On détermine l'URL de retour de façon robuste
-    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-    // Fallback : si la variable d'env est absente, on reconstruit l'URL depuis la requête
-    if (!siteUrl) {
-      const host = req.headers.get('host');
-      const protocol = host.includes('localhost') ? 'http' : 'https';
-      siteUrl = `${protocol}://${host}`;
-    }
-    // On s'assure qu'il n'y a pas de slash final pour éviter les doubles //
-    siteUrl = siteUrl.replace(/\/$/, "");
+    // On détecte l'URL de base (prod ou local) depuis la requête
+    const host = req.headers.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const origin = `${protocol}://${host}`;
 
-    // On demande à Stripe de générer un lien d'accès unique et sécurisé
-    const session = await stripe.billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
-      return_url: `${siteUrl}/profil`,
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: 'subscription',
+      success_url: `${origin}/profil?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/#pricing`,
+      customer_email: userEmail,
+      metadata: { userId, plan },
     });
 
-    // 4. On renvoie ce lien magique au site web
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ sessionId: session.id });
 
-  } catch (error) {
-    console.error("Erreur Stripe Portal:", error);
-    return NextResponse.json({ error: "Erreur lors de la création du portail." }, { status: 500 });
+  } catch (err) {
+    console.error('Erreur Stripe Checkout:', err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
