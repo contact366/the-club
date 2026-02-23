@@ -5,13 +5,13 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
+  publicExcludes: ['!api/**/*'],
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // On ajoute cette ligne pour calmer l'erreur Turbopack
-  turbopack: {}, 
+  turbopack: {},
 };
 
 export default withPWA(nextConfig);
