@@ -340,20 +340,17 @@ export default function Home() {
     if (!user) { setAuthMode('signup'); setIsAuthModalOpen(true); return; }
     setLoading(true);
     try {
-      const domain = window.location.origin;
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
-          plan,
-          userId: user.id,
-          success_url: `${domain}/success`,
-          cancel_url: `${domain}/cancel`,
-        },
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
       });
-      if (error) throw error;
-      if (data?.checkoutUrl) {
+      const data = await response.json();
+      if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        throw new Error("Impossible de générer le lien de paiement");
+        console.error("Erreur de session", data);
+        throw new Error(data.error || "Impossible de générer le lien de paiement");
       }
     } catch (err) {
       alert("Erreur de paiement : " + err.message);
@@ -731,7 +728,7 @@ export default function Home() {
                 title: 'Loisirs',
                 description: 'Activités indoor, simulateurs et expériences inédites.',
                 label: "JUSQU'À -50%",
-                image: '/bowling.png',
+                image: '/bowling.jpg',
                 color: 'text-red-500',
               },
             ].map((cat) => (
