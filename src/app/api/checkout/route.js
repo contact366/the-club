@@ -1,43 +1,33 @@
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+const PRICE_IDS = {
+  explorer: 'price_1T3olEJzvSvGGuRTdVsN0i3C',
+  celeste:  'price_1T3olZJzvSvGGuRTyl5ZWA8r',
+};
 
 export async function POST(req) {
   try {
-    const rawBody = await req.text();
-    const signature = req.headers.get('stripe-signature');
+    const { plan, userId } = await req.json();
 
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-    } catch (err) {
-      console.error('❌ Signature webhook invalide:', err.message);
-      return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    const priceId = PRICE_IDS[plan];
+    if (!priceId) {
+      return NextResponse.json({ error: `Plan inconnu : ${plan}` }, { status: 400 });
     }
 
-    // On écoute uniquement les paiements d'abonnement confirmés
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      const { userId, plan } = session.metadata;
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/?status=success`,
+      cancel_url:  `${process.env.NEXT_PUBLIC_BASE_URL}/?status=cancel`,
+      metadata: { userId, plan },
+    });
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: userId,
-          subscription_type: plan,
-          updated_at: new Date(),
-        });
-
-      if (error) throw error;
-      console.log(`✅ Profil mis à jour — userId: ${userId}, plan: ${plan}`);
-    }
-
-    return new Response('OK', { status: 200 });
+    return NextResponse.json({ checkoutUrl: session.url });
   } catch (error) {
-    console.error('❌ Erreur Webhook:', error.message);
-    return new Response('Error', { status: 500 });
+    console.error('Erreur Stripe:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

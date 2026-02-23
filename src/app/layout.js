@@ -1,19 +1,25 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+// 1. On importe la police "Inter" depuis Google Fonts via Next.js
+import { Inter } from 'next/font/google';
+import './globals.css'; // Garde ton import CSS existant
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// 2. On configure la police
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  // On peut ajouter un nom de variable si on utilise Tailwind de façon avancée
+  variable: '--font-inter', 
+});
 
 export const metadata = {
-  title: "The Club",
-  description: "Accédez à l'élite des restaurants, spas et loisirs de votre région avec des privilèges allant jusqu'à -50%.",
-  icons: { icon: "/favicon.ico" },
+  title: 'The Club',
+  description: 'Votre pass pour les meilleures offres',
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    // 3. On applique la classe de la police sur toute la balise <html>
+    <html lang="fr" className={inter.className}>
+      <body className="antialiased bg-white text-gray-900">
         {children}
       </body>
     </html>

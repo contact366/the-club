@@ -160,6 +160,8 @@ export default function Home() {
   const [activePartnerName, setActivePartnerName] = useState("");
   const [activeOfferType, setActiveOfferType] = useState("");
   const [currentOfferStatus, setCurrentOfferStatus] = useState('available');
+  const [ineligibilityMessage, setIneligibilityMessage] = useState("");
+  const [lastSaved, setLastSaved] = useState(0);
   const [billAmount, setBillAmount] = useState("");
   const [modalStep, setModalStep] = useState("amount");
 
@@ -167,49 +169,77 @@ export default function Home() {
   // FONCTIONS
   // ============================================================
 
-  const fetchTotalSavings = useCallback(async () => {
+  const sauvegarderEconomie = async (montantEconomise) => {
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (!currentUser) return;
-      const { data, error } = await supabase
-        .from('usage_history')
-        .select('saved_amount')
-        .eq('user_id', currentUser.id);
-      if (error) throw error;
-      if (data) {
-        const total = data.reduce((acc, curr) => acc + (curr.saved_amount || 0), 0);
-        setTotalSavings(total);
-      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('montant_economise')
+        .eq('id', user.id)
+        .single();
+
+      const nouveauTotal = parseFloat(profile?.montant_economise || 0) + montantEconomise;
+
+      await supabase
+        .from('profiles')
+        .update({ montant_economise: nouveauTotal })
+        .eq('id', user.id);
+
+      setTotalSavings(nouveauTotal);
     } catch (err) {
-      console.error("Erreur récupération économies :", err.message);
+      console.error("Erreur sauvegarde économie :", err.message);
     }
+  };
+
+  const verifierEligibilite = useCallback(async (userId, establishmentId, offerType, userPlan) => {
+    // 1. Les offres permanentes sont toujours illimitées
+    if (offerType === 'permanente') return { autorise: true };
+
+    // 2. Vérification par établissement (période glissante d'1 an)
+    const ilYaUnAn = new Date();
+    ilYaUnAn.setFullYear(ilYaUnAn.getFullYear() - 1);
+    const { data: utilisationEtablissement } = await supabase
+      .from('utilisations')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('establishment_id', establishmentId)
+      .eq('offer_type', 'decouverte')
+      .gte('created_at', ilYaUnAn.toISOString());
+
+    if (utilisationEtablissement && utilisationEtablissement.length > 0) {
+      return { autorise: false, message: "Vous avez déjà utilisé l'offre découverte de cet établissement cette année." };
+    }
+
+    // 3. Quota mensuel pour les Explorer (3 offres découverte/mois)
+    if (userPlan === 'explorer') {
+      const debutDuMois = new Date();
+      debutDuMois.setDate(1);
+      debutDuMois.setHours(0, 0, 0, 0);
+      const { count } = await supabase
+        .from('utilisations')
+        .select('id', { count: 'exact' })
+        .eq('user_id', userId)
+        .eq('offer_type', 'decouverte')
+        .gte('created_at', debutDuMois.toISOString());
+      if (count >= 3) {
+        return { autorise: false, message: "Vous avez atteint votre limite de 3 offres découvertes ce mois-ci. Passez au pass Céleste pour l'illimité !" };
+      }
+    }
+
+    return { autorise: true };
   }, []);
 
   const checkOfferStatus = useCallback(async (partnerName, offerType) => {
     if (!user || subscription === 'none') return 'available';
     try {
-      const { data: usages } = await supabase
-        .from('offer_usage')
-        .select('used_at')
-        .eq('user_id', user.id)
-        .eq('partner_name', partnerName);
-
-      if (offerType === 'decouverte') {
-        if (subscription === 'explorer') {
-          return usages?.length > 0 ? 'used' : 'available';
-        }
-        if (subscription === 'celeste') {
-          const startOfMonth = new Date();
-          startOfMonth.setDate(1);
-          startOfMonth.setHours(0, 0, 0, 0);
-          return usages?.some(u => new Date(u.used_at) >= startOfMonth) ? 'used' : 'available';
-        }
-      }
+      const currentPartner = partners.find(p => p.name === partnerName);
+      if (!currentPartner) return 'available';
+      const result = await verifierEligibilite(user.id, currentPartner.id, offerType, subscription);
+      if (!result.autorise) return 'used';
     } catch (err) {
       console.error("Erreur vérification offre :", err.message);
     }
     return 'available';
-  }, [user, subscription]);
+  }, [user, subscription, partners, verifierEligibilite]);
 
   const addPinDigit = (digit) => {
     if (currentPin.length < 4) setCurrentPin(prev => prev + digit.toString());
@@ -223,10 +253,34 @@ export default function Home() {
     setCurrentPin("");
     setBillAmount("");
     setModalStep("amount");
-    const status = await checkOfferStatus(partnerName, offerType);
-    setCurrentOfferStatus(status);
+    setIneligibilityMessage("");
+    // Pas connecté → on invite à se connecter
+    if (!user) {
+      setCurrentOfferStatus('not_logged');
+      setIsPinModalOpen(true);
+      return;
+    }
+    // Connecté mais sans abonnement → on invite à s'abonner
+    if (subscription === 'none') {
+      setCurrentOfferStatus('no_subscription');
+      setIsPinModalOpen(true);
+      return;
+    }
+    // Connecté et abonné → on vérifie l'éligibilité
+    const currentPartner = partners.find(p => p.name === partnerName);
+    if (currentPartner) {
+      const result = await verifierEligibilite(user.id, currentPartner.id, offerType, subscription);
+      if (!result.autorise) {
+        setIneligibilityMessage(result.message || "Cette offre n'est pas disponible.");
+        setCurrentOfferStatus('used');
+      } else {
+        setCurrentOfferStatus('available');
+      }
+    } else {
+      setCurrentOfferStatus('available');
+    }
     setIsPinModalOpen(true);
-  }, [checkOfferStatus]);
+  }, [user, subscription, partners, verifierEligibilite]);
 
   const handleUseOffer = async () => {
     const currentPartner = partners.find(p => p.name === activePartnerName);
@@ -240,6 +294,14 @@ export default function Home() {
     const amount = parseFloat(billAmount);
     if (isNaN(amount) || amount <= 0) return;
 
+    // Vérification de l'éligibilité avant d'enregistrer
+    const eligibilite = await verifierEligibilite(user.id, currentPartner.id, activeOfferType, subscription);
+    if (!eligibilite.autorise) {
+      setCurrentOfferStatus('used');
+      setCurrentPin("");
+      return;
+    }
+
     let saved = 0;
     if (activeOfferType === 'decouverte') {
       const rate = currentPartner.discount_decouverte || 50;
@@ -250,23 +312,30 @@ export default function Home() {
     }
 
     try {
-      const { error } = await supabase.from('usage_history').insert([{
-        partner_name: activePartnerName,
-        offer_type: activeOfferType === 'decouverte' ? 'Découverte' : 'Permanente',
+      const { error } = await supabase.from('utilisations').insert([{
+        user_id: user.id,
+        establishment_id: currentPartner.id,
+        offer_type: activeOfferType,
         original_amount: amount,
         saved_amount: saved,
-        user_id: user.id
       }]);
       if (error) throw error;
 
-      await fetchTotalSavings();
+      await sauvegarderEconomie(saved);
+      setLastSaved(saved);
       setCurrentOfferStatus('success');
       setCurrentPin("");
       setModalStep("amount");
       setBillAmount("");
     } catch (err) {
       console.error("Erreur enregistrement offre :", err.message);
-      setCurrentOfferStatus('error');
+      // Violation de contrainte unique = offre déjà utilisée
+      if (err.code === '23505') {
+        setIneligibilityMessage("Vous avez déjà utilisé l'offre découverte de cet établissement.");
+        setCurrentOfferStatus('used');
+      } else {
+        setCurrentOfferStatus('error');
+      }
     }
   };
 
@@ -351,11 +420,9 @@ export default function Home() {
   // EFFETS
   // ============================================================
 
-  useEffect(() => { fetchTotalSavings(); }, [fetchTotalSavings]);
-
-  // Animate counter when totalSavings updates
+  // Anime le compteur dès que totalSavings change
   useEffect(() => {
-    animateSavings(displayedSavings, totalSavings);
+    animateSavings(0, totalSavings);
   }, [totalSavings]);
 
   // Rotate badge between savings amount and subscription status every 3s
@@ -386,6 +453,14 @@ export default function Home() {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('montant_economise')
+          .eq('id', user.id)
+          .single();
+        if (data) setTotalSavings(parseFloat(data.montant_economise || 0));
+      }
     };
     checkUser();
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -397,10 +472,14 @@ export default function Home() {
   useEffect(() => {
     const getProfile = async () => {
       if (user) {
-        const { data } = await supabase.from('profiles').select('subscription_type').eq('id', user.id).single();
-        if (data) setSubscription(data.subscription_type);
+        const { data } = await supabase.from('profiles').select('subscription_type, montant_economise').eq('id', user.id).single();
+        if (data) {
+          setSubscription(data.subscription_type);
+          setTotalSavings(parseFloat(data.montant_economise || 0));
+        }
       } else {
         setSubscription('none');
+        setTotalSavings(0);
       }
     };
     getProfile();
@@ -657,6 +736,92 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* ======================================================= */}
+      {/* CINQ UNIVERS                                            */}
+      {/* ======================================================= */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">Cinq univers. Une seule carte.</h2>
+            <p className="text-gray-500 text-lg">L'excellence sélectionnée par The Club, en ville et en ligne.</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+
+            {/* Gastronomie */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute top-4 left-4">
+                <span className="bg-riviera-gold text-riviera-navy text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Jusqu'à -50%</span>
+              </div>
+              <div className="absolute bottom-0 left-0 p-5">
+                <h3 className="text-white font-bold text-2xl mb-1">Gastronomie</h3>
+                <p className="text-gray-300 text-xs leading-snug">Tables étoilées, bistrots cachés et coffee shops pointus.</p>
+              </div>
+            </div>
+
+            {/* Bien-être */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+              <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute top-4 left-4">
+                <span className="bg-riviera-azure text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Jusqu'à -40%</span>
+              </div>
+              <div className="absolute bottom-0 left-0 p-5">
+                <h3 className="text-white font-bold text-2xl mb-1">Bien-être</h3>
+                <p className="text-gray-300 text-xs leading-snug">Spas prestigieux, instituts de beauté et salles de sport privées.</p>
+              </div>
+            </div>
+
+            {/* Loisirs */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300 col-span-2 md:col-span-1">
+              <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute top-4 left-4">
+                <span className="bg-riviera-gold text-riviera-navy text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Jusqu'à -50%</span>
+              </div>
+              <div className="absolute bottom-0 left-0 p-5">
+                <h3 className="text-white font-bold text-2xl mb-1">Loisirs</h3>
+                <p className="text-gray-300 text-xs leading-snug">Activités indoor, simulateurs et expériences inédites.</p>
+              </div>
+            </div>
+
+            {/* Exclu Web */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+              <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" alt="Exclu Web" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute top-4 left-4">
+                <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-white/30">Offres Nationales</span>
+              </div>
+              <div className="absolute bottom-0 left-0 p-5">
+                <h3 className="text-white font-bold text-2xl mb-1">Exclu Web</h3>
+                <p className="text-gray-300 text-xs leading-snug">Réductions exclusives sur vos marques préférées en ligne.</p>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
+              </div>
+            </div>
+
+            {/* E-billetterie */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80" alt="E-billetterie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute top-4 left-4">
+                <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-white/30">Concerts & Parcs</span>
+              </div>
+              <div className="absolute bottom-0 left-0 p-5">
+                <h3 className="text-white font-bold text-2xl mb-1">E-billetterie</h3>
+                <p className="text-gray-300 text-xs leading-snug">Vos places de spectacles, cinémas et parcs d'attractions à prix réduits.</p>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
       {/* Carte */}
       <section id="carte" className="py-24 bg-riviera-sand relative border-y border-gray-200">
@@ -959,14 +1124,44 @@ export default function Home() {
             </p>
 
             <div className="w-full">
-              {/* CAS 1 : OFFRE DÉJÀ UTILISÉE */}
-              {currentOfferStatus === 'used' ? (
+              {/* CAS 0 : NON CONNECTÉ */}
+              {currentOfferStatus === 'not_logged' ? (
+                <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-riviera-navy/20 bg-slate-50 flex flex-col items-center text-center">
+                  <div className="text-4xl mb-4">🔐</div>
+                  <h4 className="text-lg font-bold text-riviera-navy uppercase">Connexion requise</h4>
+                  <p className="text-sm text-gray-500 mt-2">Vous devez être connecté pour profiter de cette offre.</p>
+                  <button onClick={() => { setIsPinModalOpen(false); setAuthMode('login'); setIsAuthModalOpen(true); }} className="mt-6 w-full bg-riviera-navy text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all">
+                    Se connecter
+                  </button>
+                  <button onClick={() => { setIsPinModalOpen(false); setAuthMode('signup'); setIsAuthModalOpen(true); }} className="mt-3 text-riviera-azure font-bold underline text-sm">
+                    Créer un compte
+                  </button>
+                </div>
+
+              /* CAS 0b : CONNECTÉ MAIS SANS ABONNEMENT */
+              ) : currentOfferStatus === 'no_subscription' ? (
+                <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-riviera-gold/40 bg-amber-50 flex flex-col items-center text-center">
+                  <div className="text-4xl mb-4">⭐</div>
+                  <h4 className="text-lg font-bold text-riviera-navy uppercase">Pass requis</h4>
+                  <p className="text-sm text-gray-500 mt-2">Choisissez un pass pour accéder aux offres partenaires.</p>
+                  <button onClick={() => { setIsPinModalOpen(false); document.getElementById('tarifs')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-6 w-full bg-riviera-gold text-riviera-navy font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all">
+                    Voir les abonnements
+                  </button>
+                </div>
+
+              /* CAS 1 : OFFRE NON ÉLIGIBLE */
+              ) : currentOfferStatus === 'used' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50 flex flex-col items-center text-center">
                   <div className="text-4xl mb-4">❌</div>
-                  <h4 className="text-lg font-bold text-gray-800 uppercase">Offre consommée</h4>
-                  <p className="text-sm text-gray-500 mt-2">Cette offre découverte est à usage unique.</p>
+                  <h4 className="text-lg font-bold text-gray-800 uppercase">Offre indisponible</h4>
+                  <p className="text-sm text-gray-500 mt-2">{ineligibilityMessage || "Cette offre découverte est à usage unique."}</p>
+                  {subscription === 'explorer' && ineligibilityMessage?.includes('limite') && (
+                    <button onClick={() => { setIsPinModalOpen(false); handleSubscription('celeste'); }} className="mt-5 bg-riviera-gold text-riviera-navy text-xs font-bold px-5 py-2.5 rounded-full shadow-md">
+                      ✨ Passer au Pass Céleste
+                    </button>
+                  )}
                   <p className="text-[10px] font-bold text-orange-500 mt-4 uppercase tracking-widest">L'offre permanente reste disponible !</p>
-                  <button onClick={() => setIsPinModalOpen(false)} className="mt-6 text-riviera-navy font-bold underline text-sm">Fermer</button>
+                  <button onClick={() => setIsPinModalOpen(false)} className="mt-4 text-riviera-navy font-bold underline text-sm">Fermer</button>
                 </div>
 
               /* CAS 2 : MAUVAIS PIN */
@@ -993,10 +1188,13 @@ export default function Home() {
                   <div className="text-5xl mb-4">🎉</div>
                   <h4 className="text-xl font-bold text-green-700 uppercase tracking-tight">Offre Validée !</h4>
                   <p className="text-sm text-green-600 mt-3 font-medium">
-                    Félicitations, votre avantage est activé. <br />
-                    Vos économies ont été ajoutées à votre tableau de bord !
+                    Félicitations, votre avantage est activé.
                   </p>
-                  <button onClick={() => { animateSavings(displayedSavings, totalSavings); setIsPinModalOpen(false); }} className="mt-8 w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all">
+                  <div className="mt-4 bg-white border border-green-200 rounded-2xl px-6 py-3 shadow-sm">
+                    <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Économie réalisée</p>
+                    <p className="text-3xl font-bold text-green-600 font-mono">+{lastSaved.toFixed(2)} €</p>
+                  </div>
+                  <button onClick={() => setIsPinModalOpen(false)} className="mt-8 w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all">
                     Super, merci !
                   </button>
                 </div>
