@@ -22,16 +22,41 @@ const azureAnimationStyles = `
 export default function WeatherWidget() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // ✅ Nouvel état pour les erreurs
 
   useEffect(() => {
     // 1. Fonction qui interroge l'API
     const fetchWeather = async (query) => {
       try {
-        const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${query}&days=3&lang=fr`);
+        // ✅ Vérifier que la clé API existe
+        const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+        if (!apiKey) {
+          console.error("❌ NEXT_PUBLIC_WEATHER_API_KEY non définie");
+          setError("Clé API manquante");
+          setLoading(false);
+          return;
+        }
+
+        const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${query}&days=3&lang=fr`;
+        console.log("📡 Appel API météo pour :", query);
+        
+        const res = await fetch(url, { 
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!res.ok) {
+          throw new Error(`API erreur: ${res.status} ${res.statusText}`);
+        }
+
         const data = await res.json();
+        console.log("✅ Données météo reçues", data);
         setWeather(data);
+        setError(null);
       } catch (error) {
-        console.error("Erreur Météo:", error);
+        console.error("❌ Erreur Météo:", error.message);
+        setError(error.message);
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -41,19 +66,21 @@ export default function WeatherWidget() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log("📍 Géolocalisation acceptée");
           fetchWeather(`${position.coords.latitude},${position.coords.longitude}`);
         },
         (error) => {
-          console.warn("GPS refusé, fallback Cagnes.");
+          console.warn("📍 GPS refusé, utilisation de Cagnes-sur-Mer comme fallback");
           fetchWeather("Cagnes-sur-Mer"); 
         }
       );
     } else {
+      console.warn("📍 Géolocalisation non disponible");
       fetchWeather("Cagnes-sur-Mer");
     }
   }, []);
 
-  if (loading || !weather) {
+  if (loading) {
     // Loader avec le même style pour éviter le "flash" blanc
     return (
       <>
@@ -64,6 +91,23 @@ export default function WeatherWidget() {
         }
       `}</style>
       <div className="animate-pulse bg-carbon-azure-loader h-32 rounded-[2rem] border border-blue-900/50 w-full max-w-md shadow-lg shadow-blue-900/20"></div>
+      </>
+    );
+  }
+
+  // ✅ Affichage du message d'erreur
+  if (error || !weather) {
+    return (
+      <>
+      <style jsx>{`
+        .bg-error-loader {
+          background-color: #fef2f2;
+        }
+      `}</style>
+      <div className="bg-error-loader border border-red-200 rounded-[2rem] p-6 text-red-700 w-full max-w-md">
+        <p className="font-medium text-sm">⚠️ Impossible de charger la météo</p>
+        <p className="text-xs text-red-600 mt-1">{error || "Données non disponibles"}</p>
+      </div>
       </>
     );
   }
