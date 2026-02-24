@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import WeatherWidget from '@/components/WeatherWidget';
 
 export default function EspaceMembre() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function EspaceMembre() {
   
   // 🌟 NOUVEAUX ÉTATS POUR LES FONCTIONNALITÉS PREMIUM
   const [userEmail, setUserEmail] = useState('');
+  const [userFirstName, setUserFirstName] = useState(''); // Nouveau : prénom de l'utilisateur
   const [offresUtiliseesMois, setOffresUtiliseesMois] = useState(0);
 
   useEffect(() => {
@@ -25,16 +27,18 @@ export default function EspaceMembre() {
         return;
       }
 
-      setUserEmail(user.email); // On sauvegarde l'email pour l'affichage
+      setUserEmail(user.email);
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription, montant_economise')
+        .select('subscription, montant_economise, first_name')
         .eq('id', user.id)
         .single();
 
       if (dataProfil) {
         setProfil({ ...dataProfil, created_at: user.created_at });
+        // On récupère le prénom depuis la BDD
+        setUserFirstName(dataProfil.first_name || userEmail.split('@')[0]);
       }
 
       // 🌟 NOUVEAU : Calcul des offres utilisées ce mois-ci
@@ -46,7 +50,7 @@ export default function EspaceMembre() {
         .from('utilisations')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
-        .eq('offer_type', 'decouverte') // On ne compte que les offres "découverte"
+        .eq('offer_type', 'decouverte')
         .gte('created_at', debutDuMois.toISOString());
 
       if (count !== null) setOffresUtiliseesMois(count);
@@ -151,20 +155,34 @@ export default function EspaceMembre() {
           </Link>
         </div>
 
+        {/* 🌟 EN-TÊTE DU PROFIL + WIDGET MÉTÉO COMBINÉS */}
+        <div className="space-y-4">
+          {/* En-tête avec le prénom */}
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Bonjour, {userFirstName}</h1>
+            <p className="text-gray-500 mt-2">Prêt pour votre prochaine sortie ?</p>
+          </div>
+
+          {/* Widget météo */}
+          <div>
+            <WeatherWidget />
+          </div>
+        </div>
+
         {/* CONTENEUR PRINCIPAL OPTIMISÉ POUR MOBILE */}
         <div className="flex flex-col gap-4 md:gap-6">
 
-          {/* 1. BLOC IDENTITÉ & DÉCONNEXION */}
+          {/* 1. BLOC IDENTITÉ & DÉCONNEXION (Simplifié : sans le bonjour en double) */}
           <div className="flex items-center justify-between bg-white/50 p-3 rounded-2xl border border-gray-200/50">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-gray-200 to-gray-100 text-gray-700 rounded-full flex items-center justify-center text-lg font-bold shadow-inner border border-white shrink-0">
-                {userEmail.charAt(0).toUpperCase()}
+                {userFirstName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-sm text-gray-500 font-medium">Bonjour,</p>
-                <h1 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900 truncate">
-                  {userEmail.split('@')[0]}
-                </h1>
+                <p className="text-sm text-gray-500 font-medium">Membre</p>
+                <h2 className="text-lg md:text-xl font-bold tracking-tight text-gray-900 truncate">
+                  {userFirstName}
+                </h2>
               </div>
             </div>
             {/* Bouton engrenage → Stripe Portal */}
