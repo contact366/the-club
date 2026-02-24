@@ -4,12 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// Client Supabase ADMIN — contourne le RLS pour écrire depuis le serveur
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
 export async function POST(req) {
   try {
     const rawBody = await req.text();
@@ -37,6 +31,12 @@ export async function POST(req) {
         console.error("❌ Erreur : Aucun userId trouvé dans les metadata de la session Stripe");
         return new Response('Missing userId', { status: 400 });
       }
+
+      // Client Supabase ADMIN créé à l'exécution (évite l'erreur au build)
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
 
       // MISE À JOUR DE SUPABASE (avec le client admin qui contourne le RLS)
       const { data, error } = await supabaseAdmin
