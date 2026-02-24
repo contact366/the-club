@@ -19,6 +19,7 @@ export default function EspaceMembre() {
   const [offresUtiliseesMois, setOffresUtiliseesMois] = useState(0);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [countdown, setCountdown] = useState(null);
 
   useEffect(() => {
     async function chargerDonnees() {
@@ -33,7 +34,7 @@ export default function EspaceMembre() {
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url')
+        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url, expires_at')
         .eq('id', user.id)
         .single();
 
@@ -81,6 +82,30 @@ export default function EspaceMembre() {
     }, 4000);
     return () => clearInterval(interval);
   }, [loading]);
+
+  useEffect(() => {
+    if (!profil?.expires_at || profil?.subscription_type !== 'aventurier') return;
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const expires = new Date(profil.expires_at);
+      const diff = expires - now;
+
+      if (diff <= 0) {
+        setCountdown({ expired: true });
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setCountdown({ hours, minutes, seconds, expired: false });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [profil]);
 
   // Fonction pour rediriger vers Stripe Customer Portal
   const handleGererAbonnement = async () => {
@@ -307,6 +332,21 @@ export default function EspaceMembre() {
                     <span className="flex w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
                   </div>
                 </div>
+                {profil?.subscription_type === 'aventurier' && countdown && !countdown.expired && countdown.hours !== undefined && (
+                  <div className="mt-4 flex items-center gap-2">
+                    <span className="text-xs text-gray-400 uppercase tracking-wider">Expire dans</span>
+                    <div className="flex gap-1">
+                      <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.hours).padStart(2, '0')}h</span>
+                      <span className="text-gray-500">:</span>
+                      <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.minutes).padStart(2, '0')}m</span>
+                      <span className="text-gray-500">:</span>
+                      <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.seconds).padStart(2, '0')}s</span>
+                    </div>
+                  </div>
+                )}
+                {profil?.subscription_type === 'aventurier' && countdown?.expired && (
+                  <p className="mt-4 text-red-400 text-sm font-semibold">⏰ Votre pass a expiré</p>
+                )}
               </div>
 
               <div className="relative h-20 w-full md:w-64 overflow-hidden">
