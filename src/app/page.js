@@ -879,15 +879,32 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
 
+            {/* Pass Aventurier */}
+            <div className="bg-white rounded-[2rem] p-8 border border-gray-200 flex flex-col hover:shadow-xl transition-shadow">
+              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy">🤠 Pass Aventurier</h3>
+              <p className="text-gray-500 text-sm mb-6 h-10"><em>Le pass éphémère pour tester l'expérience le temps d'un week-end.</em></p>
+              <div className="mb-8"><span className="text-5xl font-bold text-riviera-navy tracking-tight">4,90€</span><span className="text-gray-500"> / unique</span></div>
+              <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600 font-medium">
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Accès 72H (sans abonnement)</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Offres permanentes illimitées (-10% à -20%)</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> 1 Seule Offre Découverte (-50%)</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Carte interactive en temps réel</li>
+              </ul>
+              <button disabled={subscription === 'aventurier'} onClick={() => handleSubscription('aventurier')} className={`w-full py-4 rounded-xl font-bold transition ${subscription === 'aventurier' ? 'bg-green-100 text-green-700 cursor-default' : 'bg-riviera-sand text-riviera-navy border border-gray-200 hover:bg-gray-100'}`}>
+                {subscription === 'aventurier' ? "✓ Pass Actif" : (user ? "Prendre ce Pass" : "Se connecter pour choisir")}
+              </button>
+            </div>
+
             {/* Pass Explorer */}
             <div className="bg-white rounded-[2rem] p-8 border border-gray-200 flex flex-col hover:shadow-xl transition-shadow">
-              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy">Pass Explorer</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy">🚀 Pass Explorer</h3>
               <p className="text-gray-500 text-sm mb-6 h-10">La solution pour tester l'expérience en illimité ou de passage dans la région.</p>
-              <div className="mb-8"><span className="text-5xl font-bold text-riviera-navy tracking-tight">9,90€</span><span className="text-gray-500">/ mois</span></div>
+              <div className="mb-8"><span className="text-5xl font-bold text-riviera-navy tracking-tight">9,90€</span><span className="text-gray-500"> / mois</span></div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600 font-medium">
                 <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Sans engagement (annulable en 1 clic)</li>
-                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Offres permanentes (-10% à -20%)</li>
-                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> 1 Seule Offre Découverte (-50%) / mois</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Offres permanentes illimitées (-10% à -20%)</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Jusqu'à 5 Offres Découvertes (-50%) / mois</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-azure mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Accès aux exclusivités Web "The Club" <em className="text-gray-400 font-normal"> (bientôt disponible)</em></li>
               </ul>
               <button disabled={subscription === 'explorer'} onClick={() => handleSubscription('explorer')} className={`w-full py-4 rounded-xl font-bold transition ${subscription === 'explorer' ? 'bg-green-100 text-green-700 cursor-default' : 'bg-riviera-sand text-riviera-navy border border-gray-200 hover:bg-gray-100'}`}>
                 {subscription === 'explorer' ? "✓ Pass Actif" : (user ? "Prendre ce Pass" : "Se connecter pour choisir")}
@@ -904,7 +921,7 @@ export default function Home() {
                   animation: 'neonGlow 2s ease-in-out infinite, shimmer 3s linear infinite',
                   boxShadow: '0 0 10px #F5C84280, 0 0 20px #F5C84250, 0 0 40px #F5C84230',
                 }}
-              >Le plus choisi</div>
+              >LE PLUS CHOISI</div>
               <style>{`
                 @keyframes neonGlow {
                   0%, 100% { box-shadow: 0 0 8px #F5C84290, 0 0 18px #F5C84260, 0 0 35px #F5C84240; }
@@ -916,55 +933,21 @@ export default function Home() {
                   100% { background-position: 0% 50%; }
                 }
               `}</style>
-              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-gold">Pass Céleste</h3>
-              <p className="text-gray-300 text-sm mb-6 h-10">L'accès illimité. Conçu pour les résidents qui sortent souvent.</p>
-              <div className="mb-8"><span className="text-5xl font-bold tracking-tight">59€</span><span className="text-gray-400">/ an</span></div>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-gold">✨ Pass Céleste</h3>
+              <p className="text-gray-300 text-sm mb-6 h-10"><em>L'accès illimité. Conçu pour ceux qui veulent l'élite sans compromis.</em></p>
+              <div className="mb-8"><span className="text-5xl font-bold tracking-tight">59€</span><span className="text-gray-400"> / an</span></div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300 font-medium">
                 <li className="flex items-center"><svg className="w-5 h-5 text-riviera-gold mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> <span className="text-white font-bold">Toutes les offres Découvertes (-50%)</span></li>
                 <li className="flex items-center"><svg className="w-5 h-5 text-riviera-gold mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Offres permanentes illimitées</li>
-                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-gold mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Exclu Web & E-billetterie nationales</li>
+                <li className="flex items-center"><svg className="w-5 h-5 text-riviera-gold mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Exclu Web &amp; E-billetterie nationale <em className="text-gray-400 font-normal"> (bientôt disponible)</em></li>
                 <li className="flex items-center"><svg className="w-5 h-5 text-riviera-gold mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Événements privés The Club</li>
               </ul>
               <button disabled={subscription === 'celeste'} onClick={() => handleSubscription('celeste')} className={`w-full py-4 rounded-xl font-bold transition shadow-lg ${subscription === 'celeste' ? 'bg-green-100 text-green-700 cursor-default' : 'bg-riviera-gold text-white hover:bg-yellow-600'}`}>
                 {subscription === 'celeste' ? "✓ Pass Actif" : (user ? "Devenir Membre" : "Se connecter pour choisir")}
               </button>
-              <p className="text-center text-xs text-gray-400 mt-4">Soit seulement 4,91€ / mois. Rentabilisé à la 1ère sortie.</p>
+              <p className="text-center text-xs text-gray-400 mt-4"><em>Soit seulement 0,66€ / jour. Rentabilisé dès la première sortie.</em></p>
             </div>
 
-            {/* CARTE LE CERCLE */}
-            <div className="bg-[#0A0A0A] p-8 rounded-3xl text-white shadow-2xl flex flex-col border border-white/10 relative overflow-hidden group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-gray-800 to-gray-900 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-              <div className="relative flex-1">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-black tracking-tighter italic">LE CERCLE</h3>
-                  <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
-                </div>
-                <p className="text-4xl font-black mt-4">39,90€<span className="text-sm font-normal text-gray-400">/mois</span></p>
-                <ul className="mt-6 space-y-4 flex-1 text-sm text-gray-300">
-                  <li className="flex items-center gap-2">💎 <span className="font-bold text-white">Avantage +1 inclus</span></li>
-                  <li className="flex items-center gap-2">📱 Conciergerie VIP 24/7</li>
-                  <li className="flex items-center gap-2">🥂 Invitations privées</li>
-                </ul>
-              </div>
-              {/* BOUTON BLOQUÉ - TEASING */}
-              <button 
-                disabled
-                className="relative mt-8 w-full py-4 bg-white/5 text-white/40 border border-white/10 rounded-2xl font-black uppercase tracking-widest cursor-not-allowed"
-              >
-                Bientôt disponible
-              </button>
-            </div>
-
-          </div>
-
-          {/* BOUTON TEST AVENTURIER - POSITIONNÉ SOUS LA GRILLE */}
-          <div className="flex justify-center mt-12">
-            <button 
-              onClick={() => handleCheckout('aventurier')}
-              className="px-6 py-3 bg-red-600 text-white rounded-full font-bold text-sm hover:bg-red-700 transition-colors shadow-lg"
-            >
-              🧪 Test : Pass Aventurier (1€)
-            </button>
           </div>
 
         </div>

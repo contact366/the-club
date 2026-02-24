@@ -46,13 +46,21 @@ export async function POST(req) {
       }
 
       // MISE À JOUR DE SUPABASE
+      const updateData = {
+        subscription_type: plan,
+        stripe_customer_id: stripeCustomerId,
+        updated_at: new Date().toISOString()
+      };
+
+      if (plan === 'aventurier') {
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 72);
+        updateData.expires_at = expiresAt.toISOString();
+      }
+
       const { data, error } = await supabaseAdmin
         .from('profiles')
-        .update({ 
-          subscription_type: plan,
-          stripe_customer_id: stripeCustomerId,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', userId)
         .select();
 
