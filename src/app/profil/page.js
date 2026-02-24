@@ -31,7 +31,7 @@ export default function EspaceMembre() {
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription, montant_economise, first_name')
+        .select('subscription_type, montant_economise, first_name')
         .eq('id', user.id)
         .single();
 
@@ -107,7 +107,7 @@ export default function EspaceMembre() {
     );
   }
 
-  const planName = profil?.subscription?.toLowerCase() || '';
+  const planName = profil?.subscription_type?.toLowerCase() || '';
   const isCercle = planName.includes('cercle');
   const isCeleste = planName.includes('celeste') || planName.includes('céleste');
 
@@ -212,7 +212,7 @@ export default function EspaceMembre() {
                 <div className={`neon-rotating-container inline-block ${neonThemeClass}`}>
                   <div className="relative z-10 flex items-center gap-3 px-5 py-2 rounded-full">
                     <span className={`text-xl font-bold tracking-tight capitalize ${isCercle ? 'text-slate-300' : isCeleste ? 'text-yellow-400' : 'text-blue-400'}`}>
-                      Pass {profil?.subscription || 'Aucun'}
+                      Pass {profil?.subscription_type || 'Aucun'}
                     </span>
                     <span className="flex w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
                   </div>

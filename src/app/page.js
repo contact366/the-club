@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase';
 import Script from 'next/script';
 import Link from 'next/link';
 
-
 // --- DONNÉES STATIQUES ---
 const ecoData = [
   {
@@ -105,7 +104,7 @@ const LEGAL_CONTENT = {
         {[
           { title: "Article 1 : Objet", body: "Les présentes CGV régissent la vente et l'utilisation des services de The Club, marque du groupe Instant&You. The Club propose un accès privilégié à des offres de réduction chez des partenaires (restaurants, loisirs, bien-être)." },
           { title: "Article 2 : Adhésion et Forfaits", body: "L'accès aux services nécessite la souscription à un abonnement payant. Forfait Explorer : accès limité (selon descriptif en vigueur). Forfait Céleste : accès premium illimité. L'abonnement est personnel, nominatif et non transférable." },
-          { title: "Article 3 : Fonctionnement des Offres", body: "Offre Découverte : valable une seule fois par établissement partenaire, nécessite la validation par un code PIN fourni par le commerçant après saisie du montant de l'addition. Offre Permanente : valable de manière récurrente selon les conditions du partenaire. The Club ne peut être tenu responsable si un partenaire refuse d'appliquer l'offre, mais s'engage à faire ses meilleurs efforts pour résoudre tout litige." },
+          { title: "Article 3 : Fonctionnement des Offres", body: "Offre D��couverte : valable une seule fois par établissement partenaire, nécessite la validation par un code PIN fourni par le commerçant après saisie du montant de l'addition. Offre Permanente : valable de manière récurrente selon les conditions du partenaire. The Club ne peut être tenu responsable si un partenaire refuse d'appliquer l'offre, mais s'engage à faire ses meilleurs efforts pour résoudre tout litige." },
           { title: "Article 4 : Calcul des économies", body: "Le système d'économies affiché est une estimation basée sur les montants saisis par l'utilisateur et les taux de remise théoriques des partenaires. Ces données n'ont pas de valeur monétaire réelle et ne sont pas remboursables." },
           { title: "Article 5 : Prix et Paiement", body: "Les tarifs sont indiqués en euros TTC. Le paiement s'effectue par carte bancaire via une plateforme sécurisée (Stripe)." },
           { title: "Article 6 : Droit de rétractation", body: "Conformément à l'article L221-18 du Code de la consommation, le client dispose de 14 jours pour se rétracter. Toute utilisation du service (validation d'au moins une offre via code PIN) avant la fin de ce délai vaut renonciation expresse au droit de rétractation." },
@@ -140,7 +139,7 @@ export default function Home() {
 
   // Savings animation
   const [displayedSavings, setDisplayedSavings] = useState(0);
-  const [savingsLabel, setSavingsLabel] = useState('savings'); // 'savings' | 'status'
+  const [savingsLabel, setSavingsLabel] = useState('savings');
   const savingsAnimRef = useRef(null);
 
   // Auth modal
@@ -153,7 +152,7 @@ export default function Home() {
   const [message, setMessage] = useState({ text: "", type: "" });
 
   // Legal modal
-  const [legalModal, setLegalModal] = useState(null); // 'mentions' | 'confidentialite' | 'cgv' | null
+  const [legalModal, setLegalModal] = useState(null);
 
   // PIN modal
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
@@ -192,10 +191,8 @@ export default function Home() {
   };
 
   const verifierEligibilite = useCallback(async (userId, establishmentId, offerType, userPlan) => {
-    // 1. Les offres permanentes sont toujours illimitées
     if (offerType === 'permanente') return { autorise: true };
 
-    // 2. Vérification par établissement (période glissante d'1 an)
     const ilYaUnAn = new Date();
     ilYaUnAn.setFullYear(ilYaUnAn.getFullYear() - 1);
     const { data: utilisationEtablissement } = await supabase
@@ -210,7 +207,6 @@ export default function Home() {
       return { autorise: false, message: "Vous avez déjà utilisé l'offre découverte de cet établissement cette année." };
     }
 
-    // 3. Quota mensuel pour les Explorer (3 offres découverte/mois)
     if (userPlan === 'explorer') {
       const debutDuMois = new Date();
       debutDuMois.setDate(1);
@@ -255,19 +251,16 @@ export default function Home() {
     setBillAmount("");
     setModalStep("amount");
     setIneligibilityMessage("");
-    // Pas connecté → on invite à se connecter
     if (!user) {
       setCurrentOfferStatus('not_logged');
       setIsPinModalOpen(true);
       return;
     }
-    // Connecté mais sans abonnement → on invite à s'abonner
     if (subscription === 'none') {
       setCurrentOfferStatus('no_subscription');
       setIsPinModalOpen(true);
       return;
     }
-    // Connecté et abonné → on vérifie l'éligibilité
     const currentPartner = partners.find(p => p.name === partnerName);
     if (currentPartner) {
       const result = await verifierEligibilite(user.id, currentPartner.id, offerType, subscription);
@@ -295,7 +288,6 @@ export default function Home() {
     const amount = parseFloat(billAmount);
     if (isNaN(amount) || amount <= 0) return;
 
-    // Vérification de l'éligibilité avant d'enregistrer
     const eligibilite = await verifierEligibilite(user.id, currentPartner.id, activeOfferType, subscription);
     if (!eligibilite.autorise) {
       setCurrentOfferStatus('used');
@@ -330,7 +322,6 @@ export default function Home() {
       setBillAmount("");
     } catch (err) {
       console.error("Erreur enregistrement offre :", err.message);
-      // Violation de contrainte unique = offre déjà utilisée
       if (err.code === '23505') {
         setIneligibilityMessage("Vous avez déjà utilisé l'offre découverte de cet établissement.");
         setCurrentOfferStatus('used');
@@ -357,11 +348,10 @@ export default function Home() {
         setMessage({ text: error.message, type: "error" });
       } else {
         setMessage({ text: "Connexion réussie !", type: "success" });
-        // Géolocalisation à la connexion
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-            () => {} // silently fail if denied
+            () => {}
           );
         }
         setTimeout(() => { setIsAuthModalOpen(false); window.location.reload(); }, 1500);
@@ -374,7 +364,7 @@ export default function Home() {
     if (!user) { setAuthMode('signup'); setIsAuthModalOpen(true); return; }
     setLoading(true);
     try {
-      const response = await fetch('/api/checkout', {
+      const response = await fetch('/api//stripe/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan, userId: user.id }),
@@ -392,7 +382,6 @@ export default function Home() {
     }
   };
 
-  // Alias pour les boutons de la carte Le Cercle
   const handleCheckout = (plan) => handleSubscription(plan);
 
   const handleUpgrade = async () => {
@@ -405,7 +394,6 @@ export default function Home() {
     }
   };
 
-  // Animated counter: smoothly scroll from old to new value
   const animateSavings = useCallback((from, to) => {
     if (savingsAnimRef.current) cancelAnimationFrame(savingsAnimRef.current);
     const duration = 1400;
@@ -424,12 +412,10 @@ export default function Home() {
   // EFFETS
   // ============================================================
 
-  // Anime le compteur dès que totalSavings change
   useEffect(() => {
     animateSavings(0, totalSavings);
   }, [totalSavings]);
 
-  // Rotate badge between savings amount and subscription status every 3s
   useEffect(() => {
     if (!user || subscription === 'none') return;
     const labelInterval = setInterval(() => {
@@ -489,12 +475,11 @@ export default function Home() {
     getProfile();
   }, [user]);
 
-  // Request geolocation for logged-in users on page load
   useEffect(() => {
     if (user && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => {} // silently ignore if denied
+        () => {}
       );
     }
   }, [user]);
@@ -579,7 +564,6 @@ export default function Home() {
         });
       });
 
-      // User location marker
       if (userLocation) {
         new window.google.maps.Marker({
           position: userLocation,
@@ -595,7 +579,6 @@ export default function Home() {
           },
           zIndex: 999,
         });
-        // Small info bubble
         new window.google.maps.InfoWindow({
           content: '<div style="font-family:-apple-system,sans-serif;font-size:11px;font-weight:700;color:#0F172A;padding:2px 4px;">📍 Vous êtes ici</div>'
         }).open(map);
@@ -667,7 +650,6 @@ export default function Home() {
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-gray-600 flex items-center gap-2">
                   Bonjour, <span className="text-riviera-navy font-bold">{user.user_metadata?.first_name || 'Membre'}</span>
-                  {/* Rotating badge: savings amount ↔ subscription status */}
                   <div
                     className="relative bg-black px-3 py-1 rounded-full shadow-sm overflow-hidden"
                     style={{ minWidth: '120px', height: '24px', fontFamily: '-apple-system, "SF Pro Display", "SF Pro Text", BlinkMacSystemFont, sans-serif' }}
@@ -746,10 +728,7 @@ export default function Home() {
         </div>
       </section>
 
-
-      {/* ======================================================= */}
-      {/* CINQ UNIVERS                                            */}
-      {/* ======================================================= */}
+      {/* CINQ UNIVERS */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -757,7 +736,6 @@ export default function Home() {
             <p className="text-gray-500 text-lg">L'excellence sélectionnée par The Club, en ville et en ligne.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-
             {/* Gastronomie */}
             <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
               <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -828,7 +806,6 @@ export default function Home() {
                 <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -879,7 +856,8 @@ export default function Home() {
               <div className="absolute top-0 left-0 h-1 bg-riviera-azure rounded-t-[2rem] animate-pulse" style={{ width: '100%' }}></div>
               <div className="fade-transition">
                 <h3 className="font-bold text-xl text-white mb-6 text-center" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].title }}></h3>
-                <div className="space-y-4 mb-6" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].details }}></div>
+                <div className="space-y-4 
+                mb-6" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].details }}></div>
                 <div className={`font-bold text-center py-3 rounded-xl transition-colors shadow-lg ${ecoData[ecoIndex].colorClass} ${ecoData[ecoIndex].textColor}`}>{ecoData[ecoIndex].savings}</div>
                 <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].desc }}></p>
               </div>
@@ -966,15 +944,26 @@ export default function Home() {
                 </ul>
               </div>
               {/* BOUTON BLOQUÉ - TEASING */}
-          <button 
-            disabled
-            className="relative mt-8 w-full py-4 bg-white/5 text-white/40 border border-white/10 rounded-2xl font-black uppercase tracking-widest cursor-not-allowed"
-          >
-            Bientôt disponible
-          </button>
+              <button 
+                disabled
+                className="relative mt-8 w-full py-4 bg-white/5 text-white/40 border border-white/10 rounded-2xl font-black uppercase tracking-widest cursor-not-allowed"
+              >
+                Bientôt disponible
+              </button>
             </div>
 
           </div>
+
+          {/* BOUTON TEST AVENTURIER - POSITIONNÉ SOUS LA GRILLE */}
+          <div className="flex justify-center mt-12">
+            <button 
+              onClick={() => handleCheckout('aventurier')}
+              className="px-6 py-3 bg-red-600 text-white rounded-full font-bold text-sm hover:bg-red-700 transition-colors shadow-lg"
+            >
+              🧪 Test : Pass Aventurier (1€)
+            </button>
+          </div>
+
         </div>
       </section>
 
@@ -1175,7 +1164,6 @@ export default function Home() {
                   </button>
                 </div>
 
-              /* CAS 0b : CONNECTÉ MAIS SANS ABONNEMENT */
               ) : currentOfferStatus === 'no_subscription' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-riviera-gold/40 bg-amber-50 flex flex-col items-center text-center">
                   <div className="text-4xl mb-4">⭐</div>
@@ -1186,7 +1174,6 @@ export default function Home() {
                   </button>
                 </div>
 
-              /* CAS 1 : OFFRE NON ÉLIGIBLE */
               ) : currentOfferStatus === 'used' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50 flex flex-col items-center text-center">
                   <div className="text-4xl mb-4">❌</div>
@@ -1201,7 +1188,6 @@ export default function Home() {
                   <button onClick={() => setIsPinModalOpen(false)} className="mt-4 text-riviera-navy font-bold underline text-sm">Fermer</button>
                 </div>
 
-              /* CAS 2 : MAUVAIS PIN */
               ) : currentOfferStatus === 'wrong_pin' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-red-200 bg-red-50 flex flex-col items-center text-center">
                   <div className="text-4xl mb-4">🔒</div>
@@ -1210,7 +1196,6 @@ export default function Home() {
                   <button onClick={() => { setCurrentOfferStatus('available'); setModalStep('pin'); }} className="mt-6 text-riviera-navy font-bold underline text-sm">Réessayer</button>
                 </div>
 
-              /* CAS 3 : ERREUR */
               ) : currentOfferStatus === 'error' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50 flex flex-col items-center text-center">
                   <div className="text-4xl mb-4">⚠️</div>
@@ -1219,7 +1204,6 @@ export default function Home() {
                   <button onClick={() => { setCurrentOfferStatus('available'); setModalStep('pin'); }} className="mt-6 text-riviera-navy font-bold underline text-sm">Réessayer</button>
                 </div>
 
-              /* CAS 4 : SUCCÈS */
               ) : currentOfferStatus === 'success' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-green-200 bg-green-50 flex flex-col items-center text-center">
                   <div className="text-5xl mb-4">🎉</div>
@@ -1236,7 +1220,6 @@ export default function Home() {
                   </button>
                 </div>
 
-              /* CAS 5 : ÉTAPE 1 — SAISIE DU MONTANT */
               ) : modalStep === 'amount' ? (
                 <div className="py-6 flex flex-col items-center">
                   <h4 className="text-lg font-bold text-gray-800 mb-2">Montant de l'addition</h4>
@@ -1262,7 +1245,6 @@ export default function Home() {
                   </button>
                 </div>
 
-              /* CAS 6 : ÉTAPE 2 — CLAVIER PIN */
               ) : (
                 <div>
                   <div className="flex justify-center gap-4 mb-6">

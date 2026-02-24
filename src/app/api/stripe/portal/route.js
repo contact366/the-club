@@ -1,40 +1,47 @@
-import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { NextResponse } from 'next/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const { plan, userEmail, userId } = await req.json();
+    const { plan, userId } = await req.json();
 
-    // On choisit l'ID du prix en fonction du plan reçu
-    const priceId = plan === 'celeste'
-      ? process.env.STRIPE_PRICE_CELESTE
-      : process.env.STRIPE_PRICE_EXPLORER;
+    console.log("LE MOT REÇU PAR LE SERVEUR EST :", plan);
+
+    let priceId = "";
+    if (plan === 'celeste') {
+      priceId = process.env.STRIPE_PRICE_CELESTE;
+    } else if (plan === 'cercle') {
+      priceId = process.env.STRIPE_PRICE_CERCLE;
+    } else if (plan === 'aventurier') {
+      priceId = process.env.STRIPE_PRICE_AVENTURIER;
+    } else {
+      priceId = process.env.STRIPE_PRICE_EXPLORER;
+    }
+    
 
     if (!priceId) {
-      return NextResponse.json({ error: `Plan inconnu ou prix non configuré : ${plan}` }, { status: 400 });
+      return NextResponse.json({ error: `Prix non configuré pour le plan : ${plan}` }, { status: 400 });
     }
 
-    // On détecte l'URL de base (prod ou local) depuis la requête
+    // Détection de l'URL de base (prod ou local) depuis la requête
     const host = req.headers.get('host');
     const protocol = host.includes('localhost') ? 'http' : 'https';
     const origin = `${protocol}://${host}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/profil?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#pricing`,
-      customer_email: userEmail,
       metadata: { userId, plan },
     });
 
-    return NextResponse.json({ sessionId: session.id });
-
-  } catch (err) {
-    console.error('Erreur Stripe Checkout:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ checkoutUrl: session.url });
+  } catch (error) {
+    console.error('Erreur Stripe:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
