@@ -672,10 +672,10 @@ export default function Home() {
                       style={{
                         opacity: savingsLabel === 'status' ? 1 : 0,
                         transform: savingsLabel === 'status' ? 'translateY(0)' : 'translateY(8px)',
-                        color: subscription === 'celeste' ? '#F5C842' : '#60A5FA',
+                        color: subscription === 'celeste' ? '#F5C842' : subscription === 'cercle' ? '#94a3b8' : subscription === 'aventurier' ? '#F97316' : '#60A5FA',
                       }}
                     >
-                      {subscription === 'celeste' ? '✨ Céleste' : '🚀 Explorer'}
+                      {subscription === 'celeste' ? '✨ Céleste' : subscription === 'cercle' ? '🖤 Le Cercle' : subscription === 'aventurier' ? '🔥 Aventurier' : '🚀 Explorer'}
                     </span>
                   </div>
                 </span>
