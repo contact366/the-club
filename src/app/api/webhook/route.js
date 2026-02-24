@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabase';
-import { NextResponse } from 'next/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -18,21 +17,35 @@ export async function POST(req) {
       return new Response(`Webhook Error: ${err.message}`, { status: 400 });
     }
 
-    // On écoute uniquement les paiements d'abonnement confirmés
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { userId, plan } = session.metadata;
+      
+      // RÉCUPÉRATION DES INFOS
+      const userId = session.metadata?.userId;
+      const plan = session.metadata?.plan;
 
+      console.log(`Vérification : userId=${userId}, plan=${plan}`);
+
+      if (!userId) {
+        console.error("❌ Erreur : Aucun userId trouvé dans les metadata de la session Stripe");
+        return new Response('Missing userId', { status: 400 });
+      }
+
+      // MISE À JOUR DE SUPABASE
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: userId,
-          subscription_type: plan,
-          updated_at: new Date(),
-        });
+        .update({ 
+          subscription_type: plan, 
+          updated_at: new Date() 
+        })
+        .eq('id', userId); // On cible le bon utilisateur par son ID
 
-      if (error) throw error;
-      console.log(`✅ Profil mis à jour — userId: ${userId}, plan: ${plan}`);
+      if (error) {
+        console.error('❌ Erreur Supabase lors de la mise à jour:', error.message);
+        throw error;
+      }
+      
+      console.log(`✅ Profil mis à jour avec succès — Plan: ${plan}`);
     }
 
     return new Response('OK', { status: 200 });
