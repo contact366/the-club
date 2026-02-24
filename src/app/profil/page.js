@@ -20,6 +20,9 @@ export default function EspaceMembre() {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [countdown, setCountdown] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function chargerDonnees() {
@@ -181,6 +184,40 @@ export default function EspaceMembre() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'SUPPRIMER') return;
+
+    setDeleting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Erreur : utilisateur non connecté.");
+        return;
+      }
+
+      const response = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Déconnexion locale puis redirection
+        await supabase.auth.signOut();
+        router.push('/');
+      } else {
+        alert("Erreur lors de la suppression : " + (data.error || "Erreur inconnue"));
+      }
+    } catch (error) {
+      alert("Erreur de connexion au serveur.");
+      console.error("Erreur suppression compte:", error.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7]">
@@ -198,6 +235,7 @@ export default function EspaceMembre() {
   else if (isCeleste) neonThemeClass = 'theme-celeste';
 
   return (
+    <>
     <div className="min-h-screen bg-[#F5F5F7] p-6 md:p-12">
       
       {/* CSS DE L'EFFET NÉON (Inchangé) */}
@@ -382,6 +420,17 @@ export default function EspaceMembre() {
             </Link>
           </div>
 
+          {/* Bouton Supprimer mon compte */}
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="w-full mt-3 flex items-center justify-center gap-2 p-3 bg-white rounded-2xl text-xs font-medium text-gray-400 border border-gray-100 hover:text-red-500 hover:border-red-200 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Supprimer mon compte
+          </button>
+
         </div>
 
         {/* 🌟 NOUVEAU : LA JAUGE DES OFFRES */}
@@ -468,5 +517,72 @@ export default function EspaceMembre() {
 
       </div>
     </div>
+
+      {/* MODALE DE SUPPRESSION DE COMPTE */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }} />
+          <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer votre compte ?</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Cette action est <strong className="text-red-500">irréversible</strong>. Toutes vos données seront définitivement supprimées :
+              </p>
+              <ul className="text-xs text-gray-400 mt-3 space-y-1 text-left max-w-xs mx-auto">
+                <li>• Votre profil et vos informations personnelles</li>
+                <li>• Votre historique d&apos;économies et d&apos;utilisations</li>
+                <li>• Votre abonnement Stripe sera annulé</li>
+                <li>• Votre photo de profil</li>
+              </ul>
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tapez <span className="font-bold text-red-500">SUPPRIMER</span> pour confirmer
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="SUPPRIMER"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-center font-mono text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                autoComplete="off"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
+                className="flex-1 py-3 rounded-xl font-semibold text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'SUPPRIMER' || deleting}
+                className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all ${
+                  deleteConfirmText === 'SUPPRIMER' && !deleting
+                    ? 'bg-red-500 text-white hover:bg-red-600 shadow-lg'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {deleting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Suppression...
+                  </span>
+                ) : 'Supprimer définitivement'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
