@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import Script from 'next/script';
 import Link from 'next/link';
+import InstallPopup from '@/components/InstallPopup';
 
 // --- DONNÉES STATIQUES ---
 const ecoData = [
@@ -633,6 +634,8 @@ export default function Home() {
   // ============================================================
   return (
     <main className="antialiased selection:bg-riviera-azure selection:text-white">
+
+      <InstallPopup />
 
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 glass-light border-b border-gray-200/60 transition-all">
