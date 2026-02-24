@@ -1,47 +1,50 @@
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const { plan, userId } = await req.json();
+    const { userId } = await req.json();
 
-    console.log("LE MOT REÇU PAR LE SERVEUR EST :", plan);
-
-    let priceId = "";
-    if (plan === 'celeste') {
-      priceId = process.env.STRIPE_PRICE_CELESTE;
-    } else if (plan === 'cercle') {
-      priceId = process.env.STRIPE_PRICE_CERCLE;
-    } else if (plan === 'aventurier') {
-      priceId = process.env.STRIPE_PRICE_AVENTURIER;
-    } else {
-      priceId = process.env.STRIPE_PRICE_EXPLORER;
-    }
-    
-
-    if (!priceId) {
-      return NextResponse.json({ error: `Prix non configuré pour le plan : ${plan}` }, { status: 400 });
+    if (!userId) {
+      return NextResponse.json({ error: 'userId manquant' }, { status: 400 });
     }
 
-    // Détection de l'URL de base (prod ou local) depuis la requête
+    // Récupérer le stripe_customer_id depuis Supabase
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile?.stripe_customer_id) {
+      return NextResponse.json(
+        { error: 'Aucun abonnement Stripe trouvé pour cet utilisateur.' },
+        { status: 404 }
+      );
+    }
+
+    // Détection de l'URL de base
     const host = req.headers.get('host');
     const protocol = host.includes('localhost') ? 'http' : 'https';
-    const origin = `${protocol}://${host}`;
+    const returnUrl = `${protocol}://${host}/profil`;
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'subscription',
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/profil?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/#pricing`,
-      metadata: { userId, plan },
+    // Créer une session Stripe Billing Portal
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: returnUrl,
     });
 
-    return NextResponse.json({ checkoutUrl: session.url });
+    return NextResponse.json({ url: portalSession.url });
   } catch (error) {
-    console.error('Erreur Stripe:', error.message);
+    console.error('Erreur Stripe Portal:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

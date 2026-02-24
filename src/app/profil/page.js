@@ -31,7 +31,7 @@ export default function EspaceMembre() {
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription_type, montant_economise, first_name')
+        .select('subscription_type, montant_economise, first_name, stripe_customer_id')
         .eq('id', user.id)
         .single();
 
@@ -186,6 +186,7 @@ export default function EspaceMembre() {
               </div>
             </div>
             {/* Bouton engrenage → Stripe Portal */}
+            {profil?.stripe_customer_id && (
             <button
               onClick={handleGererAbonnement}
               className="p-2.5 bg-white text-gray-600 rounded-full shadow-sm border border-gray-200/60 hover:scale-105 active:scale-95 transition-all"
@@ -196,6 +197,7 @@ export default function EspaceMembre() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </button>
+            )}
           </div>
 
           {/* 2. LA CARTE VIP */}
