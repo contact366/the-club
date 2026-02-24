@@ -24,6 +24,12 @@ export async function POST(req) {
 
     console.log('📩 Événement Stripe reçu:', event.type);
 
+    // Client Supabase ADMIN créé à l'exécution (contourne le RLS)
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       
@@ -38,12 +44,6 @@ export async function POST(req) {
         console.error("❌ Erreur : Aucun userId trouvé dans les metadata de la session Stripe");
         return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
       }
-
-      // Client Supabase ADMIN créé à l'exécution (contourne le RLS)
-      const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      );
 
       // MISE À JOUR DE SUPABASE
       const { data, error } = await supabaseAdmin
@@ -103,6 +103,30 @@ export async function POST(req) {
           console.error('⚠️ Erreur envoi email (non bloquant):', emailError.message);
         }
       }
+    }
+
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object;
+      const stripeCustomerId = subscription.customer;
+
+      console.log(`🔍 Annulation détectée pour le customer: ${stripeCustomerId}`);
+
+      // Remettre le subscription_type à null pour retirer le badge
+      const { data, error } = await supabaseAdmin
+        .from('profiles')
+        .update({ 
+          subscription_type: null, 
+          updated_at: new Date().toISOString()
+        })
+        .eq('stripe_customer_id', stripeCustomerId)
+        .select();
+
+      if (error) {
+        console.error('❌ Erreur Supabase lors de l\'annulation:', error.message);
+        throw error;
+      }
+
+      console.log(`✅ Abonnement annulé avec succès pour le customer: ${stripeCustomerId}`, data);
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
