@@ -12,6 +12,8 @@ export async function POST(req) {
       priceId = process.env.STRIPE_PRICE_CELESTE;
     } else if (plan === 'cercle') {
       priceId = process.env.STRIPE_PRICE_CERCLE;
+    } else if (plan === 'aventurier') {
+      priceId = process.env.STRIPE_PRICE_AVENTURIER;
     } else {
       priceId = process.env.STRIPE_PRICE_EXPLORER;
     }

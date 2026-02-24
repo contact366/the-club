@@ -17,6 +17,8 @@ export default function EspaceMembre() {
   const [userEmail, setUserEmail] = useState('');
   const [userFirstName, setUserFirstName] = useState(''); // Nouveau : prénom de l'utilisateur
   const [offresUtiliseesMois, setOffresUtiliseesMois] = useState(0);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     async function chargerDonnees() {
@@ -31,7 +33,7 @@ export default function EspaceMembre() {
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription_type, montant_economise, first_name, stripe_customer_id')
+        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url')
         .eq('id', user.id)
         .single();
 
@@ -39,6 +41,7 @@ export default function EspaceMembre() {
         setProfil({ ...dataProfil, created_at: user.created_at });
         // On récupère le prénom depuis la BDD
         setUserFirstName(dataProfil.first_name || userEmail.split('@')[0]);
+        if (dataProfil.avatar_url) setAvatarUrl(dataProfil.avatar_url);
       }
 
       // 🌟 NOUVEAU : Calcul des offres utilisées ce mois-ci
@@ -96,6 +99,60 @@ export default function EspaceMembre() {
       }
     } catch (error) {
       alert("Erreur de connexion au serveur.");
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Vérifier le type et la taille
+    if (!file.type.startsWith('image/')) {
+      alert("Veuillez sélectionner une image.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      alert("L'image ne doit pas dépasser 2 Mo.");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      if (!allowedExts.includes(fileExt)) {
+        alert("Format d'image non supporté. Utilisez JPG, PNG, GIF ou WEBP.");
+        return;
+      }
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Upload dans Supabase Storage (bucket "avatars")
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Récupérer l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Mettre à jour le profil dans la base
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+    } catch (error) {
+      console.error("Erreur upload avatar:", error.message);
+      alert("Erreur lors de l'upload de la photo.");
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -175,9 +232,40 @@ export default function EspaceMembre() {
           {/* 1. BLOC IDENTITÉ & DÉCONNEXION (Simplifié : sans le bonjour en double) */}
           <div className="flex items-center justify-between bg-white/50 p-3 rounded-2xl border border-gray-200/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-gray-200 to-gray-100 text-gray-700 rounded-full flex items-center justify-center text-lg font-bold shadow-inner border border-white shrink-0">
-                {userFirstName.charAt(0).toUpperCase()}
-              </div>
+              <label className="relative cursor-pointer group shrink-0">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Avatar"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-white shadow-inner group-hover:opacity-80 transition-opacity"
+                  />
+                ) : (
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-gray-200 to-gray-100 text-gray-700 rounded-full flex items-center justify-center text-lg font-bold shadow-inner border border-white">
+                    {userFirstName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                {uploadingAvatar ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
+                    <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                )}
+              </label>
               <div className="min-w-0">
                 <p className="text-sm text-gray-500 font-medium">Membre</p>
                 <h2 className="text-lg md:text-xl font-bold tracking-tight text-gray-900 truncate">
