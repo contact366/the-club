@@ -1,11 +1,16 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// Désactive le body parsing de Next.js pour cette route (requis pour Stripe webhook)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
     const rawBody = await req.text();
     const signature = req.headers.get('stripe-signature');
 
@@ -14,13 +19,14 @@ export async function POST(req) {
       event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
     } catch (err) {
       console.error('❌ Signature webhook invalide:', err.message);
-      return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+      return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
     }
+
+    console.log('📩 Événement Stripe reçu:', event.type);
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       
-      // RÉCUPÉRATION DES INFOS
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan;
       const customerEmail = session.customer_details?.email;
@@ -29,16 +35,16 @@ export async function POST(req) {
 
       if (!userId) {
         console.error("❌ Erreur : Aucun userId trouvé dans les metadata de la session Stripe");
-        return new Response('Missing userId', { status: 400 });
+        return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
       }
 
-      // Client Supabase ADMIN créé à l'exécution (évite l'erreur au build)
+      // Client Supabase ADMIN créé à l'exécution (contourne le RLS)
       const supabaseAdmin = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-      // MISE À JOUR DE SUPABASE (avec le client admin qui contourne le RLS)
+      // MISE À JOUR DE SUPABASE
       const { data, error } = await supabaseAdmin
         .from('profiles')
         .update({ 
@@ -50,7 +56,7 @@ export async function POST(req) {
 
       if (error) {
         console.error('❌ Erreur Supabase lors de la mise à jour:', error.message);
-        throw error;
+        return NextResponse.json({ error: error.message }, { status: 500 });
       }
       
       console.log(`✅ Profil mis à jour avec succès — Plan: ${plan}`, data);
@@ -97,9 +103,14 @@ export async function POST(req) {
       }
     }
 
-    return new Response('OK', { status: 200 });
+    return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {
     console.error('❌ Erreur Webhook:', error.message);
-    return new Response('Error', { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
+}
+
+// Répondre aux autres méthodes HTTP pour éviter les erreurs 405
+export async function GET() {
+  return NextResponse.json({ status: 'Webhook endpoint actif. Utilisez POST.' }, { status: 200 });
 }
