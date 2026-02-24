@@ -364,7 +364,7 @@ export default function Home() {
     if (!user) { setAuthMode('signup'); setIsAuthModalOpen(true); return; }
     setLoading(true);
     try {
-      const response = await fetch('/api/stripe/portal', {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan, userId: user.id }),
