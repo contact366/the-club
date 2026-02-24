@@ -30,8 +30,9 @@ export async function POST(req) {
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan;
       const customerEmail = session.customer_details?.email;
+      const stripeCustomerId = session.customer;
 
-      console.log(`🔍 Vérification : userId=${userId}, plan=${plan}, email=${customerEmail}`);
+      console.log(`🔍 Vérification : userId=${userId}, plan=${plan}, email=${customerEmail}, stripeCustomerId=${stripeCustomerId}`);
 
       if (!userId) {
         console.error("❌ Erreur : Aucun userId trouvé dans les metadata de la session Stripe");
@@ -48,7 +49,8 @@ export async function POST(req) {
       const { data, error } = await supabaseAdmin
         .from('profiles')
         .update({ 
-          subscription_type: plan, 
+          subscription_type: plan,
+          stripe_customer_id: stripeCustomerId,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
