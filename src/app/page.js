@@ -341,7 +341,7 @@ export default function Home() {
       const { error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName } } });
       setMessage(error
         ? { text: error.message, type: "error" }
-        : { text: "Inscription réussie ! Vérifiez vos emails.", type: "success" }
+        : { text: "Compte créé ! Vérifiez votre boîte mail (et vos spams) pour confirmer votre inscription. 📩", type: "success" }
       );
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -866,6 +866,179 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Profil Utilisateur Idéal */}
+      <section className="py-24 bg-riviera-sand">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <span className="text-riviera-azure font-semibold tracking-wider text-sm uppercase mb-2 block">Pour qui ?</span>
+            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">The Club est fait pour vous.</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Que vous soyez citadin actif, amoureux ou voyageur, The Club s'adapte à votre style de vie.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                emoji: "💑",
+                title: "Couples citadins",
+                desc: "Dîners romantiques, sorties bien-être, week-ends en amoureux. Profitez de chaque moment à moindre coût.",
+                tags: ["Restaurants", "Spas", "Loisirs"],
+                usage: "Dîners en couple, spa le week-end"
+              },
+              {
+                emoji: "👔",
+                title: "Jeunes professionnels",
+                desc: "Afterwork entre collègues, déjeuners d'affaires, activités sportives. L'art de vivre en ville sans se ruiner.",
+                tags: ["Afterwork", "Déjeuners", "Sport"],
+                usage: "Restaurants le midi, afterwork"
+              },
+              {
+                emoji: "✈️",
+                title: "Voyageurs réguliers",
+                desc: "De passage sur la Côte d'Azur ? Découvrez les meilleures adresses locales avec des remises exclusives.",
+                tags: ["Découverte", "Gastronomie", "Culture"],
+                usage: "Activités, bons restaurants locaux"
+              },
+              {
+                emoji: "🌟",
+                title: "Amateurs de bons plans",
+                desc: "Sorties week-end, activités inédites, bonnes tables. Vivez l'excellence sans sacrifier votre budget.",
+                tags: ["Week-end", "Activités", "Bonne table"],
+                usage: "Spa, activités, sorties week-end"
+              }
+            ].map((profile, idx) => (
+              <div key={idx} className="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                <div className="text-5xl mb-4">{profile.emoji}</div>
+                <h3 className="font-bold text-lg text-riviera-navy mb-2">{profile.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1">{profile.desc}</p>
+                <p className="text-xs text-riviera-azure font-semibold mb-3 italic">&ldquo;{profile.usage}&rdquo;</p>
+                <div className="flex flex-wrap gap-2">
+                  {profile.tags.map((tag, tIdx) => (
+                    <span key={tIdx} className="text-xs font-semibold bg-riviera-sand text-riviera-navy px-3 py-1 rounded-full border border-gray-200">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Application Mobile PWA */}
+      <section className="py-20 bg-riviera-navy text-white overflow-hidden relative">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-riviera-gold rounded-full opacity-10 blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-riviera-azure rounded-full opacity-10 blur-3xl pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="md:w-1/2 text-center md:text-left">
+              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block">📱 Application Mobile</span>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">Toujours dans<br className="hidden md:block" /> votre poche.</h2>
+              <p className="text-gray-300 text-lg mb-8">The Club fonctionne comme une vraie application mobile, directement depuis votre navigateur. Zéro téléchargement, 100% disponible.</p>
+              <div className="space-y-4">
+                {[
+                  { icon: "📲", text: "Ajoutez The Club à votre écran d'accueil en un tap" },
+                  { icon: "🔔", text: "Notifications, accès rapide, expérience native" },
+                  { icon: "💯", text: "100% digital, toujours dans votre poche" },
+                  { icon: "🚀", text: "Compatible iOS & Android, sans passer par l'App Store" }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-4">
+                    <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                    <p className="text-gray-200 text-sm font-medium">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:w-1/2 flex justify-center">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+                <div className="text-7xl mb-4">📱</div>
+                <h3 className="font-bold text-xl text-white mb-2">Installez l'app</h3>
+                <p className="text-gray-300 text-sm mb-6 leading-relaxed">Sans téléchargement. Directement depuis votre navigateur mobile, ajoutez The Club à votre écran d'accueil.</p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
+                    <p className="text-white font-bold">🍎 iOS</p>
+                    <p className="text-gray-400 text-xs mt-1">Safari → Partager → Écran d'accueil</p>
+                  </div>
+                  <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
+                    <p className="text-white font-bold">🤖 Android</p>
+                    <p className="text-gray-400 text-xs mt-1">Chrome → Menu → Ajouter à l'écran</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Grille ROI sur 3/6/12 mois */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-2 block">Retour sur investissement</span>
+            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">Le calcul est évident.</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Basé sur 2 sorties par mois avec une économie moyenne de 35€ par sortie. Vos économies s'accumulent chaque mois.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+
+            {/* Pass Explorer ROI */}
+            <div className="rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+              <div className="bg-riviera-sand px-8 py-6 border-b border-gray-200">
+                <h3 className="font-serif text-2xl font-bold text-riviera-navy">🚀 Pass Explorer</h3>
+                <p className="text-riviera-azure font-bold text-xl mt-1">9,90 € / mois</p>
+                <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-400 uppercase tracking-wide">
+                  <span>Durée</span>
+                  <span>Coût</span>
+                  <span>Économies</span>
+                  <span className="text-green-600">Gain net</span>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {[
+                  { period: "3 mois", cost: "29,70 €", savings: "210 €", net: "+180,30 €" },
+                  { period: "6 mois", cost: "59,40 €", savings: "420 €", net: "+360,60 €" },
+                  { period: "12 mois", cost: "118,80 €", savings: "840 €", net: "+721,20 €" }
+                ].map((row, idx) => (
+                  <div key={idx} className={`grid grid-cols-4 px-8 py-4 text-sm items-center ${idx === 2 ? 'bg-green-50/50' : ''}`}>
+                    <span className="font-bold text-riviera-navy">{row.period}</span>
+                    <span className="text-gray-500">{row.cost}</span>
+                    <span className="text-gray-700 font-medium">{row.savings}</span>
+                    <span className={`font-bold ${idx === 2 ? 'text-green-600 text-base' : 'text-green-500'}`}>{row.net}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pass Céleste ROI */}
+            <div className="rounded-3xl border-2 border-riviera-gold/40 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+              <div className="bg-riviera-navy px-8 py-6 border-b border-riviera-gold/20">
+                <h3 className="font-serif text-2xl font-bold text-riviera-gold">✨ Pass Céleste</h3>
+                <p className="text-gray-300 font-bold text-xl mt-1">59 € / an <span className="text-xs font-normal text-gray-400">(paiement unique)</span></p>
+                <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                  <span>Durée</span>
+                  <span>Coût**</span>
+                  <span>Économies</span>
+                  <span className="text-riviera-gold">Gain net</span>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {[
+                  { period: "3 mois", cost: "~14,75 €", savings: "210 €", net: "+195,25 €" },
+                  { period: "6 mois", cost: "~29,50 €", savings: "420 €", net: "+390,50 €" },
+                  { period: "12 mois", cost: "59 €", savings: "840 €", net: "+781 €" }
+                ].map((row, idx) => (
+                  <div key={idx} className={`grid grid-cols-4 px-8 py-4 text-sm items-center ${idx === 2 ? 'bg-green-50' : ''}`}>
+                    <span className="font-bold text-riviera-navy">{row.period}</span>
+                    <span className="text-gray-500">{row.cost}</span>
+                    <span className="text-gray-700 font-medium">{row.savings}</span>
+                    <span className={`font-bold ${idx === 2 ? 'text-green-600 text-base' : 'text-green-500'}`}>{row.net}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-6">* Estimation basée sur 2 sorties/mois avec une économie moyenne de 35€ par sortie. Résultats indicatifs, variables selon l'usage.<br />** Le Pass Céleste (59€) est réglé en une seule fois à l'année. Le coût prorata indique la fraction du coût annuel sur la période.</p>
         </div>
       </section>
 
