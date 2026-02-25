@@ -155,6 +155,9 @@ export default function Home() {
   // Legal modal
   const [legalModal, setLegalModal] = useState(null);
 
+  // Favorites
+  const [favorites, setFavorites] = useState([]);
+
   // PIN modal
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [currentPin, setCurrentPin] = useState("");
@@ -395,6 +398,22 @@ export default function Home() {
     }
   };
 
+  const toggleFavorite = useCallback(async (partnerId) => {
+    if (!user) { setAuthMode('login'); setIsAuthModalOpen(true); return; }
+    const isFav = favorites.includes(partnerId);
+    try {
+      if (isFav) {
+        const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('partner_id', partnerId);
+        if (!error) setFavorites(prev => prev.filter(id => id !== partnerId));
+      } else {
+        const { error } = await supabase.from('favorites').insert([{ user_id: user.id, partner_id: partnerId }]);
+        if (!error) setFavorites(prev => [...prev, partnerId]);
+      }
+    } catch (err) {
+      console.error('Erreur toggle favori:', err.message);
+    }
+  }, [user, favorites]);
+
   const animateSavings = useCallback((from, to) => {
     if (savingsAnimRef.current) cancelAnimationFrame(savingsAnimRef.current);
     const duration = 1400;
@@ -451,6 +470,8 @@ export default function Home() {
           .eq('id', user.id)
           .single();
         if (data) setTotalSavings(parseFloat(data.montant_economise || 0));
+        const { data: favData } = await supabase.from('favorites').select('partner_id').eq('user_id', user.id);
+        if (favData) setFavorites(favData.map(f => f.partner_id));
       }
     };
     checkUser();
@@ -490,12 +511,14 @@ export default function Home() {
     const ecoInterval = setInterval(() => setEcoIndex(prev => (prev + 1) % ecoData.length), 4000);
     const parrInterval = setInterval(() => setParrIndex(prev => (prev + 1) % parrainageData.length), 5000);
     window.openReactPinModal = openPinModal;
+    window.toggleReactFavorite = (partnerId) => toggleFavorite(partnerId);
+    window.reactFavorites = favorites;
     return () => {
       clearInterval(wordInterval);
       clearInterval(ecoInterval);
       clearInterval(parrInterval);
     };
-  }, [openPinModal]);
+  }, [openPinModal, toggleFavorite, favorites]);
 
   useEffect(() => {
     window.initMap = () => {
@@ -516,6 +539,7 @@ export default function Home() {
 
       const locations = partners.length > 0
         ? partners.map(p => ({
+            id: p.id,
             name: p.name,
             pos: { lat: p.latitude, lng: p.longitude },
             desc: p.address,
@@ -542,8 +566,9 @@ export default function Home() {
         gMarkers.push(marker);
 
         const safeName = loc.name.replace(/'/g, "\\'");
-        const infowindow = new window.google.maps.InfoWindow({
-          content: `
+        const getInfoContent = () => {
+          const fav = loc.id && window.reactFavorites && window.reactFavorites.includes(loc.id);
+          return `
             <div style="color:#0F172A;font-family:-apple-system,sans-serif;padding:12px;min-width:240px;">
               <h4 style="font-weight:700;font-size:18px;margin-bottom:2px;letter-spacing:-0.02em;">${loc.name}</h4>
               <span style="font-size:10px;font-weight:bold;color:#0284C7;text-transform:uppercase;letter-spacing:0.05em;">${loc.type}</span>
@@ -553,14 +578,19 @@ export default function Home() {
               <button onclick="window.openReactPinModal('${safeName}', 'decouverte')" style="display:block;width:100%;background:#0F172A;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;">
                 ⭐ Offre Découverte (-50%)
               </button>
-              <button onclick="window.openReactPinModal('${safeName}', 'permanente')" style="display:block;width:100%;background:#0284C7;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;">
+              <button onclick="window.openReactPinModal('${safeName}', 'permanente')" style="display:block;width:100%;background:#0284C7;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;">
                 🔁 Offre Permanente
               </button>
-            </div>`
-        });
+              ${loc.id ? `<button onclick="window.toggleReactFavorite('${loc.id}')" style="display:block;width:100%;background:${fav ? '#FEE2E2' : '#F9FAFB'};color:${fav ? '#DC2626' : '#6B7280'};text-align:center;padding:8px 0;border-radius:10px;font-size:12px;font-weight:600;border:1px solid ${fav ? '#FECACA' : '#E5E7EB'};cursor:pointer;margin-top:6px;">
+                ${fav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}
+              </button>` : ''}
+            </div>`;
+        };
+        const infowindow = new window.google.maps.InfoWindow({ content: getInfoContent() });
         gInfowindows.push(infowindow);
         marker.addListener("click", () => {
           gInfowindows.forEach(iw => iw.close());
+          infowindow.setContent(getInfoContent());
           infowindow.open(map, marker);
         });
       });
