@@ -84,27 +84,71 @@ export async function POST(req) {
               from: process.env.EMAIL_FROM || 'The Club <bienvenue@theclub-app.fr>',
               reply_to: 'contact@instantandyou.fr',
               to: customerEmail,
-              subject: `🎉 Bienvenue dans le Pass ${plan} !`,
-              html: `
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                  <h1 style="font-size: 28px; color: #111; margin-bottom: 16px;">Bienvenue dans The Club !</h1>
-                  <p style="font-size: 16px; color: #555; line-height: 1.6;">
-                    Ton abonnement <strong>Pass ${plan}</strong> est maintenant actif. 🎉
-                  </p>
-                  <p style="font-size: 16px; color: #555; line-height: 1.6;">
-                    Tu peux dès maintenant accéder à ton espace membre et profiter de toutes les offres exclusives.
-                  </p>
-                  <div style="margin: 32px 0;">
-                    <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://theclub-app.fr'}/profil" 
-                       style="background-color: #111; color: #fff; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px;">
-                      Accéder à mon espace
-                    </a>
-                  </div>
-                  <p style="font-size: 14px; color: #999; margin-top: 40px;">
-                    Merci pour ta confiance.<br/>L'équipe The Club
-                  </p>
-                </div>
-              `,
+              subject: `Bienvenue au Club, ${plan} !`,
+              html: `<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Bienvenue au Club</title>
+    <style>
+      body { margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      table { border-collapse: collapse; }
+      a { color: inherit; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">Votre abonnement est actif, découvrez vos avantages</div>
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f4f4f5;">
+      <tbody>
+        <tr>
+          <td align="center" style="padding: 40px 20px;">
+            <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;">
+              <tbody>
+                <tr>
+                  <td style="background-color:#111111;padding:40px 40px 32px 40px;text-align:center;">
+                    <p style="margin:0;font-size:48px;line-height:1;">🌴</p>
+                    <h1 style="margin:16px 0 0 0;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Bienvenue au Club.</h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:40px;">
+                    <p style="margin:0 0 16px 0;font-size:16px;color:#374151;line-height:1.6;">
+                      Votre abonnement est actif.<br/>Profitez dès maintenant de vos avantages.
+                    </p>
+                    <p style="margin:0 0 32px 0;font-size:15px;color:#6b7280;line-height:1.6;">
+                      Votre pass <strong style="color:#111111;">${plan}</strong> vous donne accès à toutes les offres exclusives réservées aux membres du Club.
+                    </p>
+                    <table cellpadding="0" cellspacing="0" role="presentation">
+                      <tbody>
+                        <tr>
+                          <td style="border-radius:10px;background-color:#111111;">
+                            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://theclub-app.fr'}/profil"
+                               style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;letter-spacing:0.2px;">
+                              Accéder à mon espace
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 40px 40px 40px;border-top:1px solid #f3f4f6;">
+                    <p style="margin:24px 0 0 0;font-size:13px;color:#9ca3af;line-height:1.6;">
+                      Merci pour votre confiance.<br/>L'équipe The Club
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>`,
             }),
           });
           console.log(`📧 Email de confirmation envoyé à ${customerEmail}`);
