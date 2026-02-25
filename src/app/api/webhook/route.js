@@ -81,7 +81,8 @@ export async function POST(req) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: process.env.EMAIL_FROM || 'The Club <noreply@theclub.fr>',
+              from: process.env.EMAIL_FROM || 'The Club <bienvenue@theclub-app.fr>',
+              reply_to: 'contact@instantandyou.fr',
               to: customerEmail,
               subject: `🎉 Bienvenue dans le Pass ${plan} !`,
               html: `
@@ -94,7 +95,7 @@ export async function POST(req) {
                     Tu peux dès maintenant accéder à ton espace membre et profiter de toutes les offres exclusives.
                   </p>
                   <div style="margin: 32px 0;">
-                    <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://theclub.fr'}/profil" 
+                    <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://theclub-app.fr'}/profil" 
                        style="background-color: #111; color: #fff; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px;">
                       Accéder à mon espace
                     </a>
