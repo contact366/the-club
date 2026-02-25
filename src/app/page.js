@@ -740,7 +740,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {/* Gastronomie */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+            <Link href="/gastronomie" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
               <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute top-4 left-4">
@@ -750,10 +750,10 @@ export default function Home() {
                 <h3 className="text-white font-bold text-2xl mb-1">Gastronomie</h3>
                 <p className="text-gray-300 text-xs leading-snug">Tables étoilées, bistrots cachés et coffee shops pointus.</p>
               </div>
-            </div>
+            </Link>
 
             {/* Bien-être */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+            <Link href="/bien-etre" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
               <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute top-4 left-4">
@@ -763,10 +763,10 @@ export default function Home() {
                 <h3 className="text-white font-bold text-2xl mb-1">Bien-être</h3>
                 <p className="text-gray-300 text-xs leading-snug">Spas prestigieux, instituts de beauté et salles de sport privées.</p>
               </div>
-            </div>
+            </Link>
 
             {/* Loisirs */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300 col-span-2 md:col-span-1">
+            <Link href="/loisirs" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300 col-span-2 md:col-span-1">
               <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute top-4 left-4">
@@ -776,10 +776,10 @@ export default function Home() {
                 <h3 className="text-white font-bold text-2xl mb-1">Loisirs</h3>
                 <p className="text-gray-300 text-xs leading-snug">Activités indoor, simulateurs et expériences inédites.</p>
               </div>
-            </div>
+            </Link>
 
             {/* Exclu Web */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+            <Link href="/exclu-web" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
               <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" alt="Exclu Web" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute top-4 left-4">
@@ -792,10 +792,10 @@ export default function Home() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
               </div>
-            </div>
+            </Link>
 
             {/* E-billetterie */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
+            <Link href="/e-billetterie" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
               <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80" alt="E-billetterie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute top-4 left-4">
@@ -808,7 +808,7 @@ export default function Home() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

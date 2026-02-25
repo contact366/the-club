@@ -394,14 +394,14 @@ export default function EspaceMembre() {
                             linear-gradient(-45deg, transparent 75%, #111 75%);
           background-size: 4px 4px;
         }
-        .neon-rotating-container { position: relative; border-radius: 9999px; padding: 2px; overflow: hidden; isolation: isolate; display: inline-block; }
+        .neon-rotating-container { position: relative; border-radius: 9999px; padding: 2px; overflow: hidden; display: inline-block; }
         .neon-rotating-container::before {
           content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
           background: conic-gradient(transparent 0deg, transparent 260deg, var(--neon-color-tail) 320deg, var(--neon-color-head) 360deg);
-          animation: rotate-border 3s linear infinite; z-index: -2;
+          animation: rotate-border 3s linear infinite; z-index: 0;
           border-radius: 9999px;
         }
-        .neon-rotating-container::after { content: ''; position: absolute; inset: 2px; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); border-radius: 9999px; z-index: -1; }
+        .neon-rotating-container::after { content: ''; position: absolute; inset: 2px; background: #0a0a0a; border-radius: 9999px; z-index: 1; }
         @keyframes rotate-border { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}} />
 
