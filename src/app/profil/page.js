@@ -24,6 +24,7 @@ export default function EspaceMembre() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [favoris, setFavoris] = useState([]);
 
   // États pour le formulaire d'authentification
   const [authMode, setAuthMode] = useState('login');
@@ -81,6 +82,15 @@ export default function EspaceMembre() {
         .limit(10);
 
       if (dataHistorique) setHistorique(dataHistorique);
+
+      // Charger les favoris avec les infos partenaires
+      const { data: dataFavoris } = await supabase
+        .from('favorites')
+        .select('*, partners(*)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (dataFavoris) setFavoris(dataFavoris);
 
       setIsAuthenticated(true);
       setLoading(false);
@@ -253,6 +263,40 @@ export default function EspaceMembre() {
       console.error("Erreur suppression compte:", error.message);
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const removeFavori = async (favoriteId) => {
+    try {
+      const { error } = await supabase.from('favorites').delete().eq('id', favoriteId);
+      if (!error) setFavoris(prev => prev.filter(f => f.id !== favoriteId));
+    } catch (err) {
+      console.error('Erreur suppression favori:', err.message);
+    }
+  };
+
+  const handlePartagerFavoris = async () => {
+    const nomsPartenaires = favoris.map(f => f.partners?.name).filter(Boolean);
+    const textePartage = `🌴 Mes coups de cœur sur The Club :\n\n${nomsPartenaires.map(n => `❤️ ${n}`).join('\n')}\n\nDécouvrez ces adresses exclusives sur The Club !`;
+    const urlPartage = typeof window !== 'undefined' ? window.location.origin : 'https://theclub-app.fr';
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Mes coups de cœur — The Club',
+          text: textePartage,
+          url: urlPartage,
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error('Erreur partage:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${textePartage}\n\n${urlPartage}`);
+        alert('Liste copiée dans le presse-papiers ! 📋');
+      } catch {
+        prompt('Copiez ce texte pour partager vos coups de cœur :', `${textePartage}\n\n${urlPartage}`);
+      }
     }
   };
 
@@ -612,6 +656,61 @@ export default function EspaceMembre() {
                   {offresUtiliseesMois} / 3 utilisées
                 </span>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* ❤️ MES COUPS DE CŒUR */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Mes coups de cœur</h2>
+            {favoris.length > 0 && (
+              <button
+                onClick={handlePartagerFavoris}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Partager
+              </button>
+            )}
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 overflow-hidden">
+            {favoris.length === 0 ? (
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🤍</span>
+                </div>
+                <p className="text-gray-500 text-lg">Aucun coup de cœur pour le moment.</p>
+                <p className="text-gray-400 text-sm mt-1">Explorez la carte et ajoutez vos adresses préférées !</p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {favoris.map((fav) => (
+                  <li key={fav.id} className="p-5 hover:bg-gray-50 transition-colors flex items-center justify-between group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 group-hover:scale-110 transition-transform">
+                        <span className="text-lg">❤️</span>
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900">{fav.partners?.name || 'Établissement'}</p>
+                        <p className="text-sm text-gray-500">{fav.partners?.category || ''}{fav.partners?.address ? ` • ${fav.partners.address}` : ''}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeFavori(fav.id)}
+                      className="p-2 text-gray-300 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
+                      title="Retirer des favoris"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
