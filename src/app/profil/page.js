@@ -9,6 +9,7 @@ import WeatherWidget from '@/components/WeatherWidget';
 export default function EspaceMembre() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [profil, setProfil] = useState(null);
   const [historique, setHistorique] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -24,12 +25,21 @@ export default function EspaceMembre() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
 
+  // États pour le formulaire d'authentification
+  const [authMode, setAuthMode] = useState('login');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authFirstName, setAuthFirstName] = useState('');
+  const [authMessage, setAuthMessage] = useState({ text: '', type: '' });
+  const [authLoading, setAuthLoading] = useState(false);
+
   useEffect(() => {
     async function chargerDonnees() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push('/login');
+        setIsAuthenticated(false);
+        setLoading(false);
         return;
       }
 
@@ -72,11 +82,39 @@ export default function EspaceMembre() {
 
       if (dataHistorique) setHistorique(dataHistorique);
 
+      setIsAuthenticated(true);
       setLoading(false);
     }
 
     chargerDonnees();
-  }, [router]);
+  }, []);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthMessage({ text: '', type: '' });
+
+    if (authMode === 'signup') {
+      const { error } = await supabase.auth.signUp({
+        email: authEmail,
+        password: authPassword,
+        options: { data: { first_name: authFirstName } },
+      });
+      setAuthMessage(error
+        ? { text: error.message, type: 'error' }
+        : { text: "Compte créé ! Vérifiez votre boîte mail (et vos spams) pour confirmer votre inscription. 📩", type: 'success' }
+      );
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
+      if (error) {
+        setAuthMessage({ text: error.message, type: 'error' });
+      } else {
+        setAuthMessage({ text: 'Connexion réussie !', type: 'success' });
+        setTimeout(() => { window.location.reload(); }, 1500);
+      }
+    }
+    setAuthLoading(false);
+  };
 
   useEffect(() => {
     if (loading) return;
@@ -222,6 +260,107 @@ export default function EspaceMembre() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7]">
         <p className="text-gray-500 animate-pulse">Chargement de votre espace VIP...</p>
+      </div>
+    );
+  }
+
+  if (isAuthenticated === false) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          {/* Retour à l'accueil */}
+          <div className="mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors group">
+              <div className="p-2 bg-white rounded-full shadow-sm border border-gray-200/60 group-hover:scale-105 transition-transform">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </div>
+              Retour à l&apos;accueil
+            </Link>
+          </div>
+
+          {/* Logo & titre */}
+          <div className="text-center mb-8">
+            <p className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase mb-2">THE CLUB</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Accédez à votre espace membre</h1>
+            <p className="text-sm text-gray-500">Connectez-vous ou créez un compte pour profiter de vos avantages exclusifs.</p>
+          </div>
+
+          {/* Carte du formulaire */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-8">
+            {authMessage.text && (
+              <div className={`p-4 rounded-2xl text-sm mb-6 ${authMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                {authMessage.text}
+              </div>
+            )}
+
+            <form onSubmit={handleAuth} className="space-y-4">
+              {authMode === 'signup' && (
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Prénom</label>
+                  <input
+                    type="text"
+                    value={authFirstName}
+                    onChange={(e) => setAuthFirstName(e.target.value)}
+                    placeholder="Votre prénom"
+                    required
+                    autoComplete="given-name"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Email</label>
+                <input
+                  type="email"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  placeholder="votre@email.com"
+                  required
+                  autoComplete="email"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Mot de passe</label>
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={authLoading}
+                className="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-semibold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              >
+                {authLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Chargement...
+                  </span>
+                ) : authMode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthMessage({ text: '', type: '' }); }}
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+              >
+                {authMode === 'login' ? "Pas encore membre ? Créer un compte" : "Déjà membre ? Se connecter"}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
