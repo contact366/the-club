@@ -369,9 +369,12 @@ export default function EspaceMembre() {
   const isCercle = planName.includes('cercle');
   const isCeleste = planName.includes('celeste') || planName.includes('céleste');
 
+  const isAventurier = planName.includes('aventurier');
+
   let neonThemeClass = 'theme-explorer';
   if (isCercle) neonThemeClass = 'theme-cercle';
   else if (isCeleste) neonThemeClass = 'theme-celeste';
+  else if (isAventurier) neonThemeClass = 'theme-aventurier';
 
   return (
     <>
@@ -382,6 +385,7 @@ export default function EspaceMembre() {
         .theme-celeste { --neon-color-head: #ffffff; --neon-color-tail: #EAB308; }
         .theme-explorer { --neon-color-head: #ffffff; --neon-color-tail: #3B82F6; }
         .theme-cercle { --neon-color-head: #ffffff; --neon-color-tail: #94a3b8; }
+        .theme-aventurier { --neon-color-head: #ffffff; --neon-color-tail: #F97316; }
         .bg-carbon {
           background-color: #0a0a0a;
           background-image: linear-gradient(45deg, #111 25%, transparent 25%),
@@ -390,11 +394,12 @@ export default function EspaceMembre() {
                             linear-gradient(-45deg, transparent 75%, #111 75%);
           background-size: 4px 4px;
         }
-        .neon-rotating-container { position: relative; border-radius: 9999px; padding: 2px; overflow: hidden; isolation: isolate; }
+        .neon-rotating-container { position: relative; border-radius: 9999px; padding: 2px; overflow: hidden; isolation: isolate; display: inline-block; }
         .neon-rotating-container::before {
           content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
           background: conic-gradient(transparent 0deg, transparent 260deg, var(--neon-color-tail) 320deg, var(--neon-color-head) 360deg);
           animation: rotate-border 3s linear infinite; z-index: -2;
+          border-radius: 9999px;
         }
         .neon-rotating-container::after { content: ''; position: absolute; inset: 2px; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); border-radius: 9999px; z-index: -1; }
         @keyframes rotate-border { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
