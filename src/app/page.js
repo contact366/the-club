@@ -152,6 +152,13 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [newsletter, setNewsletter] = useState(false);
+  const [smsAlerts, setSmsAlerts] = useState(false);
+  const [cguAccepted, setCguAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
 
@@ -349,7 +356,28 @@ export default function Home() {
     setMessage({ text: "", type: "" });
 
     if (authMode === 'signup') {
-      const { data: signupData, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName } } });
+      if (!cguAccepted) {
+        setMessage({ text: "Vous devez accepter les conditions générales d'utilisation.", type: "error" });
+        setLoading(false);
+        return;
+      }
+      const { data: signupData, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            gender,
+            birth_date: birthDate,
+            newsletter,
+            sms_alerts: smsAlerts,
+            cgu_accepted: true,
+            cgu_accepted_at: new Date().toISOString(),
+          },
+        },
+      });
       if (!error && signupData?.user) {
         const storedRef = localStorage.getItem('ref_code');
         if (storedRef) {
@@ -1343,10 +1371,38 @@ export default function Home() {
             )}
             <form className="space-y-4" onSubmit={handleAuth}>
               {authMode === 'signup' && (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Prénom</label>
-                  <input type="text" placeholder="Thomas" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
-                </div>
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Prénom *</label>
+                      <input type="text" placeholder="Thomas" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nom *</label>
+                      <input type="text" placeholder="Dupont" required value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">N° de téléphone</label>
+                    <input type="tel" placeholder="+33 6 00 00 00 00" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Genre</label>
+                      <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all bg-white">
+                        <option value="">Choisir</option>
+                        <option value="homme">Homme</option>
+                        <option value="femme">Femme</option>
+                        <option value="autre">Autre</option>
+                        <option value="non_precise">Ne pas préciser</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Date de naissance *</label>
+                      <input type="date" required value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
+                    </div>
+                  </div>
+                </>
               )}
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Email</label>
@@ -1356,7 +1412,23 @@ export default function Home() {
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Mot de passe</label>
                 <input type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
               </div>
-              <button type="submit" disabled={loading} className="w-full bg-riviera-navy text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition shadow-lg mt-2 focus:outline-none disabled:opacity-50">
+              {authMode === 'signup' && (
+                <div className="space-y-3 pt-1">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} className="mt-0.5 rounded" />
+                    <span className="text-xs text-gray-600">Restez informés de nos nouvelles offres, inscrivez-vous à la newsletter</span>
+                  </label>
+                  <label className={`flex items-start gap-3 ${!phone ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <input type="checkbox" checked={smsAlerts} onChange={(e) => setSmsAlerts(e.target.checked)} disabled={!phone} className="mt-0.5 rounded" />
+                    <span className="text-xs text-gray-600">S&apos;inscrire aux alertes SMS</span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" checked={cguAccepted} onChange={(e) => setCguAccepted(e.target.checked)} required className="mt-0.5 rounded" />
+                    <span className="text-xs text-gray-600">J&apos;accepte les <span className="font-semibold text-gray-900">conditions générales d&apos;utilisation</span> *</span>
+                  </label>
+                </div>
+              )}
+              <button type="submit" disabled={loading || (authMode === 'signup' && !cguAccepted)} className="w-full bg-riviera-navy text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition shadow-lg mt-2 focus:outline-none disabled:opacity-50">
                 {loading ? "Chargement..." : (authMode === 'signup' ? "Créer mon compte" : "Se connecter")}
               </button>
             </form>
