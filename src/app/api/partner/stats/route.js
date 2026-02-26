@@ -30,7 +30,7 @@ export async function POST(req) {
     let query = supabaseAdmin
       .from('utilisations')
       .select('id, user_id, offer_type, original_amount, saved_amount, created_at')
-      .eq('partner_id', partnerId);
+      .eq('establishment_id', partnerId);
 
     if (startDate) {
       query = query.gte('created_at', startDate);

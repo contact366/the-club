@@ -98,7 +98,7 @@ export default function EspacePartenaire() {
       // Récupérer les infos du partenaire
       const { data: partnerData } = await supabase
         .from('partners')
-        .select('id, name, address, category, affluence_status, pin, decouverte_offer, permanent_offer')
+        .select('id, name, address, category, affluence_status, pin_code, decouverte_offer, permanent_offer, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente')
         .eq('id', account.partner_id)
         .single();
 
@@ -128,6 +128,34 @@ export default function EspacePartenaire() {
       .then((data) => { if (!data.error) setStats(data); })
       .catch((err) => console.error('Erreur chargement stats:', err))
       .finally(() => setStatsLoading(false));
+  }, [partnerId, period]);
+
+  // Supabase Realtime : écouter les nouvelles visites
+  useEffect(() => {
+    if (!partnerId) return;
+
+    const channel = supabase
+      .channel(`partner-visits-${partnerId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'utilisations',
+        filter: `establishment_id=eq.${partnerId}`,
+      }, () => {
+        fetch('/api/partner/stats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ partnerId, period }),
+        })
+          .then((res) => res.json())
+          .then((data) => { if (!data.error) setStats(data); })
+          .catch((err) => console.error('Erreur reload stats:', err));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [partnerId, period]);
 
   const handleAuth = async (e) => {
@@ -383,10 +411,10 @@ export default function EspacePartenaire() {
                   <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Visites totales</p>
                   <p className="text-3xl font-bold">{stats?.visits ?? '—'}</p>
                 </div>
-                {partner?.pin && (
+                {partner?.pin_code && (
                   <div className="text-right">
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Code PIN</p>
-                    <p className="text-xl font-mono font-bold tracking-widest">{partner.pin}</p>
+                    <p className="text-xl font-mono font-bold tracking-widest">{partner.pin_code}</p>
                   </div>
                 )}
               </div>
@@ -809,10 +837,10 @@ export default function EspacePartenaire() {
                   <span className="text-sm font-semibold text-gray-900 text-right max-w-[60%]">{partner.permanent_offer}</span>
                 </div>
               )}
-              {partner?.pin && (
+              {partner?.pin_code && (
                 <div className="px-6 py-4 flex justify-between items-center">
                   <span className="text-sm text-gray-500">Code PIN</span>
-                  <span className="font-mono text-lg font-bold text-gray-900 tracking-widest">{partner.pin}</span>
+                  <span className="font-mono text-lg font-bold text-gray-900 tracking-widest">{partner.pin_code}</span>
                 </div>
               )}
             </div>

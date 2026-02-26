@@ -647,6 +647,7 @@ export default function Home() {
             offerDecouverte: p.offer_decouverte || '',
             offerPermanente: p.offer_permanente || '',
             type: p.category,
+            affluence: p.affluence_status || null,
           }))
         : [
             { name: "Le Negresco", pos: { lat: 43.6946, lng: 7.2581 }, desc: "37 Prom. des Anglais, 06000 Nice", offerDecouverte: "DÉCOUVERTE : SURCLASSEMENT OFFERT", offerPermanente: "PERMANENTE : 1 BOISSON OFFERTE/PERS.", type: "Hôtellerie & Bien-être" },
@@ -669,10 +670,22 @@ export default function Home() {
         const safeName = loc.name.replace(/'/g, "\\'");
         const getInfoContent = () => {
           const fav = loc.id && window.reactFavorites && window.reactFavorites.includes(loc.id);
+          const affluenceMap = {
+            calme: { label: 'Calme', color: '#22c55e', bg: '#f0fdf4' },
+            modere: { label: 'Modéré', color: '#eab308', bg: '#fefce8' },
+            plein: { label: 'Plein', color: '#ef4444', bg: '#fef2f2' },
+          };
+          const aff = loc.affluence && affluenceMap[loc.affluence];
+          const affluenceBadge = aff
+            ? `<span style="display:inline-block;font-size:10px;font-weight:700;color:${aff.color};background:${aff.bg};border:1px solid ${aff.color}30;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle;">${aff.label}</span>`
+            : '';
           return `
             <div style="color:#0F172A;font-family:-apple-system,sans-serif;padding:12px;min-width:240px;">
               <h4 style="font-weight:700;font-size:18px;margin-bottom:2px;letter-spacing:-0.02em;">${loc.name}</h4>
-              <span style="font-size:10px;font-weight:bold;color:#0284C7;text-transform:uppercase;letter-spacing:0.05em;">${loc.type}</span>
+              <div style="margin-bottom:8px;">
+                <span style="font-size:10px;font-weight:bold;color:#0284C7;text-transform:uppercase;letter-spacing:0.05em;">${loc.type}</span>
+                ${affluenceBadge}
+              </div>
               <p style="font-size:12px;color:#64748b;margin-top:4px;margin-bottom:12px;line-height:1.3;">${loc.desc}</p>
               <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:10px;font-weight:bold;padding:6px 8px;border-radius:6px;margin-bottom:6px;text-align:center;">${loc.offerDecouverte}</div>
               <div style="background:#eff6ff;border:1px solid #bfdbfe;color:#0284c7;font-size:10px;font-weight:bold;padding:6px 8px;border-radius:6px;margin-bottom:12px;text-align:center;">${loc.offerPermanente}</div>
