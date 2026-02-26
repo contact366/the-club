@@ -834,7 +834,7 @@ export default function Home() {
                 Se connecter
               </button>
             )}
-            <Link href="/devenir-partenaire" className="hidden md:inline-block text-sm font-semibold text-riviera-navy border border-riviera-navy px-5 py-2 rounded-full hover:bg-riviera-navy hover:text-white transition">
+            <Link href="/espace-partenaire" className="hidden md:inline-block text-sm font-semibold text-riviera-navy border border-riviera-navy px-5 py-2 rounded-full hover:bg-riviera-navy hover:text-white transition">
               Espace Partenaire
             </Link>
           </div>
@@ -1327,8 +1327,8 @@ export default function Home() {
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">Attirez la clientèle que vous méritez.</h2>
           <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto font-light">Intégrez l'écosystème The Club. Zéro frais d'installation, zéro commission cachée. Nous digitalisons vos offres et vous apportons un flux qualifié.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-white text-riviera-navy font-semibold px-8 py-4 rounded-full hover:bg-gray-100 transition shadow-xl">Référencer mon établissement</button>
-            <button className="text-white border border-white/30 px-8 py-4 rounded-full hover:bg-white/10 transition backdrop-blur-sm">Découvrir l'offre Pro</button>
+            <Link href="/espace-partenaire" className="bg-white text-riviera-navy font-semibold px-8 py-4 rounded-full hover:bg-gray-100 transition shadow-xl">Référencer mon établissement</Link>
+            <Link href="/espace-partenaire" className="text-white border border-white/30 px-8 py-4 rounded-full hover:bg-white/10 transition backdrop-blur-sm">Découvrir l&apos;offre Pro</Link>
           </div>
         </div>
       </section>
@@ -1342,7 +1342,7 @@ export default function Home() {
             <button onClick={() => setLegalModal('mentions')} className="hover:text-riviera-azure transition">Mentions légales</button>
             <button onClick={() => setLegalModal('confidentialite')} className="hover:text-riviera-azure transition">Politique de confidentialité</button>
             <a href="#faq" className="hover:text-riviera-azure transition">FAQ</a>
-            <Link href="/devenir-partenaire" className="hover:text-riviera-azure transition">Espace Partenaire</Link>
+            <Link href="/espace-partenaire" className="hover:text-riviera-azure transition">Espace Partenaire</Link>
           </div>
           <p className="text-gray-500 text-sm mb-2">Conçu et propulsé par l'écosystème <span className="text-riviera-navy font-bold">Instant&amp;You</span>.</p>
           <p className="text-gray-400 text-xs">© 2026 The Club. Tous droits réservés.</p>

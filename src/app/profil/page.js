@@ -756,7 +756,7 @@ export default function EspaceMembre() {
               Déconnexion
             </button>
             <Link
-              href="/devenir-partenaire"
+              href="/espace-partenaire"
               className="flex items-center justify-center gap-2 p-3 bg-white rounded-2xl text-sm font-semibold text-gray-700 border border-gray-200 shadow-sm active:bg-gray-50 text-center transition-colors"
             >
               Espace Partenaire

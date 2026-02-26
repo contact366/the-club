@@ -80,7 +80,43 @@ export async function POST(req) {
       hourlyDistribution[hour] = (hourlyDistribution[hour] || 0) + 1;
     });
 
-    // 10 dernières visites
+    // Taux de conversion (offres utilisées / visites totales)
+    const conversionRate = visits > 0
+      ? Math.round(((offerTypeDistribution['decouverte'] || 0) + (offerTypeDistribution['permanente'] || 0)) / visits * 100)
+      : 0;
+
+    // Répartition par jour de la semaine (0=dimanche, 1=lundi...)
+    const dailyDistribution = {};
+    data.forEach((u) => {
+      const day = new Date(u.created_at).getDay();
+      dailyDistribution[day] = (dailyDistribution[day] || 0) + 1;
+    });
+
+    // Panier moyen par type d'offre
+    const revenueByType = {};
+    const countByType = {};
+    data.forEach((u) => {
+      const type = u.offer_type || 'inconnu';
+      revenueByType[type] = (revenueByType[type] || 0) + (parseFloat(u.original_amount) || 0);
+      countByType[type] = (countByType[type] || 0) + 1;
+    });
+    const avgBasketByType = {
+      decouverte: countByType['decouverte'] > 0 ? Math.round((revenueByType['decouverte'] / countByType['decouverte']) * 100) / 100 : 0,
+      permanente: countByType['permanente'] > 0 ? Math.round((revenueByType['permanente'] / countByType['permanente']) * 100) / 100 : 0,
+    };
+
+    // Nouveaux vs récurrents
+    const newVsReturning = {
+      new: Object.values(visitsByUser).filter((count) => count === 1).length,
+      returning: returningUsers,
+    };
+
+    // Top 5 membres (user_id les plus fréquents)
+    const topMembers = Object.entries(visitsByUser)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([userId, count], index) => ({ rank: index + 1, visits: count }));
+
     const recentVisits = data.slice(0, 10).map((u) => ({
       id: u.id,
       created_at: u.created_at,
@@ -95,8 +131,13 @@ export async function POST(req) {
       savings: Math.round(savings * 100) / 100,
       avgBasket: Math.round(avgBasket * 100) / 100,
       returnRate,
+      conversionRate,
       offerTypeDistribution,
       hourlyDistribution,
+      dailyDistribution,
+      avgBasketByType,
+      newVsReturning,
+      topMembers,
       recentVisits,
     });
   } catch (error) {
