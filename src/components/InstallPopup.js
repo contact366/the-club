@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Emoji from '@/components/Emoji';
 
 export default function InstallPopup() {
   const [isVisible, setIsVisible] = useState(false);
@@ -52,7 +53,7 @@ export default function InstallPopup() {
             <>
               {/* Initial screen */}
               <div className="text-center mb-6">
-                <div className="text-3xl mb-3">⚡️</div>
+                <div className="text-3xl mb-3"><Emoji symbol="⚡️" label="rapide" size={32} /></div>
                 <h2 className="text-lg font-bold mb-2">Installez l&apos;application &ldquo;The Club&rdquo;</h2>
                 <p className="text-gray-400 text-sm leading-relaxed">
                   Accédez à votre espace membre en un clic et profitez d&apos;une navigation plus fluide et rapide.
@@ -64,7 +65,7 @@ export default function InstallPopup() {
                   onClick={() => setSelectedOS('iphone')}
                   className="flex-1 flex flex-col items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-colors"
                 >
-                  <span className="text-2xl">🍎</span>
+                  <span className="text-2xl"><Emoji symbol="🍎" label="iPhone" size={28} /></span>
                   <span className="text-sm font-semibold">iPhone</span>
                   <span className="text-xs text-gray-400">Safari</span>
                 </button>
@@ -72,7 +73,7 @@ export default function InstallPopup() {
                   onClick={() => setSelectedOS('android')}
                   className="flex-1 flex flex-col items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-colors"
                 >
-                  <span className="text-2xl">🤖</span>
+                  <span className="text-2xl"><Emoji symbol="🤖" label="Android" size={28} /></span>
                   <span className="text-sm font-semibold">Android</span>
                   <span className="text-xs text-gray-400">Chrome</span>
                 </button>
@@ -91,18 +92,18 @@ export default function InstallPopup() {
 
           {selectedOS === 'iphone' && (
             <>
-              <h2 className="text-base font-bold mb-4 text-center">🍎 Installation sur iPhone (Safari)</h2>
+              <h2 className="text-base font-bold mb-4 text-center"><Emoji symbol="🍎" label="iPhone" size={20} /> Installation sur iPhone (Safari)</h2>
               <ol className="space-y-3 mb-5 text-sm text-gray-300">
                 <li className="flex gap-3">
-                  <span className="text-lg">📤</span>
+                  <span className="text-lg"><Emoji symbol="📤" label="partager" size={20} /></span>
                   <span>Appuyez sur l&apos;icône <strong className="text-white">Partager</strong> (le carré avec une flèche vers le haut en bas de votre écran).</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-lg">📋</span>
+                  <span className="text-lg"><Emoji symbol="📋" label="liste" size={20} /></span>
                   <span>Faites défiler les options et appuyez sur <strong className="text-white">&ldquo;Sur l&apos;écran d&apos;accueil&rdquo;</strong>.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-lg">✅</span>
+                  <span className="text-lg"><Emoji symbol="✅" label="valider" size={20} /></span>
                   <span>Appuyez sur <strong className="text-white">&ldquo;Ajouter&rdquo;</strong> en haut à droite pour confirmer.</span>
                 </li>
               </ol>
@@ -126,18 +127,18 @@ export default function InstallPopup() {
 
           {selectedOS === 'android' && (
             <>
-              <h2 className="text-base font-bold mb-4 text-center">🤖 Installation sur Android (Chrome)</h2>
+              <h2 className="text-base font-bold mb-4 text-center"><Emoji symbol="🤖" label="Android" size={20} /> Installation sur Android (Chrome)</h2>
               <ol className="space-y-3 mb-5 text-sm text-gray-300">
                 <li className="flex gap-3">
                   <span className="text-lg">⋮</span>
                   <span>Appuyez sur les <strong className="text-white">trois points verticaux (⋮)</strong> situés en haut à droite de votre navigateur.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-lg">📲</span>
+                  <span className="text-lg"><Emoji symbol="📲" label="installer" size={20} /></span>
                   <span>Sélectionnez l&apos;option <strong className="text-white">&ldquo;Installer l&apos;application&rdquo;</strong> ou <strong className="text-white">&ldquo;Ajouter à l&apos;écran d&apos;accueil&rdquo;</strong>.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-lg">✅</span>
+                  <span className="text-lg"><Emoji symbol="✅" label="valider" size={20} /></span>
                   <span>Validez en appuyant sur <strong className="text-white">&ldquo;Ajouter&rdquo;</strong>.</span>
                 </li>
               </ol>
@@ -170,15 +171,15 @@ function BenefitsSection() {
     <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-sm space-y-2">
       <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-3">Pourquoi l&apos;installer ?</p>
       <div className="flex gap-2">
-        <span>⚡</span>
+        <span><Emoji symbol="⚡" label="rapide" size={18} /></span>
         <span><strong className="text-white">Rapidité</strong> <span className="text-gray-400">: Plus besoin de taper l&apos;adresse dans votre navigateur.</span></span>
       </div>
       <div className="flex gap-2">
-        <span>📱</span>
+        <span><Emoji symbol="📱" label="mobile" size={18} /></span>
         <span><strong className="text-white">Immersion</strong> <span className="text-gray-400">: Navigation en plein écran sans les barres de menu du navigateur.</span></span>
       </div>
       <div className="flex gap-2">
-        <span>🔒</span>
+        <span><Emoji symbol="🔒" label="privé" size={18} /></span>
         <span><strong className="text-white">Accès Privé</strong> <span className="text-gray-400">: Le Club est toujours à portée de main.</span></span>
       </div>
     </div>

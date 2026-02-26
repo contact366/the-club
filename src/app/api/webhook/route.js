@@ -108,7 +108,7 @@ export async function POST(req) {
               <tbody>
                 <tr>
                   <td style="background-color:#111111;padding:40px 40px 32px 40px;text-align:center;">
-                    <p style="margin:0;font-size:48px;line-height:1;">🌴</p>
+                    <p style="margin:0;font-size:48px;line-height:1;"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f334.svg" alt="🌴" width="48" height="48" style="display:inline-block;vertical-align:middle;" /></p>
                     <h1 style="margin:16px 0 0 0;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Bienvenue au Club.</h1>
                   </td>
                 </tr>

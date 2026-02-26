@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import Emoji from '@/components/Emoji';
 
 const CATEGORIES = ["Toutes", "Parcs d'attractions", "Spectacles", "Cinéma", "Sport"];
 
@@ -48,7 +49,7 @@ export default function EBilletteriePage() {
       <section className="bg-white pt-12 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-4">
-            <span className="text-5xl">🎟️</span>
+            <span className="text-5xl"><Emoji symbol="🎟️" label="e-billetterie" size={48} /></span>
             <div>
               <div className="inline-block bg-white/90 text-riviera-navy border border-riviera-navy text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2">Concerts & Parcs</div>
               <h1 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy">E-billetterie</h1>
@@ -103,7 +104,7 @@ export default function EBilletteriePage() {
           </div>
         ) : (
           <div className="text-center py-24">
-            <p className="text-6xl mb-4">🎟️</p>
+            <p className="text-6xl mb-4"><Emoji symbol="🎟️" label="e-billetterie" size={56} /></p>
             <h2 className="font-serif text-2xl font-bold text-riviera-navy mb-2">Offres à venir</h2>
             <p className="text-gray-500">Les offres dans cette catégorie arrivent bientôt.</p>
           </div>

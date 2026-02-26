@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import WeatherWidget from '@/components/WeatherWidget';
+import Emoji from '@/components/Emoji';
 
 export default function EspaceMembre() {
   const router = useRouter();
@@ -725,7 +726,7 @@ export default function EspaceMembre() {
                   </div>
                 )}
                 {profil?.subscription_type === 'aventurier' && countdown?.expired && (
-                  <p className="mt-4 text-red-400 text-sm font-semibold">⏰ Votre pass a expiré</p>
+                  <p className="mt-4 text-red-400 text-sm font-semibold"><Emoji symbol="⏰" label="expiré" size={16} /> Votre pass a expiré</p>
                 )}
               </div>
 
@@ -758,7 +759,7 @@ export default function EspaceMembre() {
               href="/devenir-partenaire"
               className="flex items-center justify-center gap-2 p-3 bg-white rounded-2xl text-sm font-semibold text-gray-700 border border-gray-200 shadow-sm active:bg-gray-50 text-center transition-colors"
             >
-              Devenir Partenaire
+              Espace Partenaire
             </Link>
           </div>
 
@@ -904,7 +905,7 @@ export default function EspaceMembre() {
             {favoris.length === 0 ? (
               <div className="p-12 text-center">
                 <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">🤍</span>
+                  <span className="text-3xl"><Emoji symbol="🤍" label="aucun favori" size={32} /></span>
                 </div>
                 <p className="text-gray-500 text-lg">Aucun coup de cœur pour le moment.</p>
                 <p className="text-gray-400 text-sm mt-1">Explorez la carte et ajoutez vos adresses préférées !</p>
@@ -915,7 +916,7 @@ export default function EspaceMembre() {
                   <li key={fav.id} className="flex items-center justify-between group overflow-hidden" style={{ transition: 'opacity 350ms ease, max-height 350ms ease, padding 350ms ease', opacity: removingFavIds.has(fav.id) ? 0 : 1, maxHeight: removingFavIds.has(fav.id) ? '0' : '200px', padding: removingFavIds.has(fav.id) ? '0 20px' : '20px' }}>
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 group-hover:scale-110 transition-transform">
-                        <span className="text-lg">❤️</span>
+                        <span className="text-lg"><Emoji symbol="❤️" label="favori" size={20} /></span>
                       </div>
                       <div>
                         <p className="text-lg font-semibold text-gray-900">{fav.partners?.name || 'Établissement'}</p>
@@ -943,7 +944,7 @@ export default function EspaceMembre() {
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-6">Programme Ambassadeur</h2>
           <div className="bg-gradient-to-br from-riviera-azure to-blue-900 rounded-3xl p-6 text-white shadow-xl">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">🎁</span>
+              <span className="text-3xl"><Emoji symbol="🎁" label="cadeau" size={32} /></span>
               <div>
                 <p className="font-bold text-lg">Invitez vos amis, soyez récompensé !</p>
                 <p className="text-blue-200 text-sm">Pour chaque filleul au Pass Céleste : 2 mois offerts</p>
