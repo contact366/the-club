@@ -21,7 +21,7 @@ export async function POST(req) {
 
     const { error } = await supabaseAdmin
       .from('partners')
-      .update({ affluence_status: status })
+      .update({ affluence_status: status, affluence_updated_at: new Date().toISOString() })
       .eq('id', partnerId);
 
     if (error) {
