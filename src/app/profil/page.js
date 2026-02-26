@@ -25,6 +25,7 @@ export default function EspaceMembre() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [favoris, setFavoris] = useState([]);
+  const [removingFavIds, setRemovingFavIds] = useState(new Set());
 
   // États pour le formulaire d'authentification
   const [authMode, setAuthMode] = useState('login');
@@ -48,7 +49,7 @@ export default function EspaceMembre() {
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url, expires_at')
+        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url, expires_at, referral_code, referral_count')
         .eq('id', user.id)
         .single();
 
@@ -267,11 +268,15 @@ export default function EspaceMembre() {
   };
 
   const removeFavori = async (favoriteId) => {
+    setRemovingFavIds(prev => new Set([...prev, favoriteId]));
+    await new Promise(r => setTimeout(r, 350));
     try {
       const { error } = await supabase.from('favorites').delete().eq('id', favoriteId);
       if (!error) setFavoris(prev => prev.filter(f => f.id !== favoriteId));
     } catch (err) {
       console.error('Erreur suppression favori:', err.message);
+    } finally {
+      setRemovingFavIds(prev => { const next = new Set(prev); next.delete(favoriteId); return next; });
     }
   };
 
@@ -689,7 +694,7 @@ export default function EspaceMembre() {
             ) : (
               <ul className="divide-y divide-gray-100">
                 {favoris.map((fav) => (
-                  <li key={fav.id} className="p-5 hover:bg-gray-50 transition-colors flex items-center justify-between group">
+                  <li key={fav.id} className="flex items-center justify-between group overflow-hidden" style={{ transition: 'opacity 350ms ease, max-height 350ms ease, padding 350ms ease', opacity: removingFavIds.has(fav.id) ? 0 : 1, maxHeight: removingFavIds.has(fav.id) ? '0' : '200px', padding: removingFavIds.has(fav.id) ? '0 20px' : '20px' }}>
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 group-hover:scale-110 transition-transform">
                         <span className="text-lg">❤️</span>
@@ -711,6 +716,51 @@ export default function EspaceMembre() {
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+        </div>
+
+        {/* 🎁 PROGRAMME AMBASSADEUR */}
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-6">Programme Ambassadeur</h2>
+          <div className="bg-gradient-to-br from-riviera-azure to-blue-900 rounded-3xl p-6 text-white shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">🎁</span>
+              <div>
+                <p className="font-bold text-lg">Invitez vos amis, soyez récompensé !</p>
+                <p className="text-blue-200 text-sm">Pour chaque filleul au Pass Céleste : 2 mois offerts</p>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-2xl p-4 mb-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-1">Vos filleuls</p>
+              <p className="text-3xl font-bold">{profil?.referral_count ?? 0}</p>
+              <p className="text-blue-200 text-sm mt-1">ami{(profil?.referral_count ?? 0) !== 1 ? 's' : ''} parrainé{(profil?.referral_count ?? 0) !== 1 ? 's' : ''}</p>
+            </div>
+            {profil?.referral_code ? (
+              <div className="bg-white/10 rounded-2xl p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-2">Votre lien d&apos;invitation</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-mono text-white break-all flex-1">
+                    {typeof window !== 'undefined' ? `${window.location.origin}/?ref=${profil.referral_code}` : `https://theclub-app.fr/?ref=${profil.referral_code}`}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      const link = `${window.location.origin}/?ref=${profil.referral_code}`;
+                      if (navigator.share) {
+                        try { await navigator.share({ title: 'The Club', text: "Rejoins The Club !", url: link }); } catch (e) { if (e.name !== 'AbortError') console.error(e); }
+                      } else {
+                        try { await navigator.clipboard.writeText(link); alert('Lien copié ! 📋'); }
+                        catch { prompt('Votre lien :', link); }
+                      }
+                    }}
+                    className="shrink-0 bg-white text-riviera-navy text-xs font-bold px-3 py-2 rounded-xl hover:bg-gray-100 transition"
+                  >
+                    Copier
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-blue-200 text-sm text-center">Accédez à l&apos;accueil pour générer votre lien de parrainage.</p>
             )}
           </div>
         </div>
