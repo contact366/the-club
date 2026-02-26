@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import Script from 'next/script';
 import Link from 'next/link';
 import InstallPopup from '@/components/InstallPopup';
+import Emoji from '@/components/Emoji';
 
 // --- DONNÉES STATIQUES ---
 const ecoData = [
@@ -676,13 +677,13 @@ export default function Home() {
               <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:10px;font-weight:bold;padding:6px 8px;border-radius:6px;margin-bottom:6px;text-align:center;">${loc.offerDecouverte}</div>
               <div style="background:#eff6ff;border:1px solid #bfdbfe;color:#0284c7;font-size:10px;font-weight:bold;padding:6px 8px;border-radius:6px;margin-bottom:12px;text-align:center;">${loc.offerPermanente}</div>
               <button onclick="window.openReactPinModal('${safeName}', 'decouverte')" style="display:block;width:100%;background:#0F172A;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;">
-                ⭐ Offre Découverte (-50%)
+                <img src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2b50.svg' alt='⭐' width='14' height='14' style='display:inline-block;vertical-align:middle;margin-right:4px;' /> Offre Découverte (-50%)
               </button>
               <button onclick="window.openReactPinModal('${safeName}', 'permanente')" style="display:block;width:100%;background:#0284C7;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;">
-                🔁 Offre Permanente
+                <img src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f501.svg' alt='🔁' width='14' height='14' style='display:inline-block;vertical-align:middle;margin-right:4px;' /> Offre Permanente
               </button>
               ${loc.id ? `<button class="fav-toggle-btn" onclick="window.toggleReactFavorite('${loc.id}')" style="display:block;width:100%;background:${fav ? '#FEE2E2' : '#F9FAFB'};color:${fav ? '#DC2626' : '#6B7280'};text-align:center;padding:8px 0;border-radius:10px;font-size:12px;font-weight:600;border:1px solid ${fav ? '#FECACA' : '#E5E7EB'};cursor:pointer;margin-top:6px;transition:transform 0.2s ease;">
-                ${fav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}
+                <img src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${fav ? '2764-fe0f' : '1f90d'}.svg' alt='${fav ? '❤️' : '🤍'}' width='14' height='14' style='display:inline-block;vertical-align:middle;margin-right:4px;' /> ${fav ? 'Dans mes favoris' : 'Ajouter aux favoris'}
               </button>` : ''}
             </div>`;
         };
@@ -717,7 +718,7 @@ export default function Home() {
           zIndex: 999,
         });
         new window.google.maps.InfoWindow({
-          content: '<div style="font-family:-apple-system,sans-serif;font-size:11px;font-weight:700;color:#0F172A;padding:2px 4px;">📍 Vous êtes ici</div>'
+          content: '<div style="font-family:-apple-system,sans-serif;font-size:11px;font-weight:700;color:#0F172A;padding:2px 4px;"><img src=\'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4cd.svg\' alt=\'📍\' width=\'14\' height=\'14\' style=\'display:inline-block;vertical-align:middle;\' /> Vous êtes ici</div>'
         }).open(map);
       }
 
@@ -814,7 +815,7 @@ export default function Home() {
                         color: subscription === 'celeste' ? '#F5C842' : subscription === 'cercle' ? '#94a3b8' : subscription === 'aventurier' ? '#F97316' : '#60A5FA',
                       }}
                     >
-                      {subscription === 'celeste' ? '✨ Céleste' : subscription === 'cercle' ? '🖤 Le Cercle' : subscription === 'aventurier' ? '🔥 Aventurier' : '🚀 Explorer'}
+                      {subscription === 'celeste' ? <><Emoji symbol="✨" label="céleste" size={14} /> Céleste</> : subscription === 'cercle' ? <><Emoji symbol="🖤" label="cercle" size={14} /> Le Cercle</> : subscription === 'aventurier' ? <><Emoji symbol="🔥" label="aventurier" size={14} /> Aventurier</> : <><Emoji symbol="🚀" label="explorer" size={14} /> Explorer</>}
                     </span>
                   </div>
                 </span>
@@ -833,9 +834,9 @@ export default function Home() {
                 Se connecter
               </button>
             )}
-            <a href="#b2b" className="hidden md:inline-block text-sm font-semibold text-riviera-navy border border-riviera-navy px-5 py-2 rounded-full hover:bg-riviera-navy hover:text-white transition">
-              Devenir Partenaire
-            </a>
+            <Link href="/devenir-partenaire" className="hidden md:inline-block text-sm font-semibold text-riviera-navy border border-riviera-navy px-5 py-2 rounded-full hover:bg-riviera-navy hover:text-white transition">
+              Espace Partenaire
+            </Link>
           </div>
         </div>
       </nav>
@@ -1055,7 +1056,7 @@ export default function Home() {
               }
             ].map((profile, idx) => (
               <div key={idx} className="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div className="text-5xl mb-4">{profile.emoji}</div>
+                <div className="text-5xl mb-4"><Emoji symbol={profile.emoji} label={profile.title} size={48} /></div>
                 <h3 className="font-bold text-lg text-riviera-navy mb-2">{profile.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1">{profile.desc}</p>
                 <p className="text-xs text-riviera-azure font-semibold mb-3 italic">&ldquo;{profile.usage}&rdquo;</p>
@@ -1079,7 +1080,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2 text-center md:text-left">
-              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block">📱 Application Mobile</span>
+              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block"><Emoji symbol="📱" label="mobile" size={16} /> Application Mobile</span>
               <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">Toujours dans<br className="hidden md:block" /> votre poche.</h2>
               <p className="text-gray-300 text-lg mb-8">The Club fonctionne comme une vraie application mobile, directement depuis votre navigateur. Zéro téléchargement, 100% disponible.</p>
               <div className="space-y-4">
@@ -1090,7 +1091,7 @@ export default function Home() {
                   { icon: "🚀", text: "Compatible iOS & Android, sans passer par l'App Store" }
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-4">
-                    <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                    <span className="text-2xl flex-shrink-0"><Emoji symbol={item.icon} size={24} /></span>
                     <p className="text-gray-200 text-sm font-medium">{item.text}</p>
                   </div>
                 ))}
@@ -1098,16 +1099,16 @@ export default function Home() {
             </div>
             <div className="md:w-1/2 flex justify-center">
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
-                <div className="text-7xl mb-4">📱</div>
+                <div className="text-7xl mb-4"><Emoji symbol="📱" label="mobile" size={72} /></div>
                 <h3 className="font-bold text-xl text-white mb-2">Installez l'app</h3>
                 <p className="text-gray-300 text-sm mb-6 leading-relaxed">Sans téléchargement. Directement depuis votre navigateur mobile, ajoutez The Club à votre écran d'accueil.</p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
-                    <p className="text-white font-bold">🍎 iOS</p>
+                    <p className="text-white font-bold"><Emoji symbol="🍎" label="iOS" size={18} /> iOS</p>
                     <p className="text-gray-400 text-xs mt-1">Safari → Partager → Écran d'accueil</p>
                   </div>
                   <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
-                    <p className="text-white font-bold">🤖 Android</p>
+                    <p className="text-white font-bold"><Emoji symbol="🤖" label="Android" size={18} /> Android</p>
                     <p className="text-gray-400 text-xs mt-1">Chrome → Menu → Ajouter à l'écran</p>
                   </div>
                 </div>
@@ -1130,7 +1131,7 @@ export default function Home() {
             {/* Pass Explorer ROI */}
             <div className="rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
               <div className="bg-riviera-sand px-8 py-6 border-b border-gray-200">
-                <h3 className="font-serif text-2xl font-bold text-riviera-navy">🚀 Pass Explorer</h3>
+                <h3 className="font-serif text-2xl font-bold text-riviera-navy"><Emoji symbol="🚀" label="explorer" size={24} /> Pass Explorer</h3>
                 <p className="text-riviera-azure font-bold text-xl mt-1">9,90 € / mois</p>
                 <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-400 uppercase tracking-wide">
                   <span>Durée</span>
@@ -1158,7 +1159,7 @@ export default function Home() {
             {/* Pass Céleste ROI */}
             <div className="rounded-3xl border-2 border-riviera-gold/40 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
               <div className="bg-riviera-navy px-8 py-6 border-b border-riviera-gold/20">
-                <h3 className="font-serif text-2xl font-bold text-riviera-gold">✨ Pass Céleste</h3>
+                <h3 className="font-serif text-2xl font-bold text-riviera-gold"><Emoji symbol="✨" label="céleste" size={24} /> Pass Céleste</h3>
                 <p className="text-gray-300 font-bold text-xl mt-1">59 € / an <span className="text-xs font-normal text-gray-400">(paiement unique)</span></p>
                 <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-500 uppercase tracking-wide">
                   <span>Durée</span>
@@ -1200,7 +1201,7 @@ export default function Home() {
 
             {/* Pass Aventurier */}
             <div className="bg-white rounded-[2rem] p-8 border border-gray-200 flex flex-col hover:shadow-xl transition-shadow">
-              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy">🤠 Pass Aventurier</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy"><Emoji symbol="🤠" label="aventurier" size={24} /> Pass Aventurier</h3>
               <p className="text-gray-500 text-sm mb-6 h-10"><em>Le pass éphémère pour tester l'expérience le temps d'un week-end.</em></p>
               <div className="mb-8"><span className="text-5xl font-bold text-riviera-navy tracking-tight">4,90€</span><span className="text-gray-500"> / unique</span></div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600 font-medium">
@@ -1216,7 +1217,7 @@ export default function Home() {
 
             {/* Pass Explorer */}
             <div className="bg-white rounded-[2rem] p-8 border border-gray-200 flex flex-col hover:shadow-xl transition-shadow">
-              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy">🚀 Pass Explorer</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-navy"><Emoji symbol="🚀" label="explorer" size={24} /> Pass Explorer</h3>
               <p className="text-gray-500 text-sm mb-6 h-10">La solution pour tester l'expérience en illimité ou de passage dans la région.</p>
               <div className="mb-8"><span className="text-5xl font-bold text-riviera-navy tracking-tight">9,90€</span><span className="text-gray-500"> / mois</span></div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-600 font-medium">
@@ -1252,7 +1253,7 @@ export default function Home() {
                   100% { background-position: 0% 50%; }
                 }
               `}</style>
-              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-gold">✨ Pass Céleste</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-gold"><Emoji symbol="✨" label="céleste" size={24} /> Pass Céleste</h3>
               <p className="text-gray-300 text-sm mb-6 h-10"><em>L'accès illimité. Conçu pour ceux qui veulent l'élite sans compromis.</em></p>
               <div className="mb-8"><span className="text-5xl font-bold tracking-tight">59€</span><span className="text-gray-400"> / an</span></div>
               <ul className="space-y-4 mb-8 flex-1 text-sm text-gray-300 font-medium">
@@ -1277,7 +1278,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
           <div className="md:w-1/2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider border border-white/30 mb-6">🎁 Programme Ambassadeur</div>
+            <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider border border-white/30 mb-6"><Emoji symbol="🎁" label="cadeau" size={16} /> Programme Ambassadeur</div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Partagez l'excellence. Soyez récompensé.</h2>
             <p className="text-white/80 text-lg">Invitez vos amis à rejoindre l'élite de la région. Le programme ambassadeur The Club est conçu pour vous remercier à la hauteur de votre fidélité.</p>
             <button onClick={handleGenerateReferral} disabled={referralLoading} className="mt-8 bg-white text-riviera-navy text-sm font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition shadow-xl hidden md:inline-block disabled:opacity-70">{referralLoading ? 'Génération...' : 'Générer mon lien d\'invitation'}</button>
@@ -1285,7 +1286,7 @@ export default function Home() {
           <div className="md:w-1/2 w-full flex justify-center min-h-[200px]">
             <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative flex items-center justify-center">
               <div className="fade-transition w-full">
-                <div className="text-5xl mb-4">{parrainageData[parrIndex].icon}</div>
+                <div className="text-5xl mb-4"><Emoji symbol={parrainageData[parrIndex].icon} size={48} /></div>
                 <h3 className="text-xl font-bold text-white mb-2">{parrainageData[parrIndex].title}</h3>
                 <p className="text-sm font-medium text-blue-100">{parrainageData[parrIndex].text}</p>
               </div>
@@ -1341,7 +1342,7 @@ export default function Home() {
             <button onClick={() => setLegalModal('mentions')} className="hover:text-riviera-azure transition">Mentions légales</button>
             <button onClick={() => setLegalModal('confidentialite')} className="hover:text-riviera-azure transition">Politique de confidentialité</button>
             <a href="#faq" className="hover:text-riviera-azure transition">FAQ</a>
-            <a href="#b2b" className="hover:text-riviera-azure transition">Devenir Partenaire</a>
+            <Link href="/devenir-partenaire" className="hover:text-riviera-azure transition">Espace Partenaire</Link>
           </div>
           <p className="text-gray-500 text-sm mb-2">Conçu et propulsé par l'écosystème <span className="text-riviera-navy font-bold">Instant&amp;You</span>.</p>
           <p className="text-gray-400 text-xs">© 2026 The Club. Tous droits réservés.</p>
@@ -1489,7 +1490,7 @@ export default function Home() {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="text-center mb-6">
-              <div className="text-5xl mb-3">🎁</div>
+              <div className="text-5xl mb-3"><Emoji symbol="🎁" label="cadeau" size={48} /></div>
               <h3 className="font-serif text-2xl font-bold text-riviera-navy mb-2">Votre lien ambassadeur</h3>
               <p className="text-sm text-gray-500">Partagez ce lien avec vos amis et recevez vos récompenses !</p>
             </div>
@@ -1510,7 +1511,7 @@ export default function Home() {
                 onClick={() => navigator.share({ title: 'The Club — Mon invitation', text: "Rejoins The Club avec mon lien d'invitation !", url: referralLink })}
                 className="w-full bg-riviera-navy text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition"
               >
-                📤 Partager
+                <Emoji symbol="📤" label="partager" size={18} /> Partager
               </button>
             )}
           </div>
@@ -1534,14 +1535,14 @@ export default function Home() {
             <h3 className="text-xl font-bold text-riviera-navy mb-1 text-center">{activePartnerName}</h3>
             <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1 text-center">Validation Partenaire</p>
             <p className="text-riviera-azure text-[11px] font-bold uppercase tracking-widest mb-6 text-center">
-              {activeOfferType === 'decouverte' ? '⭐ Offre Découverte' : '🔁 Offre Permanente'}
+              {activeOfferType === 'decouverte' ? <><Emoji symbol="⭐" label="découverte" size={14} /> Offre Découverte</> : <><Emoji symbol="🔁" label="permanente" size={14} /> Offre Permanente</>}
             </p>
 
             <div className="w-full">
               {/* CAS 0 : NON CONNECTÉ */}
               {currentOfferStatus === 'not_logged' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-riviera-navy/20 bg-slate-50 flex flex-col items-center text-center">
-                  <div className="text-4xl mb-4">🔐</div>
+                  <div className="text-4xl mb-4"><Emoji symbol="🔐" label="connexion requise" size={40} /></div>
                   <h4 className="text-lg font-bold text-riviera-navy uppercase">Connexion requise</h4>
                   <p className="text-sm text-gray-500 mt-2">Vous devez être connecté pour profiter de cette offre.</p>
                   <button onClick={() => { setIsPinModalOpen(false); setAuthMode('login'); setIsAuthModalOpen(true); }} className="mt-6 w-full bg-riviera-navy text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all">
@@ -1554,7 +1555,7 @@ export default function Home() {
 
               ) : currentOfferStatus === 'no_subscription' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-riviera-gold/40 bg-amber-50 flex flex-col items-center text-center">
-                  <div className="text-4xl mb-4">⭐</div>
+                  <div className="text-4xl mb-4"><Emoji symbol="⭐" label="pass requis" size={40} /></div>
                   <h4 className="text-lg font-bold text-riviera-navy uppercase">Pass requis</h4>
                   <p className="text-sm text-gray-500 mt-2">Choisissez un pass pour accéder aux offres partenaires.</p>
                   <button onClick={() => { setIsPinModalOpen(false); document.getElementById('tarifs')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-6 w-full bg-riviera-gold text-riviera-navy font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all">
@@ -1564,12 +1565,12 @@ export default function Home() {
 
               ) : currentOfferStatus === 'used' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50 flex flex-col items-center text-center">
-                  <div className="text-4xl mb-4">❌</div>
+                  <div className="text-4xl mb-4"><Emoji symbol="❌" label="offre indisponible" size={40} /></div>
                   <h4 className="text-lg font-bold text-gray-800 uppercase">Offre indisponible</h4>
                   <p className="text-sm text-gray-500 mt-2">{ineligibilityMessage || "Cette offre découverte est à usage unique."}</p>
                   {subscription === 'explorer' && ineligibilityMessage?.includes('limite') && (
                     <button onClick={() => { setIsPinModalOpen(false); handleSubscription('celeste'); }} className="mt-5 bg-riviera-gold text-riviera-navy text-xs font-bold px-5 py-2.5 rounded-full shadow-md">
-                      ✨ Passer au Pass Céleste
+                      <Emoji symbol="✨" label="céleste" size={16} /> Passer au Pass Céleste
                     </button>
                   )}
                   <p className="text-[10px] font-bold text-orange-500 mt-4 uppercase tracking-widest">L'offre permanente reste disponible !</p>
@@ -1578,7 +1579,7 @@ export default function Home() {
 
               ) : currentOfferStatus === 'wrong_pin' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-red-200 bg-red-50 flex flex-col items-center text-center">
-                  <div className="text-4xl mb-4">🔒</div>
+                  <div className="text-4xl mb-4"><Emoji symbol="🔒" label="code incorrect" size={40} /></div>
                   <h4 className="text-lg font-bold text-red-700 uppercase">Code Incorrect</h4>
                   <p className="text-sm text-red-600 mt-2">Le code PIN saisi ne correspond pas à cet établissement.</p>
                   <button onClick={() => { setCurrentOfferStatus('available'); setModalStep('pin'); }} className="mt-6 text-riviera-navy font-bold underline text-sm">Réessayer</button>
@@ -1586,7 +1587,7 @@ export default function Home() {
 
               ) : currentOfferStatus === 'error' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50 flex flex-col items-center text-center">
-                  <div className="text-4xl mb-4">⚠️</div>
+                  <div className="text-4xl mb-4"><Emoji symbol="⚠️" label="erreur" size={40} /></div>
                   <h4 className="text-lg font-bold text-orange-700 uppercase">Erreur d'enregistrement</h4>
                   <p className="text-sm text-orange-600 mt-2">Une erreur est survenue. Vérifiez votre connexion et réessayez.</p>
                   <button onClick={() => { setCurrentOfferStatus('available'); setModalStep('pin'); }} className="mt-6 text-riviera-navy font-bold underline text-sm">Réessayer</button>
@@ -1594,7 +1595,7 @@ export default function Home() {
 
               ) : currentOfferStatus === 'success' ? (
                 <div className="py-10 px-4 rounded-2xl border-2 border-dashed border-green-200 bg-green-50 flex flex-col items-center text-center">
-                  <div className="text-5xl mb-4">🎉</div>
+                  <div className="text-5xl mb-4"><Emoji symbol="🎉" label="succès" size={48} /></div>
                   <h4 className="text-xl font-bold text-green-700 uppercase tracking-tight">Offre Validée !</h4>
                   <p className="text-sm text-green-600 mt-3 font-medium">
                     Félicitations, votre avantage est activé.
@@ -1668,7 +1669,7 @@ export default function Home() {
                     disabled={currentPin.length < 4}
                     className={`w-full font-bold py-4 rounded-2xl shadow-lg transition-all ${currentPin.length < 4 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-riviera-navy text-white active:scale-95'}`}
                   >
-                    ✨ Valider l'offre avec le code
+                    <Emoji symbol="✨" label="valider" size={16} /> Valider l&apos;offre avec le code
                   </button>
                 </div>
               )}
