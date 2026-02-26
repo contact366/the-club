@@ -143,6 +143,9 @@ export default function Home() {
   const [savingsLabel, setSavingsLabel] = useState('savings');
   const savingsAnimRef = useRef(null);
 
+  // Active infowindow ref (for instant favourite refresh)
+  const activeInfowindowRef = useRef({ iw: null, getContent: null });
+
   // Auth modal
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signup");
@@ -157,6 +160,11 @@ export default function Home() {
 
   // Favorites
   const [favorites, setFavorites] = useState([]);
+
+  // Referral modal
+  const [referralModalOpen, setReferralModalOpen] = useState(false);
+  const [referralLink, setReferralLink] = useState('');
+  const [referralLoading, setReferralLoading] = useState(false);
 
   // PIN modal
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
@@ -341,7 +349,20 @@ export default function Home() {
     setMessage({ text: "", type: "" });
 
     if (authMode === 'signup') {
-      const { error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName } } });
+      const { data: signupData, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName } } });
+      if (!error && signupData?.user) {
+        const storedRef = localStorage.getItem('ref_code');
+        if (storedRef) {
+          try {
+            await fetch('/api/referral/track', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ newUserId: signupData.user.id, refCode: storedRef }),
+            });
+            localStorage.removeItem('ref_code');
+          } catch (e) { /* non-blocking */ }
+        }
+      }
       setMessage(error
         ? { text: error.message, type: "error" }
         : { text: "Compte créé ! Vérifiez votre boîte mail (et vos spams) pour confirmer votre inscription. 📩", type: "success" }
@@ -362,6 +383,29 @@ export default function Home() {
       }
     }
     setLoading(false);
+  };
+
+  const handleGenerateReferral = async () => {
+    if (!user) { setAuthMode('login'); setIsAuthModalOpen(true); return; }
+    setReferralLoading(true);
+    try {
+      const response = await fetch('/api/referral/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const data = await response.json();
+      if (data.link) {
+        setReferralLink(data.link);
+        setReferralModalOpen(true);
+      } else {
+        alert("Erreur : " + (data.error || "Impossible de générer le lien"));
+      }
+    } catch (err) {
+      alert("Erreur de connexion.");
+    } finally {
+      setReferralLoading(false);
+    }
   };
 
   const handleSubscription = async (plan) => {
@@ -401,13 +445,34 @@ export default function Home() {
   const toggleFavorite = useCallback(async (partnerId) => {
     if (!user) { setAuthMode('login'); setIsAuthModalOpen(true); return; }
     const isFav = favorites.includes(partnerId);
+    const newFavorites = isFav ? favorites.filter(id => id !== partnerId) : [...favorites, partnerId];
     try {
       if (isFav) {
         const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('partner_id', partnerId);
-        if (!error) setFavorites(prev => prev.filter(id => id !== partnerId));
+        if (!error) {
+          setFavorites(newFavorites);
+          window.reactFavorites = newFavorites;
+          if (activeInfowindowRef.current.iw && activeInfowindowRef.current.getContent) {
+            activeInfowindowRef.current.iw.setContent(activeInfowindowRef.current.getContent());
+            setTimeout(() => {
+              const favBtn = document.querySelector('.fav-toggle-btn');
+              if (favBtn) { favBtn.style.transition = 'transform 0.2s ease'; favBtn.style.transform = 'scale(1.3)'; setTimeout(() => { favBtn.style.transform = 'scale(1)'; }, 200); }
+            }, 50);
+          }
+        }
       } else {
         const { error } = await supabase.from('favorites').insert([{ user_id: user.id, partner_id: partnerId }]);
-        if (!error) setFavorites(prev => [...prev, partnerId]);
+        if (!error) {
+          setFavorites(newFavorites);
+          window.reactFavorites = newFavorites;
+          if (activeInfowindowRef.current.iw && activeInfowindowRef.current.getContent) {
+            activeInfowindowRef.current.iw.setContent(activeInfowindowRef.current.getContent());
+            setTimeout(() => {
+              const favBtn = document.querySelector('.fav-toggle-btn');
+              if (favBtn) { favBtn.style.transition = 'transform 0.2s ease'; favBtn.style.transform = 'scale(1.3)'; setTimeout(() => { favBtn.style.transform = 'scale(1)'; }, 200); }
+            }, 50);
+          }
+        }
       }
     } catch (err) {
       console.error('Erreur toggle favori:', err.message);
@@ -431,6 +496,12 @@ export default function Home() {
   // ============================================================
   // EFFETS
   // ============================================================
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && /^CLUB-[A-Z0-9]{6}$/.test(ref)) localStorage.setItem('ref_code', ref);
+  }, []);
 
   useEffect(() => {
     animateSavings(0, totalSavings);
@@ -524,6 +595,7 @@ export default function Home() {
     window.initMap = () => {
       const mapElement = document.getElementById("map");
       if (!mapElement || !window.google) return;
+      activeInfowindowRef.current = { iw: null, getContent: null };
 
       const map = new window.google.maps.Map(mapElement, {
         center: userLocation || { lat: 43.68, lng: 7.18 },
@@ -581,7 +653,7 @@ export default function Home() {
               <button onclick="window.openReactPinModal('${safeName}', 'permanente')" style="display:block;width:100%;background:#0284C7;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;">
                 🔁 Offre Permanente
               </button>
-              ${loc.id ? `<button onclick="window.toggleReactFavorite('${loc.id}')" style="display:block;width:100%;background:${fav ? '#FEE2E2' : '#F9FAFB'};color:${fav ? '#DC2626' : '#6B7280'};text-align:center;padding:8px 0;border-radius:10px;font-size:12px;font-weight:600;border:1px solid ${fav ? '#FECACA' : '#E5E7EB'};cursor:pointer;margin-top:6px;">
+              ${loc.id ? `<button class="fav-toggle-btn" onclick="window.toggleReactFavorite('${loc.id}')" style="display:block;width:100%;background:${fav ? '#FEE2E2' : '#F9FAFB'};color:${fav ? '#DC2626' : '#6B7280'};text-align:center;padding:8px 0;border-radius:10px;font-size:12px;font-weight:600;border:1px solid ${fav ? '#FECACA' : '#E5E7EB'};cursor:pointer;margin-top:6px;transition:transform 0.2s ease;">
                 ${fav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}
               </button>` : ''}
             </div>`;
@@ -590,8 +662,14 @@ export default function Home() {
         gInfowindows.push(infowindow);
         marker.addListener("click", () => {
           gInfowindows.forEach(iw => iw.close());
+          activeInfowindowRef.current = { iw: infowindow, getContent: getInfoContent };
           infowindow.setContent(getInfoContent());
           infowindow.open(map, marker);
+        });
+        infowindow.addListener('closeclick', () => {
+          if (activeInfowindowRef.current.iw === infowindow) {
+            activeInfowindowRef.current = { iw: null, getContent: null };
+          }
         });
       });
 
@@ -865,6 +943,7 @@ export default function Home() {
       </section>
 
       {/* Économies */}
+      <style dangerouslySetInnerHTML={{ __html: `@keyframes ecoProgress { from { width: 0% } to { width: 100% } }` }} />
       <section id="economies" className="py-24 bg-riviera-navy text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-riviera-azure rounded-full opacity-10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 bg-riviera-gold rounded-full opacity-10 blur-3xl"></div>
@@ -886,13 +965,22 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center justify-center w-12 h-12 bg-riviera-gold text-riviera-navy font-bold rounded-full z-10 -mx-6 shadow-xl">VS</div>
             <div className="w-full md:w-5/12 bg-gradient-to-br from-riviera-azure/20 to-slate-800 border-2 border-riviera-azure p-8 rounded-[2rem] transform md:scale-105 shadow-2xl relative min-h-[350px]">
-              <div className="absolute top-0 left-0 h-1 bg-riviera-azure rounded-t-[2rem] animate-pulse" style={{ width: '100%' }}></div>
-              <div className="fade-transition">
-                <h3 className="font-bold text-xl text-white mb-6 text-center" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].title }}></h3>
-                <div className="space-y-4 
-                mb-6" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].details }}></div>
-                <div className={`font-bold text-center py-3 rounded-xl transition-colors shadow-lg ${ecoData[ecoIndex].colorClass} ${ecoData[ecoIndex].textColor}`}>{ecoData[ecoIndex].savings}</div>
-                <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: ecoData[ecoIndex].desc }}></p>
+              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[2rem] bg-slate-700/50 overflow-hidden">
+                <div key={ecoIndex} style={{ height: '100%', backgroundColor: '#0284C7', animation: 'ecoProgress 4s linear forwards' }}></div>
+              </div>
+              <div className="relative" style={{ minHeight: '260px' }}>
+                {ecoData.map((eco, idx) => (
+                  <div
+                    key={idx}
+                    className="absolute inset-0"
+                    style={{ opacity: idx === ecoIndex ? 1 : 0, transition: 'opacity 700ms ease-in-out', pointerEvents: idx === ecoIndex ? 'auto' : 'none' }}
+                  >
+                    <h3 className="font-bold text-xl text-white mb-6 text-center" dangerouslySetInnerHTML={{ __html: eco.title }}></h3>
+                    <div className="space-y-4 mb-6" dangerouslySetInnerHTML={{ __html: eco.details }}></div>
+                    <div className={`font-bold text-center py-3 rounded-xl transition-colors shadow-lg ${eco.colorClass} ${eco.textColor}`}>{eco.savings}</div>
+                    <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: eco.desc }}></p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1164,7 +1252,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider border border-white/30 mb-6">🎁 Programme Ambassadeur</div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Partagez l'excellence. Soyez récompensé.</h2>
             <p className="text-white/80 text-lg">Invitez vos amis à rejoindre l'élite de la région. Le programme ambassadeur The Club est conçu pour vous remercier à la hauteur de votre fidélité.</p>
-            <button className="mt-8 bg-white text-riviera-navy text-sm font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition shadow-xl hidden md:inline-block">Générer mon lien d'invitation</button>
+            <button onClick={handleGenerateReferral} disabled={referralLoading} className="mt-8 bg-white text-riviera-navy text-sm font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition shadow-xl hidden md:inline-block disabled:opacity-70">{referralLoading ? 'Génération...' : 'Générer mon lien d\'invitation'}</button>
           </div>
           <div className="md:w-1/2 w-full flex justify-center min-h-[200px]">
             <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative flex items-center justify-center">
@@ -1175,7 +1263,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <button className="mt-2 bg-white text-riviera-navy text-sm font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition shadow-xl inline-block md:hidden">Générer mon lien d'invitation</button>
+          <button onClick={handleGenerateReferral} disabled={referralLoading} className="mt-2 bg-white text-riviera-navy text-sm font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition shadow-xl inline-block md:hidden disabled:opacity-70">{referralLoading ? 'Génération...' : 'Générer mon lien d\'invitation'}</button>
         </div>
       </section>
 
@@ -1314,6 +1402,45 @@ export default function Home() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================= */}
+      {/* MODAL AMBASSADEUR — Lien de parrainage                  */}
+      {/* ======================================================= */}
+      {referralModalOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-riviera-navy/40 backdrop-blur-sm" onClick={() => setReferralModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+            <button onClick={() => setReferralModalOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 focus:outline-none">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-3">🎁</div>
+              <h3 className="font-serif text-2xl font-bold text-riviera-navy mb-2">Votre lien ambassadeur</h3>
+              <p className="text-sm text-gray-500">Partagez ce lien avec vos amis et recevez vos récompenses !</p>
+            </div>
+            <div className="bg-riviera-sand rounded-2xl p-4 mb-6 flex items-center gap-3">
+              <span className="text-sm text-gray-700 font-mono break-all flex-1">{referralLink}</span>
+              <button
+                onClick={async () => {
+                  try { await navigator.clipboard.writeText(referralLink); alert('Lien copié ! 📋'); }
+                  catch { prompt('Votre lien de parrainage :', referralLink); }
+                }}
+                className="shrink-0 bg-riviera-azure text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 transition"
+              >
+                Copier
+              </button>
+            </div>
+            {typeof navigator !== 'undefined' && navigator.share && (
+              <button
+                onClick={() => navigator.share({ title: 'The Club — Mon invitation', text: "Rejoins The Club avec mon lien d'invitation !", url: referralLink })}
+                className="w-full bg-riviera-navy text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition"
+              >
+                📤 Partager
+              </button>
+            )}
           </div>
         </div>
       )}
