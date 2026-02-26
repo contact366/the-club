@@ -27,11 +27,25 @@ export default function EspaceMembre() {
   const [favoris, setFavoris] = useState([]);
   const [removingFavIds, setRemovingFavIds] = useState(new Set());
 
+  // États pour la section "Mes informations"
+  const [newEmail, setNewEmail] = useState('');
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [newPhone, setNewPhone] = useState('');
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [infoMessage, setInfoMessage] = useState({ text: '', type: '' });
+
   // États pour le formulaire d'authentification
   const [authMode, setAuthMode] = useState('login');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authFirstName, setAuthFirstName] = useState('');
+  const [authLastName, setAuthLastName] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
+  const [authGender, setAuthGender] = useState('');
+  const [authBirthDate, setAuthBirthDate] = useState('');
+  const [authNewsletter, setAuthNewsletter] = useState(false);
+  const [authSmsAlerts, setAuthSmsAlerts] = useState(false);
+  const [authCgu, setAuthCgu] = useState(false);
   const [authMessage, setAuthMessage] = useState({ text: '', type: '' });
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -49,7 +63,7 @@ export default function EspaceMembre() {
 
       const { data: dataProfil } = await supabase
         .from('profiles')
-        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url, expires_at, referral_code, referral_count')
+        .select('subscription_type, montant_economise, first_name, stripe_customer_id, avatar_url, expires_at, referral_code, referral_count, phone')
         .eq('id', user.id)
         .single();
 
@@ -58,6 +72,7 @@ export default function EspaceMembre() {
         // On récupère le prénom depuis la BDD
         setUserFirstName(dataProfil.first_name || userEmail.split('@')[0]);
         if (dataProfil.avatar_url) setAvatarUrl(dataProfil.avatar_url);
+        if (dataProfil.phone) setNewPhone(dataProfil.phone);
       }
 
       // 🌟 NOUVEAU : Calcul des offres utilisées ce mois-ci
@@ -106,10 +121,27 @@ export default function EspaceMembre() {
     setAuthMessage({ text: '', type: '' });
 
     if (authMode === 'signup') {
+      if (!authCgu) {
+        setAuthMessage({ text: 'Vous devez accepter les conditions générales d\'utilisation.', type: 'error' });
+        setAuthLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.signUp({
         email: authEmail,
         password: authPassword,
-        options: { data: { first_name: authFirstName } },
+        options: {
+          data: {
+            first_name: authFirstName,
+            last_name: authLastName,
+            phone: authPhone,
+            gender: authGender,
+            birth_date: authBirthDate,
+            newsletter: authNewsletter,
+            sms_alerts: authSmsAlerts,
+            cgu_accepted: true,
+            cgu_accepted_at: new Date().toISOString(),
+          },
+        },
       });
       setAuthMessage(error
         ? { text: error.message, type: 'error' }
@@ -176,6 +208,37 @@ export default function EspaceMembre() {
       }
     } catch (error) {
       alert("Erreur de connexion au serveur.");
+    }
+  };
+
+  const handleUpdateEmail = async () => {
+    if (!newEmail) return;
+    setInfoMessage({ text: '', type: '' });
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) {
+      setInfoMessage({ text: error.message, type: 'error' });
+    } else {
+      setInfoMessage({ text: 'Un email de confirmation a été envoyé à votre nouvelle adresse.', type: 'success' });
+      setEditingEmail(false);
+      setNewEmail('');
+    }
+  };
+
+  const handleUpdatePhone = async () => {
+    setSavingPhone(true);
+    setInfoMessage({ text: '', type: '' });
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from('profiles').update({ phone: newPhone }).eq('id', user.id);
+      if (error) {
+        setInfoMessage({ text: error.message, type: 'error' });
+      } else {
+        setInfoMessage({ text: 'Téléphone mis à jour avec succès.', type: 'success' });
+      }
+    } catch (err) {
+      setInfoMessage({ text: 'Erreur lors de la mise à jour.', type: 'error' });
+    } finally {
+      setSavingPhone(false);
     }
   };
 
@@ -346,18 +409,71 @@ export default function EspaceMembre() {
 
             <form onSubmit={handleAuth} className="space-y-4">
               {authMode === 'signup' && (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Prénom</label>
-                  <input
-                    type="text"
-                    value={authFirstName}
-                    onChange={(e) => setAuthFirstName(e.target.value)}
-                    placeholder="Votre prénom"
-                    required
-                    autoComplete="given-name"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  />
-                </div>
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Prénom *</label>
+                      <input
+                        type="text"
+                        value={authFirstName}
+                        onChange={(e) => setAuthFirstName(e.target.value)}
+                        placeholder="Votre prénom"
+                        required
+                        autoComplete="given-name"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nom *</label>
+                      <input
+                        type="text"
+                        value={authLastName}
+                        onChange={(e) => setAuthLastName(e.target.value)}
+                        placeholder="Votre nom"
+                        required
+                        autoComplete="family-name"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">N° de téléphone</label>
+                    <input
+                      type="tel"
+                      value={authPhone}
+                      onChange={(e) => setAuthPhone(e.target.value)}
+                      placeholder="+33 6 00 00 00 00"
+                      autoComplete="tel"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Genre</label>
+                      <select
+                        value={authGender}
+                        onChange={(e) => setAuthGender(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                      >
+                        <option value="">Choisir</option>
+                        <option value="homme">Homme</option>
+                        <option value="femme">Femme</option>
+                        <option value="autre">Autre</option>
+                        <option value="non_precise">Ne pas préciser</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Date de naissance *</label>
+                      <input
+                        type="date"
+                        value={authBirthDate}
+                        onChange={(e) => setAuthBirthDate(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                </>
               )}
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Email</label>
@@ -383,9 +499,42 @@ export default function EspaceMembre() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
+              {authMode === 'signup' && (
+                <div className="space-y-3 pt-1">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={authNewsletter}
+                      onChange={(e) => setAuthNewsletter(e.target.checked)}
+                      className="mt-0.5 rounded"
+                    />
+                    <span className="text-xs text-gray-600">Restez informés de nos nouvelles offres, inscrivez-vous à la newsletter</span>
+                  </label>
+                  <label className={`flex items-start gap-3 ${!authPhone ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <input
+                      type="checkbox"
+                      checked={authSmsAlerts}
+                      onChange={(e) => setAuthSmsAlerts(e.target.checked)}
+                      disabled={!authPhone}
+                      className="mt-0.5 rounded"
+                    />
+                    <span className="text-xs text-gray-600">S&apos;inscrire aux alertes SMS</span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={authCgu}
+                      onChange={(e) => setAuthCgu(e.target.checked)}
+                      required
+                      className="mt-0.5 rounded"
+                    />
+                    <span className="text-xs text-gray-600">J&apos;accepte les <span className="font-semibold text-gray-900">conditions générales d&apos;utilisation</span> *</span>
+                  </label>
+                </div>
+              )}
               <button
                 type="submit"
-                disabled={authLoading}
+                disabled={authLoading || (authMode === 'signup' && !authCgu)}
                 className="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-semibold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed mt-2"
               >
                 {authLoading ? (
@@ -545,14 +694,14 @@ export default function EspaceMembre() {
           </div>
 
           {/* 2. LA CARTE VIP */}
-          <div className={`relative ${isCercle ? 'bg-carbon border border-white/20' : 'bg-[#0A0A0A]'} rounded-3xl p-6 md:p-8 text-white shadow-xl overflow-hidden min-h-[140px] flex items-center`}>
+          <div className={`relative ${isCercle ? 'bg-carbon border border-white/20' : 'bg-[#0A0A0A]'} rounded-3xl p-4 md:p-8 text-white shadow-xl overflow-hidden min-h-[140px] flex items-center w-full`}>
             {/* Reflet argenté exclusif au Cercle */}
             {isCercle && <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-0"></div>}
 
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full"></div>
             <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
 
-            <div className="relative z-10 flex flex-col md:flex-row justify-between w-full items-start md:items-center gap-8">
+            <div className="relative z-10 flex flex-col md:flex-row justify-between w-full min-h-0 items-start md:items-center gap-8">
               <div className="space-y-3">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Statut du membre</p>
                 <div className={`neon-rotating-container inline-block ${neonThemeClass}`}>
@@ -564,7 +713,7 @@ export default function EspaceMembre() {
                   </div>
                 </div>
                 {profil?.subscription_type === 'aventurier' && countdown && !countdown.expired && countdown.hours !== undefined && (
-                  <div className="mt-4 flex items-center gap-2">
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
                     <span className="text-xs text-gray-400 uppercase tracking-wider">Expire dans</span>
                     <div className="flex gap-1">
                       <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.hours).padStart(2, '0')}h</span>
@@ -662,6 +811,75 @@ export default function EspaceMembre() {
                 </span>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* ℹ️ MES INFORMATIONS */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Mes informations</h3>
+          {infoMessage.text && (
+            <div className={`p-3 rounded-xl text-sm mb-4 ${infoMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+              {infoMessage.text}
+            </div>
+          )}
+          <div className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Email</label>
+              {editingEmail ? (
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder={userEmail}
+                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  />
+                  <button
+                    onClick={handleUpdateEmail}
+                    className="px-4 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
+                  >
+                    Confirmer
+                  </button>
+                  <button
+                    onClick={() => { setEditingEmail(false); setNewEmail(''); }}
+                    className="px-3 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm hover:bg-gray-200 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700">{userEmail}</span>
+                  <button
+                    onClick={() => setEditingEmail(true)}
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Modifier
+                  </button>
+                </div>
+              )}
+            </div>
+            {/* Téléphone */}
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Téléphone</label>
+              <div className="flex gap-2">
+                <input
+                  type="tel"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="+33 6 00 00 00 00"
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+                <button
+                  onClick={handleUpdatePhone}
+                  disabled={savingPhone}
+                  className="px-4 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-60"
+                >
+                  {savingPhone ? 'Sauvegarde...' : 'Sauvegarder'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
