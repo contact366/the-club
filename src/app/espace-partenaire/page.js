@@ -311,6 +311,17 @@ export default function EspacePartenaire() {
   const permanenteCount = stats?.offerTypeDistribution?.permanente || 0;
   const totalOffers = decouverteCount + permanenteCount || 1;
 
+  // Jours de la semaine
+  const DAY_LABELS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+  const dailyData = DAY_LABELS.map((label, i) => ({
+    label,
+    count: stats?.dailyDistribution?.[i] || 0,
+  }));
+  const maxDayCount = Math.max(...dailyData.map((d) => d.count), 1);
+
+  // Top membres
+  const topMembers = stats?.topMembers || [];
+
   return (
     <>
       <div className="min-h-screen bg-[#F5F5F7] pb-16">
@@ -326,6 +337,12 @@ export default function EspacePartenaire() {
               </div>
               Retour à l&apos;accueil
             </Link>
+          </div>
+
+          {/* Message de bienvenue */}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Bonjour, {partner?.name || 'Partenaire'} 👋</h1>
+            <p className="text-sm text-gray-500 mt-1">Gérez votre établissement et suivez vos performances.</p>
           </div>
 
           {/* ── Carte VIP Partenaire ── */}
@@ -439,6 +456,25 @@ export default function EspacePartenaire() {
                 </p>
                 <p className="text-sm text-gray-500 mt-1">Économies membres</p>
               </div>
+
+              {/* Taux de conversion */}
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6 sm:col-span-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 bg-amber-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Taux de conversion (offres utilisées sur visites totales)</p>
+                    <p className="text-3xl font-bold text-gray-900 mt-1">
+                      {statsLoading ? <span className="text-gray-300 animate-pulse">—</span> : (
+                        <AnimatedNumber value={stats?.conversionRate || 0} suffix=" %" />
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -446,7 +482,20 @@ export default function EspacePartenaire() {
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">Gestion de l&apos;Affluence</h2>
             <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
-              <p className="text-sm text-gray-500 mb-4">Indiquez le niveau d&apos;affluence actuel de votre établissement. Il sera visible sur la carte The Club.</p>
+              {/* Indicateur visuel du statut actuel */}
+              <div className={`flex items-center gap-3 p-4 rounded-2xl border-2 mb-4 ${currentAffluence.color}`}>
+                <span className="text-3xl">{currentAffluence.emoji}</span>
+                <div>
+                  <p className="font-bold text-base">{currentAffluence.label}</p>
+                  <p className="text-xs opacity-75">Statut actuel de votre établissement</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mb-4 flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Ce statut est visible sur la carte Google Maps par vos membres.
+              </p>
               <div className="grid grid-cols-3 gap-3">
                 {AFFLUENCE_OPTIONS.map((option) => (
                   <button
@@ -571,9 +620,107 @@ export default function EspacePartenaire() {
                   </div>
                 )}
               </div>
+
+              {/* Jours de la semaine */}
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+                <p className="text-sm font-semibold text-gray-900 mb-4">Fréquentation par jour</p>
+                {statsLoading ? (
+                  <div className="flex gap-2">
+                    {[1,2,3,4,5,6,7].map((i) => <div key={i} className="flex-1 h-16 bg-gray-100 rounded-xl animate-pulse" />)}
+                  </div>
+                ) : (
+                  <div className="flex items-end gap-1.5 h-20">
+                    {dailyData.map(({ label, count }) => (
+                      <div key={label} className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-full flex items-end justify-center" style={{ height: '56px' }}>
+                          <div
+                            className="w-full rounded-t-lg bg-indigo-400 transition-all duration-700"
+                            style={{ height: count > 0 ? `${Math.max((count / maxDayCount) * 56, 4)}px` : '0px' }}
+                          />
+                        </div>
+                        <span className="text-[10px] text-gray-500 font-medium">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Nouveaux vs récurrents */}
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+                <p className="text-sm font-semibold text-gray-900 mb-4">Nouveaux vs Récurrents</p>
+                {statsLoading ? (
+                  <div className="space-y-3">
+                    <div className="h-6 bg-gray-100 rounded-full animate-pulse" />
+                    <div className="h-6 bg-gray-100 rounded-full animate-pulse" />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {(() => {
+                      const newCount = stats?.newVsReturning?.new || 0;
+                      const returningCount = stats?.newVsReturning?.returning || 0;
+                      const total = newCount + returningCount || 1;
+                      return (
+                        <>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-gray-600 font-medium">Nouveaux clients</span>
+                              <span className="text-gray-500">{newCount}</span>
+                            </div>
+                            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-teal-400 rounded-full transition-all duration-700" style={{ width: `${(newCount / total) * 100}%` }} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-gray-600 font-medium">Clients récurrents</span>
+                              <span className="text-gray-500">{returningCount}</span>
+                            </div>
+                            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-orange-400 rounded-full transition-all duration-700" style={{ width: `${(returningCount / total) * 100}%` }} />
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Panier moyen par type d'offre */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Panier moyen découverte</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {statsLoading ? <span className="text-gray-300 animate-pulse">—</span> : <AnimatedNumber value={stats?.avgBasketByType?.decouverte || 0} suffix=" €" />}
+                  </p>
+                </div>
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Panier moyen permanente</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {statsLoading ? <span className="text-gray-300 animate-pulse">—</span> : <AnimatedNumber value={stats?.avgBasketByType?.permanente || 0} suffix=" €" />}
+                  </p>
+                </div>
+              </div>
+
+              {/* Top membres */}
+              {topMembers.length > 0 && (
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+                  <p className="text-sm font-semibold text-gray-900 mb-4">Top Membres</p>
+                  <div className="space-y-2">
+                    {topMembers.map((member) => (
+                      <div key={member.rank} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-indigo-50 rounded-full flex items-center justify-center text-xs font-bold text-indigo-600">#{member.rank}</div>
+                          <span className="text-sm font-medium text-gray-700">Membre #{member.rank}</span>
+                        </div>
+                        <span className="text-sm text-gray-500">{member.visits} visite{member.visits !== 1 ? 's' : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-
           {/* ── Dernières visites ── */}
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">Dernières visites</h2>
@@ -598,13 +745,18 @@ export default function EspacePartenaire() {
                   {stats.recentVisits.map((visit) => (
                     <li key={visit.id} className="p-5 hover:bg-gray-50 transition-colors flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${visit.offer_type === 'decouverte' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-gray-900 capitalize">Offre {visit.offer_type}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-gray-900 capitalize">Offre {visit.offer_type}</p>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${visit.offer_type === 'decouverte' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {visit.offer_type === 'decouverte' ? 'Découverte' : 'Permanente'}
+                            </span>
+                          </div>
                           <p className="text-xs text-gray-400">
                             {new Date(visit.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
                             {' '}·{' '}
@@ -617,7 +769,7 @@ export default function EspacePartenaire() {
                           <p className="text-sm font-semibold text-gray-900">{parseFloat(visit.original_amount).toFixed(2)} €</p>
                         )}
                         {visit.saved_amount != null && (
-                          <p className="text-xs text-green-600">−{parseFloat(visit.saved_amount).toFixed(2)} €</p>
+                          <p className="text-xs text-green-600 font-medium">−{parseFloat(visit.saved_amount).toFixed(2)} € économisés</p>
                         )}
                       </div>
                     </li>
