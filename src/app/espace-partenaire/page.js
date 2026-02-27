@@ -96,7 +96,7 @@ export default function EspacePartenaire() {
 
       setPartnerId(account.partner_id);
 
-      // Récupérer les infos du partenaire
+      // Récupérer les infos du partenaire (requête séparée)
       const { data: partnerData } = await supabase
         .from('partners')
         .select('id, name, address, category, affluence_status, pin_code, decouverte_offer, permanent_offer, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente')
