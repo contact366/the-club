@@ -80,10 +80,10 @@ export default function EspacePartenaire() {
         return;
       }
 
-      // Vérifier que l'utilisateur est bien un partenaire et récupérer les infos du partenaire
+      // Vérifier que l'utilisateur est bien un partenaire
       const { data: account } = await supabase
         .from('partner_accounts')
-        .select('partner_id, role, partners(id, name, address, category, affluence_status, pin_code, decouverte_offer, permanent_offer, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente)')
+        .select('partner_id, role')
         .eq('user_id', user.id)
         .single();
 
@@ -96,7 +96,12 @@ export default function EspacePartenaire() {
 
       setPartnerId(account.partner_id);
 
-      const partnerData = account.partners;
+      // Récupérer les infos du partenaire (requête séparée)
+      const { data: partnerData } = await supabase
+        .from('partners')
+        .select('id, name, address, category, affluence_status, pin_code, decouverte_offer, permanent_offer, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente')
+        .eq('id', account.partner_id)
+        .single();
 
       if (partnerData) {
         setPartner(partnerData);
