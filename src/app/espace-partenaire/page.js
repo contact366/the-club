@@ -99,7 +99,7 @@ export default function EspacePartenaire() {
       // Récupérer les infos du partenaire (requête séparée)
       const { data: partnerData } = await supabase
         .from('partners')
-        .select('id, name, address, category, affluence_status, pin_code, decouverte_offer, permanent_offer, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente')
+        .select('id, name, address, category, affluence_status, pin_code, offer_decouverte, offer_permanente')
         .eq('id', account.partner_id)
         .single();
 
@@ -836,16 +836,16 @@ export default function EspacePartenaire() {
                 ) : null
               )}
 
-              {partner?.decouverte_offer && (
+              {partner?.offer_decouverte && (
                 <div className="px-6 py-4 flex justify-between items-center">
                   <span className="text-sm text-gray-500">Offre découverte</span>
-                  <span className="text-sm font-semibold text-gray-900 text-right max-w-[60%]">{partner.decouverte_offer}</span>
+                  <span className="text-sm font-semibold text-gray-900 text-right max-w-[60%]">{partner.offer_decouverte}</span>
                 </div>
               )}
-              {partner?.permanent_offer && (
+              {partner?.offer_permanente && (
                 <div className="px-6 py-4 flex justify-between items-center">
                   <span className="text-sm text-gray-500">Offre permanente</span>
-                  <span className="text-sm font-semibold text-gray-900 text-right max-w-[60%]">{partner.permanent_offer}</span>
+                  <span className="text-sm font-semibold text-gray-900 text-right max-w-[60%]">{partner.offer_permanente}</span>
                 </div>
               )}
               {partner?.pin_code && (
