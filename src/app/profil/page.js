@@ -49,6 +49,7 @@ export default function EspaceMembre() {
   const [authCgu, setAuthCgu] = useState(false);
   const [authMessage, setAuthMessage] = useState({ text: '', type: '' });
   const [authLoading, setAuthLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
     async function chargerDonnees() {
@@ -157,6 +158,20 @@ export default function EspaceMembre() {
         setTimeout(() => { window.location.reload(); }, 1500);
       }
     }
+    setAuthLoading(false);
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthMessage({ text: '', type: '' });
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setAuthMessage(error
+      ? { text: error.message, type: 'error' }
+      : { text: 'Un email de réinitialisation a été envoyé. Vérifiez votre boîte mail (et vos spams).', type: 'success' }
+    );
     setAuthLoading(false);
   };
 
@@ -408,6 +423,30 @@ export default function EspaceMembre() {
               </div>
             )}
 
+            {authMode === 'reset' ? (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <p className="text-sm text-gray-600">Entrez votre adresse email pour recevoir un lien de réinitialisation.</p>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    required
+                    autoComplete="email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-semibold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                >
+                  {authLoading ? 'Envoi...' : 'Envoyer le lien de réinitialisation'}
+                </button>
+              </form>
+            ) : (
             <form onSubmit={handleAuth} className="space-y-4">
               {authMode === 'signup' && (
                 <>
@@ -499,6 +538,17 @@ export default function EspaceMembre() {
                   autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
                   className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
+                {authMode === 'login' && (
+                  <div className="text-right mt-1">
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('reset'); setResetEmail(authEmail); setAuthMessage({ text: '', type: '' }); }}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    >
+                      Mot de passe oublié ?
+                    </button>
+                  </div>
+                )}
               </div>
               {authMode === 'signup' && (
                 <div className="space-y-3 pt-1">
@@ -549,13 +599,14 @@ export default function EspaceMembre() {
                 ) : authMode === 'login' ? 'Se connecter' : 'Créer mon compte'}
               </button>
             </form>
+            )}
 
             <div className="mt-6 text-center">
               <button
                 onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthMessage({ text: '', type: '' }); }}
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
               >
-                {authMode === 'login' ? "Pas encore membre ? Créer un compte" : "Déjà membre ? Se connecter"}
+                {authMode === 'reset' ? 'Retour à la connexion' : authMode === 'login' ? "Pas encore membre ? Créer un compte" : "Déjà membre ? Se connecter"}
               </button>
             </div>
           </div>
