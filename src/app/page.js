@@ -162,6 +162,7 @@ export default function Home() {
   const [cguAccepted, setCguAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
+  const [resetEmail, setResetEmail] = useState("");
 
   // Legal modal
   const [legalModal, setLegalModal] = useState(null);
@@ -414,8 +415,21 @@ export default function Home() {
     setLoading(false);
   };
 
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ text: "", type: "" });
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setMessage(error
+      ? { text: error.message, type: "error" }
+      : { text: "Un email de réinitialisation a été envoyé. Vérifiez votre boîte mail (et vos spams).", type: "success" }
+    );
+    setLoading(false);
+  };
+
   const handleGenerateReferral = async () => {
-    if (!user) { setAuthMode('login'); setIsAuthModalOpen(true); return; }
     setReferralLoading(true);
     try {
       const response = await fetch('/api/referral/generate', {
@@ -1383,6 +1397,18 @@ export default function Home() {
                 {message.text}
               </div>
             )}
+            {authMode === 'reset' ? (
+              <form className="space-y-4" onSubmit={handleResetPassword}>
+                <p className="text-sm text-gray-600">Entrez votre adresse email pour recevoir un lien de réinitialisation.</p>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Email</label>
+                  <input type="email" placeholder="thomas@exemple.com" required value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
+                </div>
+                <button type="submit" disabled={loading} className="w-full bg-riviera-navy text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition shadow-lg mt-2 focus:outline-none disabled:opacity-50">
+                  {loading ? "Envoi..." : "Envoyer le lien de réinitialisation"}
+                </button>
+              </form>
+            ) : (
             <form className="space-y-4" onSubmit={handleAuth}>
               {authMode === 'signup' && (
                 <>
@@ -1425,6 +1451,17 @@ export default function Home() {
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Mot de passe</label>
                 <input type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 outline-none transition-all" />
+                {authMode === 'login' && (
+                  <div className="text-right mt-1">
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('reset'); setResetEmail(email); setMessage({ text: "", type: "" }); }}
+                      className="text-xs text-riviera-azure font-medium hover:underline focus:outline-none"
+                    >
+                      Mot de passe oublié ?
+                    </button>
+                  </div>
+                )}
               </div>
               {authMode === 'signup' && (
                 <div className="space-y-3 pt-1">
@@ -1446,10 +1483,11 @@ export default function Home() {
                 {loading ? "Chargement..." : (authMode === 'signup' ? "Créer mon compte" : "Se connecter")}
               </button>
             </form>
+            )}
             <div className="mt-6 text-center text-sm text-gray-500">
-              {authMode === 'signup' ? "Vous avez déjà un compte ?" : "Nouveau ici ?"}
-              <button onClick={() => { setAuthMode(authMode === 'signup' ? 'login' : 'signup'); setMessage({ text: "", type: "" }); }} className="ml-1 text-riviera-azure font-bold hover:underline focus:outline-none">
-                {authMode === 'signup' ? 'Se connecter' : 'Créer un compte'}
+              {authMode === 'reset' ? '' : (authMode === 'signup' ? "Vous avez déjà un compte ?" : "Nouveau ici ?")}
+              <button onClick={() => { setAuthMode(authMode === 'signup' ? 'login' : authMode === 'reset' ? 'login' : 'signup'); setMessage({ text: "", type: "" }); }} className="ml-1 text-riviera-azure font-bold hover:underline focus:outline-none">
+                {authMode === 'reset' ? 'Retour à la connexion' : authMode === 'signup' ? 'Se connecter' : 'Créer un compte'}
               </button>
             </div>
           </div>
