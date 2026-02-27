@@ -59,6 +59,7 @@ export default function EspacePartenaire() {
   const [authLoading, setAuthLoading] = useState(false);
 
   // Partner data
+  const [profileFirstName, setProfileFirstName] = useState('');
   const [partner, setPartner] = useState(null);
   const [partnerId, setPartnerId] = useState(null);
   const [affluenceStatus, setAffluenceStatus] = useState('calme');
@@ -105,6 +106,16 @@ export default function EspacePartenaire() {
       if (partnerData) {
         setPartner(partnerData);
         setAffluenceStatus(partnerData.affluence_status || 'calme');
+      }
+
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('first_name')
+        .eq('id', user.id)
+        .single();
+
+      if (profileData?.first_name) {
+        setProfileFirstName(profileData.first_name);
       }
 
       setIsAuthenticated(true);
@@ -369,7 +380,7 @@ export default function EspacePartenaire() {
 
           {/* Message de bienvenue */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Bonjour, {partner?.name || 'Partenaire'} 👋</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Bonjour, {profileFirstName || 'Partenaire'} 👋</h1>
             <p className="text-sm text-gray-500 mt-1">Gérez votre établissement et suivez vos performances.</p>
           </div>
 
