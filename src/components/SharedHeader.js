@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import MobileNav from './MobileNav';
@@ -13,6 +13,8 @@ const NAV_LINKS = [
 export default function SharedHeader() {
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
 
   // Auth modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -31,6 +33,23 @@ export default function SharedHeader() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Close user menu on outside click or Escape
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handleClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    const handleKey = (e) => { if (e.key === 'Escape') setUserMenuOpen(false); };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [userMenuOpen]);
 
   const openSignIn = () => {
     setAuthMode('login');
@@ -74,8 +93,8 @@ export default function SharedHeader() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-200/60 shadow-sm transition-all duration-300 ease-out">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300 ease-out">
+        <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
@@ -106,26 +125,47 @@ export default function SharedHeader() {
           {/* Desktop right actions */}
           <div className="hidden lg:flex items-center gap-4">
             {user ? (
-              <>
-                <span className="text-sm font-medium text-gray-500">
-                  {user.user_metadata?.first_name || user.email?.split('@')[0] || 'Membre'}
-                </span>
-                <Link
-                  href="/profil"
-                  className="flex items-center gap-2 px-4 py-2 bg-riviera-navy text-white rounded-full text-sm font-medium hover:bg-gray-900 transition-colors duration-300 ease-out"
+              <div
+                className="relative"
+                ref={userMenuRef}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setUserMenuOpen(false);
+                  }
+                }}
+              >
+                <button
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  className="flex items-center gap-2 px-4 py-2 bg-riviera-navy text-white text-sm font-semibold rounded-full hover:bg-gray-900 transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-riviera-navy"
+                  aria-haspopup="true"
+                  aria-expanded={userMenuOpen}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                   </svg>
                   Mon Espace
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors duration-300 ease-out"
-                >
-                  Déconnexion
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
-              </>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-1 z-10">
+                    <Link
+                      href="/profil"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-riviera-navy hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      Mon profil
+                    </Link>
+                    <button
+                      onClick={() => { handleSignOut(); setUserMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-riviera-navy hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:bg-gray-50"
+                    >
+                      Déconnexion
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <button
