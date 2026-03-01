@@ -66,3 +66,8 @@ img.emoji {
   vertical-align: -0.1em;
   display: inline;
 }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

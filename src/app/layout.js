@@ -1,8 +1,9 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import TwemojiLoader from '@/components/TwemojiLoader';
+import SharedHeader from '@/components/SharedHeader';
+import SharedFooter from '@/components/SharedFooter';
 
-// 2. On configure la police
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -25,10 +26,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    // 3. On applique la classe de la police sur toute la balise <html>
     <html lang="fr" className={inter.className}>
       <body className="antialiased bg-white text-gray-900">
-        {children}
+        <SharedHeader />
+        <div className="pt-16">
+          {children}
+        </div>
+        <SharedFooter />
         <TwemojiLoader />
       </body>
     </html>

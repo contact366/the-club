@@ -44,84 +44,6 @@ const faqData = [
   { q: "Comment utiliser The Club chez un partenaire ?", a: "Ouvrez l'application, sélectionnez le partenaire et présentez votre téléphone. Cliquez sur Utiliser l'offre. Le commerçant tape son code secret à 4 chiffres sur votre écran et la remise est appliquée sur votre facture instantanément." }
 ];
 
-// --- CONTENUS LÉGAUX ---
-const LEGAL_CONTENT = {
-  mentions: {
-    title: "Mentions Légales",
-    content: (
-      <div className="space-y-6 text-sm text-gray-600 leading-relaxed">
-        <div>
-          <h4 className="font-bold text-riviera-navy text-base mb-3">Éditeur du site</h4>
-          <p>Le site The Club est édité par le groupe <strong>Instant&amp;You</strong>.</p>
-          <ul className="mt-3 space-y-2">
-            <li><span className="font-semibold text-gray-800">Forme juridique :</span> SASU au capital de 15 000 €</li>
-            <li><span className="font-semibold text-gray-800">Siège social :</span> 42 chemin du val fleuri, 06800 Cagnes-sur-Mer</li>
-            <li><span className="font-semibold text-gray-800">Immatriculation :</span> RCS d'Antibes n° 98431860000017</li>
-            <li><span className="font-semibold text-gray-800">N° TVA intracommunautaire :</span> NC</li>
-            <li><span className="font-semibold text-gray-800">Directeur de la publication :</span> Maxime FALLET</li>
-            <li><span className="font-semibold text-gray-800">Contact :</span>{" "}
-              <a href="mailto:contact@instantandyou.fr" className="text-riviera-azure hover:underline">contact@instantandyou.fr</a>
-              {" "}— 07.45.05.50.69
-            </li>
-          </ul>
-        </div>
-      </div>
-    )
-  },
-  confidentialite: {
-    title: "Politique de Confidentialité (RGPD)",
-    content: (
-      <div className="space-y-6 text-sm text-gray-600 leading-relaxed">
-        <div>
-          <h4 className="font-bold text-riviera-navy text-base mb-3">Données collectées</h4>
-          <p className="mb-2">Nous collectons les données suivantes :</p>
-          <ul className="space-y-1 list-disc list-inside">
-            <li><span className="font-semibold text-gray-800">Identité :</span> Nom, prénom, adresse email.</li>
-            <li><span className="font-semibold text-gray-800">Abonnement :</span> Type de forfait (Explorer ou Céleste).</li>
-            <li><span className="font-semibold text-gray-800">Usage :</span> Historique des économies réalisées, établissements visités, montants des additions.</li>
-            <li><span className="font-semibold text-gray-800">Paiement :</span> Traité de manière sécurisée par <strong>Stripe</strong>. Aucune coordonnée bancaire n'est stockée par nos soins.</li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="font-bold text-riviera-navy text-base mb-3">Finalités du traitement</h4>
-          <ol className="space-y-1 list-decimal list-inside">
-            <li>Gérer votre accès aux offres partenaires.</li>
-            <li>Calculer et afficher vos économies cumulées en temps réel.</li>
-            <li>Vous envoyer des communications liées à votre abonnement.</li>
-          </ol>
-        </div>
-        <div>
-          <h4 className="font-bold text-riviera-navy text-base mb-3">Vos droits</h4>
-          <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez exercer ce droit en nous contactant à :{" "}
-            <a href="mailto:contact@instantandyou.fr" className="text-riviera-azure hover:underline">contact@instantandyou.fr</a>
-          </p>
-        </div>
-      </div>
-    )
-  },
-  cgv: {
-    title: "Conditions Générales de Vente",
-    content: (
-      <div className="space-y-5 text-sm text-gray-600 leading-relaxed">
-        {[
-          { title: "Article 1 : Objet", body: "Les présentes CGV régissent la vente et l'utilisation des services de The Club, marque du groupe Instant&You. The Club propose un accès privilégié à des offres de réduction chez des partenaires (restaurants, loisirs, bien-être)." },
-          { title: "Article 2 : Adhésion et Forfaits", body: "L'accès aux services nécessite la souscription à un abonnement payant. Forfait Explorer : accès limité (selon descriptif en vigueur). Forfait Céleste : accès premium illimité. L'abonnement est personnel, nominatif et non transférable." },
-          { title: "Article 3 : Fonctionnement des Offres", body: "Offre D��couverte : valable une seule fois par établissement partenaire, nécessite la validation par un code PIN fourni par le commerçant après saisie du montant de l'addition. Offre Permanente : valable de manière récurrente selon les conditions du partenaire. The Club ne peut être tenu responsable si un partenaire refuse d'appliquer l'offre, mais s'engage à faire ses meilleurs efforts pour résoudre tout litige." },
-          { title: "Article 4 : Calcul des économies", body: "Le système d'économies affiché est une estimation basée sur les montants saisis par l'utilisateur et les taux de remise théoriques des partenaires. Ces données n'ont pas de valeur monétaire réelle et ne sont pas remboursables." },
-          { title: "Article 5 : Prix et Paiement", body: "Les tarifs sont indiqués en euros TTC. Le paiement s'effectue par carte bancaire via une plateforme sécurisée (Stripe)." },
-          { title: "Article 6 : Droit de rétractation", body: "Conformément à l'article L221-18 du Code de la consommation, le client dispose de 14 jours pour se rétracter. Toute utilisation du service (validation d'au moins une offre via code PIN) avant la fin de ce délai vaut renonciation expresse au droit de rétractation." },
-          { title: "Article 7 : Résiliation", body: "L'utilisateur peut résilier son abonnement à tout moment depuis son espace client. La résiliation sera effective à la fin de la période de facturation en cours." },
-          { title: "Article 8 : Litiges", body: "Les présentes CGV sont soumises au droit français. En cas de litige, une solution amiable sera recherchée avant toute action devant les tribunaux compétents de Nice." }
-        ].map((article, i) => (
-          <div key={i}>
-            <h4 className="font-bold text-riviera-navy text-sm mb-1">{article.title}</h4>
-            <p>{article.body}</p>
-          </div>
-        ))}
-      </div>
-    )
-  }
-};
 
 export default function Home() {
 
@@ -160,9 +82,6 @@ export default function Home() {
   const [cguAccepted, setCguAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
-
-  // Legal modal
-  const [legalModal, setLegalModal] = useState(null);
 
   // Favorites
   const [favorites, setFavorites] = useState([]);
@@ -798,72 +717,6 @@ export default function Home() {
 
       <InstallPopup />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 glass-light border-b border-gray-200/60 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a href="#" className="font-serif font-bold text-xl tracking-wide text-riviera-navy">
-            THE <span className="text-riviera-gold">CLUB</span>
-          </a>
-          <div className="hidden lg:flex space-x-8 text-sm font-medium text-gray-600">
-            <a href="#economies" className="hover:text-riviera-azure transition">Avantages</a>
-            <a href="#tarifs" className="hover:text-riviera-azure transition">Abonnements</a>
-            <a href="#faq" className="hover:text-riviera-azure transition">FAQ</a>
-          </div>
-          <div className="flex items-center gap-6">
-            {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  Bonjour, <span className="text-riviera-navy font-bold">{user.user_metadata?.first_name || 'Membre'}</span>
-                  <div
-                    className="relative bg-black px-3 py-1 rounded-full shadow-sm overflow-hidden"
-                    style={{ minWidth: '120px', height: '24px', fontFamily: '-apple-system, "SF Pro Display", "SF Pro Text", BlinkMacSystemFont, sans-serif' }}
-                  >
-                    <span
-                      className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold tracking-tight transition-all duration-700"
-                      style={{
-                        opacity: savingsLabel === 'savings' ? 1 : 0,
-                        transform: savingsLabel === 'savings' ? 'translateY(0)' : 'translateY(-8px)',
-                        letterSpacing: '-0.02em',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      <span className="text-green-400 mr-1">↓</span>
-                      {displayedSavings.toFixed(2)}€
-                      <span className="font-normal text-gray-400 ml-1">économisés</span>
-                    </span>
-                    <span
-                      className="absolute inset-0 flex items-center justify-center text-xs font-bold uppercase tracking-widest transition-all duration-700"
-                      style={{
-                        opacity: savingsLabel === 'status' ? 1 : 0,
-                        transform: savingsLabel === 'status' ? 'translateY(0)' : 'translateY(8px)',
-                        color: subscription === 'celeste' ? '#F5C842' : subscription === 'cercle' ? '#94a3b8' : subscription === 'aventurier' ? '#F97316' : '#60A5FA',
-                      }}
-                    >
-                      {subscription === 'celeste' ? <><Emoji symbol="✨" label="céleste" size={14} /> Céleste</> : subscription === 'cercle' ? <><Emoji symbol="🖤" label="cercle" size={14} /> Le Cercle</> : subscription === 'aventurier' ? <><Emoji symbol="🔥" label="aventurier" size={14} /> Aventurier</> : <><Emoji symbol="🚀" label="explorer" size={14} /> Explorer</>}
-                    </span>
-                  </div>
-                </span>
-                <Link href="/profil" className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                  </svg>
-                  Mon Espace
-                </Link>
-                <button onClick={() => supabase.auth.signOut()} className="text-xs text-red-500 hover:text-red-700 font-semibold transition">
-                  Déconnexion
-                </button>
-              </div>
-            ) : (
-              <button onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }} className="text-sm font-semibold text-gray-600 hover:text-riviera-azure transition">
-                Se connecter
-              </button>
-            )}
-            <Link href="/espace-partenaire" className="hidden md:inline-block text-sm font-semibold text-riviera-navy border border-riviera-navy px-5 py-2 rounded-full hover:bg-riviera-navy hover:text-white transition">
-              Espace Partenaire
-            </Link>
-          </div>
-        </div>
-      </nav>
 
       {/* Hero */}
       <section className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
@@ -1346,21 +1199,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white pt-16 pb-8 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="font-serif font-bold text-3xl tracking-wide text-riviera-navy mb-8">THE <span className="text-riviera-gold">CLUB</span></div>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-medium text-gray-600 mb-8">
-            <button onClick={() => setLegalModal('cgv')} className="hover:text-riviera-azure transition">Conditions Générales de Vente</button>
-            <button onClick={() => setLegalModal('mentions')} className="hover:text-riviera-azure transition">Mentions légales</button>
-            <button onClick={() => setLegalModal('confidentialite')} className="hover:text-riviera-azure transition">Politique de confidentialité</button>
-            <a href="#faq" className="hover:text-riviera-azure transition">FAQ</a>
-            <Link href="/espace-partenaire" className="hover:text-riviera-azure transition">Espace Partenaire</Link>
-          </div>
-          <p className="text-gray-500 text-sm mb-2">Conçu et propulsé par l'écosystème <span className="text-riviera-navy font-bold">Instant&amp;You</span>.</p>
-          <p className="text-gray-400 text-xs">© 2026 The Club. Tous droits réservés.</p>
-        </div>
-      </footer>
 
       {/* ======================================================= */}
       {/* MODAL AUTHENTIFICATION                                   */}
@@ -1480,41 +1318,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ======================================================= */}
-      {/* MODAL LÉGAL (Mentions / RGPD / CGV)                     */}
-      {/* ======================================================= */}
-      {legalModal && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-riviera-navy/50 backdrop-blur-sm" onClick={() => setLegalModal(null)}></div>
-          <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
-            {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
-              <h3 className="font-serif text-2xl font-bold text-riviera-navy">
-                {LEGAL_CONTENT[legalModal].title}
-              </h3>
-              <button onClick={() => setLegalModal(null)} className="text-gray-400 hover:text-gray-600 transition focus:outline-none">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            {/* Scrollable content */}
-            <div className="overflow-y-auto px-8 py-6 flex-1">
-              {LEGAL_CONTENT[legalModal].content}
-            </div>
-            {/* Footer tabs */}
-            <div className="px-8 py-5 border-t border-gray-100 flex flex-wrap gap-3 justify-center">
-              {Object.entries(LEGAL_CONTENT).map(([key, val]) => (
-                <button
-                  key={key}
-                  onClick={() => setLegalModal(key)}
-                  className={`text-xs font-semibold px-4 py-2 rounded-full transition ${legalModal === key ? 'bg-riviera-navy text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                >
-                  {val.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ======================================================= */}
       {/* MODAL AMBASSADEUR — Lien de parrainage                  */}
