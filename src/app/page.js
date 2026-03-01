@@ -1248,7 +1248,7 @@ export default function Home() {
           </div>
           <div className="md:w-1/2 w-full flex justify-center min-h-[200px]">
             <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative flex items-center justify-center">
-              <div className="fade-transition w-full">
+              <div className="transition duration-500 ease-in-out w-full">
                 <div className="text-5xl mb-4"><Emoji symbol={parrainageData[parrIndex].icon} size={48} /></div>
                 <h3 className="text-xl font-bold text-white mb-2">{parrainageData[parrIndex].title}</h3>
                 <p className="text-sm font-medium text-blue-100">{parrainageData[parrIndex].text}</p>
