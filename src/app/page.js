@@ -7,31 +7,6 @@ import InstallPopup from '@/components/InstallPopup';
 import Emoji from '@/components/Emoji';
 
 // --- DONNÉES STATIQUES ---
-const ecoData = [
-  {
-    title: 'Avec Le Pass <span class="text-riviera-navy">Explorer (9,90€/m)</span>',
-    details: `
-      <div class="flex justify-between items-center text-sm"><span class="text-gray-300">Dîner pour deux <span class="text-riviera-azure text-xs font-bold bg-blue-500/20 px-2 py-0.5 rounded ml-1">-50% (1 seule fois)</span></span><span class="text-white font-mono">60 €</span></div>
-      <div class="flex justify-between items-center text-sm mt-4"><span class="text-gray-300">Activité de loisir <span class="text-gray-400 text-xs font-bold bg-gray-500/20 px-2 py-0.5 rounded ml-1">-10% (Permanent)</span></span><span class="text-white font-mono">90 €</span></div>
-      <hr class="border-riviera-azure/30 my-4">
-      <div class="flex justify-between items-center"><span class="font-bold text-lg">Total Payé</span><span class="text-3xl font-bold text-white font-mono">150 €</span></div>`,
-    savings: 'Économie sur la soirée : 70 €',
-    desc: 'Idéal pour tester. <span class="text-white font-semibold">Gain net : 60,10€</span> une fois le pass déduit.',
-    colorClass: 'bg-white', textColor: 'text-riviera-navy'
-  },
-  {
-    title: 'Avec Le Pass <span class="text-riviera-gold">Céleste (59€/an)</span>',
-    details: `
-      <div class="flex justify-between items-center text-sm"><span class="text-gray-300">Dîner pour deux <span class="text-green-400 text-xs font-bold bg-green-500/20 px-2 py-0.5 rounded ml-1">-50%</span></span><span class="text-white font-mono">60 €</span></div>
-      <div class="flex justify-between items-center text-sm mt-4"><span class="text-gray-300">Activité de loisir <span class="text-green-400 text-xs font-bold bg-green-500/20 px-2 py-0.5 rounded ml-1">-50%</span></span><span class="text-white font-mono">50 €</span></div>
-      <hr class="border-riviera-azure/30 my-4">
-      <div class="flex justify-between items-center"><span class="font-bold text-lg">Total Payé</span><span class="text-3xl font-bold text-white font-mono">110 €</span></div>`,
-    savings: 'Économie sur la soirée : 110 €',
-    desc: 'Votre pass annuel à 59€ est <span class="text-white font-semibold underline decoration-riviera-gold">intégralement remboursé dès le premier soir</span> !',
-    colorClass: 'bg-riviera-gold', textColor: 'text-riviera-navy'
-  }
-];
-
 const parrainageData = [
   { icon: "🎁", title: "2 Mois Offerts", text: "Pour chaque filleul qui s'abonne au Pass Céleste, recevez 2 mois d'abonnement immédiats." },
   { icon: "♾️", title: "Sans Limite", text: "Parrainez 6 amis et profitez de l'application The Club 100% gratuitement pendant un an." },
@@ -40,7 +15,7 @@ const parrainageData = [
 
 const faqData = [
   { q: "Comment fonctionne l'offre Découverte ?", a: "L'offre Découverte (allant jusqu'à -50%) est valable une seule fois par établissement partenaire. Une fois scannée et utilisée, vous bénéficiez automatiquement de l'offre Privilège permanente (ex: -10% ou -20%) pour toutes vos visites suivantes." },
-  { q: "Le Pass Explorer est-il avec engagement ?", a: "Non, le Pass Explorer (mensuel à 9,90€) est totalement sans engagement. Vous pouvez l'annuler en un seul clic depuis votre espace membre. Le Pass Céleste (59€/an) vous engage sur 12 mois pour vous offrir le tarif le plus avantageux possible et un accès illimité aux offres." },
+  { q: "Le Pass Explorer est-il avec engagement ?", a: "Non, le Pass Explorer (mensuel à 9,90€) est totalement sans engagement. Vous pouvez l'annuler en un seul clic depuis votre espace membre. Le Pass Céleste (14,90€/mois ou 129€/an) vous offre l'accès illimité à toutes les offres." },
   { q: "Comment utiliser The Club chez un partenaire ?", a: "Ouvrez l'application, sélectionnez le partenaire et présentez votre téléphone. Cliquez sur Utiliser l'offre. Le commerçant tape son code secret à 4 chiffres sur votre écran et la remise est appliquée sur votre facture instantanément." },
   { q: "Puis-je changer de pass après souscription ?", a: "Oui. Vous pouvez passer au Pass Céleste à tout moment depuis votre espace membre. La montée en gamme est immédiate. Pour un passage au Pass Explorer ou Aventurier, contactez le support." },
   { q: "Le Pass Aventurier est-il remboursable ?", a: "Le Pass Aventurier est un paiement unique non remboursable une fois activé. Il vous donne accès à la plateforme pendant 72 heures, idéal pour découvrir l'expérience lors d'un séjour." }
@@ -64,7 +39,6 @@ function ChevronIcon({ rotated }) {
 export default function Home() {
 
   // --- ÉTATS ---
-  const [ecoIndex, setEcoIndex] = useState(0);
   const [parrIndex, setParrIndex] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
   const [openPlanDetail, setOpenPlanDetail] = useState(null);
@@ -556,13 +530,11 @@ export default function Home() {
   }, [user]);
 
   useEffect(() => {
-    const ecoInterval = setInterval(() => setEcoIndex(prev => (prev + 1) % ecoData.length), 4000);
     const parrInterval = setInterval(() => setParrIndex(prev => (prev + 1) % parrainageData.length), 5000);
     window.openReactPinModal = openPinModal;
     window.toggleReactFavorite = (partnerId) => toggleFavorite(partnerId);
     window.reactFavorites = favorites;
     return () => {
-      clearInterval(ecoInterval);
       clearInterval(parrInterval);
     };
   }, [openPinModal, toggleFavorite, favorites]);
@@ -760,66 +732,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* GASTRONOMIE */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center gap-16">
-            <div className="md:w-1/2">
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
-            </div>
-            <div className="md:w-1/2">
-              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Gastronomie</span>
-              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Tables d&apos;exception.</h2>
-              <p className="text-gray-500 text-lg mb-8">Des tables étoilées aux bistrots cachés — sélectionnés pour leur excellence. Jusqu&apos;à −50&nbsp;% sur votre premier dîner.</p>
-              <Link href="/gastronomie" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
-                Découvrir les tables
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* LOISIRS */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row-reverse items-center gap-16">
-            <div className="md:w-1/2">
-              <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
-            </div>
-            <div className="md:w-1/2">
-              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Loisirs</span>
-              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Activités uniques.</h2>
-              <p className="text-gray-500 text-lg mb-8">Simulateurs, activités indoor, expériences inédites. Des moments mémorables à moindre coût.</p>
-              <Link href="/loisirs" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
-                Voir les loisirs
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BIEN-ÊTRE */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center gap-16">
-            <div className="md:w-1/2">
-              <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
-            </div>
-            <div className="md:w-1/2">
-              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Bien-être</span>
-              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Votre espace zen.</h2>
-              <p className="text-gray-500 text-lg mb-8">Spas prestigieux, instituts de beauté et salles de sport privées. Prenez soin de vous à prix privilégié.</p>
-              <Link href="/bien-etre" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
-                Explorer le bien-être
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* COMMENT ÇA MARCHE */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-[1200px] mx-auto px-6">
@@ -857,238 +769,60 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Carte */}
-      <section id="carte" className="py-24 bg-riviera-sand relative border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8 pointer-events-none">
-          <div className="text-center md:text-left max-w-2xl mx-auto md:mx-0">
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4 text-riviera-navy pointer-events-auto flex flex-wrap justify-center md:justify-start items-end gap-2">
-              Votre terrain de <span className="text-riviera-gold pb-1">jeu.</span>
-            </h2>
-            <p className="text-gray-600 text-lg pointer-events-auto bg-white/50 inline-block px-4 py-2 rounded-lg backdrop-blur-sm mb-6">Découvrez nos partenaires en temps réel autour de vous.</p>
-            <div className="relative pointer-events-auto max-w-md w-full shadow-2xl rounded-2xl bg-white">
-              <input id="search-input" type="text" placeholder="Rechercher (ex: Nice, Cagnes, Spa...)" autoComplete="off" className="w-full pl-6 pr-14 py-4 rounded-full border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 focus:outline-none text-sm text-gray-700 bg-white/95 backdrop-blur-md transition-all" />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-riviera-navy text-white p-2.5 rounded-full hover:bg-riviera-azure transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              </button>
-              <div id="search-results" className="absolute top-full left-0 w-full bg-white rounded-xl shadow-xl mt-2 hidden overflow-hidden z-50 border border-gray-100"></div>
-            </div>
-          </div>
-        </div>
-        <div id="map" className="w-full h-[500px] md:h-[700px] bg-gray-200 z-0 absolute top-0 left-0 right-0 bottom-0 mt-[400px] md:mt-[300px]"></div>
-        <div className="h-[400px] md:h-[500px]"></div>
-      </section>
-
-      {/* Économies */}
-      <style dangerouslySetInnerHTML={{ __html: `@keyframes ecoProgress { from { width: 0% } to { width: 100% } }` }} />
-      <section id="economies" className="py-24 bg-riviera-navy text-white">
+      {/* UNIVERS */}
+      <section className="py-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-2 block">Le calcul est vite fait</span>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4">Rentabilisé dès le premier soir.</h2>
-            <p className="text-gray-300 max-w-2xl mx-auto">Concrètement, voici ce qu'il se passe lors d'une sortie en amoureux avec et sans l'application The Club.</p>
+            <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-4">Un univers de privilèges.</h2>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">Gastronomie, loisirs, bien-être — sélectionnés pour leur excellence.</p>
           </div>
-          <div className="flex flex-col md:flex-row gap-8 justify-center items-center max-w-5xl mx-auto">
-            <div className="w-full md:w-1/3 bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-8 rounded-[2rem]">
-              <h3 className="font-bold text-xl text-gray-400 mb-6 text-center">Une soirée classique</h3>
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center text-sm"><span className="text-gray-300">Dîner pour deux</span><span className="text-white font-mono">120 €</span></div>
-                <div className="flex justify-between items-center text-sm"><span className="text-gray-300">Activité de loisir</span><span className="text-white font-mono">100 €</span></div>
-                <hr className="border-slate-700" />
-                <div className="flex justify-between items-center"><span className="font-bold">Total Payé</span><span className="text-xl font-bold text-white font-mono">220 €</span></div>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center justify-center w-12 h-12 bg-riviera-gold text-riviera-navy font-bold rounded-full z-10 -mx-6 shadow-xl">VS</div>
-            <div className="w-full md:w-5/12 bg-gradient-to-br from-riviera-azure/20 to-slate-800 border-2 border-riviera-azure p-8 rounded-[2rem] transform md:scale-105 shadow-2xl relative min-h-[350px]">
-              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[2rem] bg-slate-700/50 overflow-hidden">
-                <div key={ecoIndex} style={{ height: '100%', backgroundColor: '#0284C7', animation: 'ecoProgress 4s linear forwards' }}></div>
-              </div>
-              <div className="relative" style={{ minHeight: '260px' }}>
-                {ecoData.map((eco, idx) => (
-                  <div
-                    key={idx}
-                    className="absolute inset-0"
-                    style={{ opacity: idx === ecoIndex ? 1 : 0, transition: 'opacity 700ms ease-in-out', pointerEvents: idx === ecoIndex ? 'auto' : 'none' }}
-                  >
-                    <h3 className="font-bold text-xl text-white mb-6 text-center" dangerouslySetInnerHTML={{ __html: eco.title }}></h3>
-                    <div className="space-y-4 mb-6" dangerouslySetInnerHTML={{ __html: eco.details }}></div>
-                    <div className={`font-bold text-center py-3 rounded-xl transition-colors shadow-lg ${eco.colorClass} ${eco.textColor}`}>{eco.savings}</div>
-                    <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: eco.desc }}></p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Profil Utilisateur Idéal */}
-      <section className="py-24 bg-riviera-sand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="text-riviera-azure font-semibold tracking-wider text-sm uppercase mb-2 block">Pour qui ?</span>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">The Club est fait pour vous.</h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Que vous soyez citadin actif, amoureux ou voyageur, The Club s'adapte à votre style de vie.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                emoji: "💑",
-                title: "Couples citadins",
-                desc: "Dîners romantiques, sorties bien-être, week-ends en amoureux. Profitez de chaque moment à moindre coût.",
-                tags: ["Restaurants", "Spas", "Loisirs"],
-                usage: "Dîners en couple, spa le week-end"
+                img: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
+                label: "Gastronomie",
+                title: "Tables d'exception.",
+                desc: "Jusqu'à −50 % sur votre premier dîner.",
+                href: "/gastronomie",
+                cta: "Découvrir les tables"
               },
               {
-                emoji: "👔",
-                title: "Jeunes professionnels",
-                desc: "Afterwork entre collègues, déjeuners d'affaires, activités sportives. L'art de vivre en ville sans se ruiner.",
-                tags: ["Afterwork", "Déjeuners", "Sport"],
-                usage: "Restaurants le midi, afterwork"
+                img: "https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80",
+                label: "Loisirs",
+                title: "Activités uniques.",
+                desc: "Simulateurs, expériences inédites, moments mémorables.",
+                href: "/loisirs",
+                cta: "Voir les loisirs"
               },
               {
-                emoji: "✈️",
-                title: "Voyageurs réguliers",
-                desc: "De passage sur la Côte d'Azur ? Découvrez les meilleures adresses locales avec des remises exclusives.",
-                tags: ["Découverte", "Gastronomie", "Culture"],
-                usage: "Activités, bons restaurants locaux"
-              },
-              {
-                emoji: "🌟",
-                title: "Amateurs de bons plans",
-                desc: "Sorties week-end, activités inédites, bonnes tables. Vivez l'excellence sans sacrifier votre budget.",
-                tags: ["Week-end", "Activités", "Bonne table"],
-                usage: "Spa, activités, sorties week-end"
+                img: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80",
+                label: "Bien-être",
+                title: "Votre espace zen.",
+                desc: "Spas et instituts de beauté à prix privilégié.",
+                href: "/bien-etre",
+                cta: "Explorer le bien-être"
               }
-            ].map((profile, idx) => (
-              <div key={idx} className="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div className="text-5xl mb-4"><Emoji symbol={profile.emoji} label={profile.title} size={48} /></div>
-                <h3 className="font-bold text-lg text-riviera-navy mb-2">{profile.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1">{profile.desc}</p>
-                <p className="text-xs text-riviera-azure font-semibold mb-3 italic">&ldquo;{profile.usage}&rdquo;</p>
-                <div className="flex flex-wrap gap-2">
-                  {profile.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="text-xs font-semibold bg-riviera-sand text-riviera-navy px-3 py-1 rounded-full border border-gray-200">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+            ].map((item, idx) => (
+              <div key={idx} className="flex flex-col">
+                <img src={item.img} alt={item.label} className="rounded-2xl shadow-sm w-full aspect-[4/3] object-cover mb-6" />
+                <span className="text-riviera-azure text-xs font-semibold uppercase tracking-widest mb-2 block">{item.label}</span>
+                <h3 className="text-2xl font-semibold text-riviera-navy mb-2">{item.title}</h3>
+                <p className="text-gray-500 text-sm mb-4 flex-1">{item.desc}</p>
+                <Link href={item.href} className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out text-sm">
+                  {item.cta}
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </Link>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Application Mobile PWA */}
-      <section className="py-20 bg-riviera-navy text-white overflow-hidden">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2 text-center md:text-left">
-              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block"><Emoji symbol="📱" label="mobile" size={16} /> Application Mobile</span>
-              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">Toujours dans<br className="hidden md:block" /> votre poche.</h2>
-              <p className="text-gray-300 text-lg mb-8">The Club fonctionne comme une vraie application mobile, directement depuis votre navigateur. Zéro téléchargement, 100% disponible.</p>
-              <div className="space-y-4">
-                {[
-                  { icon: "📲", text: "Ajoutez The Club à votre écran d'accueil en un tap" },
-                  { icon: "🔔", text: "Notifications, accès rapide, expérience native" },
-                  { icon: "💯", text: "100% digital, toujours dans votre poche" },
-                  { icon: "🚀", text: "Compatible iOS & Android, sans passer par l'App Store" }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-4">
-                    <span className="text-2xl flex-shrink-0"><Emoji symbol={item.icon} size={24} /></span>
-                    <p className="text-gray-200 text-sm font-medium">{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="md:w-1/2 flex justify-center">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
-                <div className="text-7xl mb-4"><Emoji symbol="📱" label="mobile" size={72} /></div>
-                <h3 className="font-bold text-xl text-white mb-2">Installez l'app</h3>
-                <p className="text-gray-300 text-sm mb-6 leading-relaxed">Sans téléchargement. Directement depuis votre navigateur mobile, ajoutez The Club à votre écran d'accueil.</p>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
-                    <p className="text-white font-bold"><Emoji symbol="🍎" label="iOS" size={18} /> iOS</p>
-                    <p className="text-gray-400 text-xs mt-1">Safari → Partager → Écran d'accueil</p>
-                  </div>
-                  <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
-                    <p className="text-white font-bold"><Emoji symbol="🤖" label="Android" size={18} /> Android</p>
-                    <p className="text-gray-400 text-xs mt-1">Chrome → Menu → Ajouter à l'écran</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Grille ROI sur 3/6/12 mois */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-2 block">Retour sur investissement</span>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">Le calcul est évident.</h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Basé sur 2 sorties par mois avec une économie moyenne de 35€ par sortie. Vos économies s'accumulent chaque mois.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-
-            {/* Pass Explorer ROI */}
-            <div className="rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-              <div className="bg-riviera-sand px-8 py-6 border-b border-gray-200">
-                <h3 className="font-serif text-2xl font-bold text-riviera-navy"><Emoji symbol="🚀" label="explorer" size={24} /> Pass Explorer</h3>
-                <p className="text-riviera-azure font-bold text-xl mt-1">9,90 € / mois</p>
-                <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-400 uppercase tracking-wide">
-                  <span>Durée</span>
-                  <span>Coût</span>
-                  <span>Économies</span>
-                  <span className="text-green-600">Gain net</span>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {[
-                  { period: "3 mois", cost: "29,70 €", savings: "210 €", net: "+180,30 €" },
-                  { period: "6 mois", cost: "59,40 €", savings: "420 €", net: "+360,60 €" },
-                  { period: "12 mois", cost: "118,80 €", savings: "840 €", net: "+721,20 €" }
-                ].map((row, idx) => (
-                  <div key={idx} className={`grid grid-cols-4 px-8 py-4 text-sm items-center ${idx === 2 ? 'bg-green-50/50' : ''}`}>
-                    <span className="font-bold text-riviera-navy">{row.period}</span>
-                    <span className="text-gray-500">{row.cost}</span>
-                    <span className="text-gray-700 font-medium">{row.savings}</span>
-                    <span className={`font-bold ${idx === 2 ? 'text-green-600 text-base' : 'text-green-500'}`}>{row.net}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Pass Céleste ROI */}
-            <div className="rounded-3xl border-2 border-riviera-gold/40 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-              <div className="bg-riviera-navy px-8 py-6 border-b border-riviera-gold/20">
-                <h3 className="font-serif text-2xl font-bold text-riviera-gold"><Emoji symbol="✨" label="céleste" size={24} /> Pass Céleste</h3>
-                <p className="text-gray-300 font-bold text-xl mt-1">59 € / an <span className="text-xs font-normal text-gray-400">(paiement unique)</span></p>
-                <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-500 uppercase tracking-wide">
-                  <span>Durée</span>
-                  <span>Coût**</span>
-                  <span>Économies</span>
-                  <span className="text-riviera-gold">Gain net</span>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {[
-                  { period: "3 mois", cost: "~14,75 €", savings: "210 €", net: "+195,25 €" },
-                  { period: "6 mois", cost: "~29,50 €", savings: "420 €", net: "+390,50 €" },
-                  { period: "12 mois", cost: "59 €", savings: "840 €", net: "+781 €" }
-                ].map((row, idx) => (
-                  <div key={idx} className={`grid grid-cols-4 px-8 py-4 text-sm items-center ${idx === 2 ? 'bg-green-50' : ''}`}>
-                    <span className="font-bold text-riviera-navy">{row.period}</span>
-                    <span className="text-gray-500">{row.cost}</span>
-                    <span className="text-gray-700 font-medium">{row.savings}</span>
-                    <span className={`font-bold ${idx === 2 ? 'text-green-600 text-base' : 'text-green-500'}`}>{row.net}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-          <p className="text-center text-xs text-gray-400 mt-6">* Estimation basée sur 2 sorties/mois avec une économie moyenne de 35€ par sortie. Résultats indicatifs, variables selon l'usage.<br />** Le Pass Céleste (59€) est réglé en une seule fois à l'année. Le coût prorata indique la fraction du coût annuel sur la période.</p>
+      {/* ROI */}
+      <section id="economies" className="py-24 bg-riviera-navy text-white">
+        <div className="max-w-[1200px] mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-5xl font-semibold mb-4">Rentabilisé dès la première sortie.</h2>
+          <p className="text-gray-300 text-lg max-w-xl mx-auto">Un dîner suffit à rentabiliser votre abonnement.</p>
         </div>
       </section>
 
@@ -1177,7 +911,7 @@ export default function Home() {
               >
                 <ul className="space-y-2 text-xs text-gray-500 mb-5 pl-3 border-l-2 border-gray-100">
                   <li>Annulable en 1 clic depuis votre espace membre</li>
-                  <li>Accès aux exclusivités Web "The Club" (bientôt)</li>
+                  <li>Exclusivités Web The Club — <span className="text-gray-400">À venir</span></li>
                   <li>Carte interactive partenaires en temps réel</li>
                 </ul>
               </div>
@@ -1186,19 +920,18 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Pass Céleste — Recommandé */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-riviera-azure shadow-md flex flex-col relative transition-shadow duration-300 ease-out hover:shadow-lg">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span className="bg-riviera-azure text-white text-xs font-semibold px-4 py-1 rounded-full tracking-wide">Recommandé</span>
-              </div>
+            {/* Pass Céleste */}
+            <div className="bg-sky-50/40 rounded-2xl p-8 border border-riviera-azure/30 shadow-sm flex flex-col transition-shadow duration-300 ease-out hover:shadow-md">
               <div className="mb-6">
                 <h3 className="font-serif text-xl font-bold text-riviera-navy mb-1 flex items-center gap-2"><Emoji symbol="✨" label="céleste" size={20} /> Pass Céleste</h3>
                 <p className="text-gray-500 text-sm">L'accès illimité. Rentabilisé dès la première sortie.</p>
               </div>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-riviera-navy tracking-tight">59€</span>
-                <span className="text-gray-400 text-sm ml-1">/ an</span>
-                <p className="text-xs text-riviera-azure font-medium mt-1">Soit 0,66€/jour</p>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-4xl font-bold text-riviera-navy tracking-tight">14,90€</span>
+                  <span className="text-gray-400 text-sm">/ mois</span>
+                </div>
+                <p className="text-sm text-gray-500">ou <span className="font-semibold text-riviera-navy">129€ / an</span></p>
               </div>
               <ul className="space-y-3 mb-5 flex-1 text-sm text-gray-700">
                 <li className="flex items-center gap-2"><svg className="w-4 h-4 text-riviera-azure shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> <span className="font-semibold">Offres Découvertes illimitées (-50%)</span></li>
@@ -1222,7 +955,7 @@ export default function Home() {
                 aria-hidden={openPlanDetail !== 'celeste'}
               >
                 <ul className="space-y-2 text-xs text-gray-500 mb-5 pl-3 border-l-2 border-riviera-azure/30">
-                  <li>Exclu Web &amp; E-billetterie nationale (bientôt)</li>
+                  <li>Exclu Web &amp; E-billetterie nationale — <span className="text-gray-400">À venir</span></li>
                   <li>Accès gastronomie, bien-être, loisirs</li>
                   <li>Programme ambassadeur inclus</li>
                 </ul>
@@ -1235,6 +968,55 @@ export default function Home() {
           </div>
 
         </div>
+      </section>
+
+      {/* Application Mobile */}
+      <section className="py-24 bg-riviera-navy text-white">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="md:w-1/2 text-center md:text-left">
+              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block">Application Mobile</span>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Toujours dans votre poche.</h2>
+              <p className="text-gray-300 text-lg mb-8">Sans téléchargement. Ajoutez The Club à votre écran d'accueil depuis votre navigateur.</p>
+              <a href="#tarifs" className="inline-block bg-white text-riviera-navy font-semibold px-6 py-3 rounded-full text-sm hover:bg-gray-100 transition-colors duration-300 ease-out">
+                Obtenir mon Pass
+              </a>
+            </div>
+            <div className="md:w-1/2 flex justify-center">
+              <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
+                <div className="bg-white/10 rounded-2xl px-4 py-4 border border-white/20 text-center">
+                  <p className="text-white font-semibold text-sm mb-1">iOS</p>
+                  <p className="text-gray-400 text-xs">Safari → Partager → Écran d'accueil</p>
+                </div>
+                <div className="bg-white/10 rounded-2xl px-4 py-4 border border-white/20 text-center">
+                  <p className="text-white font-semibold text-sm mb-1">Android</p>
+                  <p className="text-gray-400 text-xs">Chrome → Menu → Ajouter à l'écran</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Carte */}
+      <section id="carte" className="py-24 bg-riviera-sand relative border-y border-gray-200">
+        <div className="max-w-[1200px] mx-auto px-6 relative z-10 mb-8 pointer-events-none">
+          <div className="text-center md:text-left max-w-2xl">
+            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4 text-riviera-navy pointer-events-auto">
+              Votre terrain de <span className="text-riviera-gold">jeu.</span>
+            </h2>
+            <p className="text-gray-600 text-lg pointer-events-auto bg-white/50 inline-block px-4 py-2 rounded-lg backdrop-blur-sm mb-6">Découvrez nos partenaires en temps réel autour de vous.</p>
+            <div className="relative pointer-events-auto max-w-md w-full shadow-2xl rounded-2xl bg-white">
+              <input id="search-input" type="text" placeholder="Rechercher (ex: Nice, Cagnes, Spa...)" autoComplete="off" className="w-full pl-6 pr-14 py-4 rounded-full border border-gray-200 focus:border-riviera-azure focus:ring-2 focus:ring-riviera-azure/20 focus:outline-none text-sm text-gray-700 bg-white/95 backdrop-blur-md transition-all" />
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-riviera-navy text-white p-2.5 rounded-full hover:bg-riviera-azure transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </button>
+              <div id="search-results" className="absolute top-full left-0 w-full bg-white rounded-xl shadow-xl mt-2 hidden overflow-hidden z-50 border border-gray-100"></div>
+            </div>
+          </div>
+        </div>
+        <div id="map" className="w-full h-[500px] md:h-[700px] bg-gray-200 z-0 absolute top-0 left-0 right-0 bottom-0 mt-[400px] md:mt-[300px]"></div>
+        <div className="h-[400px] md:h-[500px]"></div>
       </section>
 
       {/* Parrainage */}
