@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import MobileNav from './MobileNav';
@@ -13,6 +13,8 @@ const NAV_LINKS = [
 export default function SharedHeader() {
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Auth modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -70,6 +72,17 @@ export default function SharedHeader() {
     }
   };
 
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
   const handleSignOut = () => supabase.auth.signOut();
 
   return (
@@ -106,26 +119,47 @@ export default function SharedHeader() {
           {/* Desktop right actions */}
           <div className="hidden lg:flex items-center gap-4">
             {user ? (
-              <>
-                <span className="text-sm font-medium text-gray-500">
-                  {user.user_metadata?.first_name || user.email?.split('@')[0] || 'Membre'}
-                </span>
-                <Link
-                  href="/profil"
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 px-4 py-2 bg-riviera-navy text-white rounded-full text-sm font-medium hover:bg-gray-900 transition-colors duration-300 ease-out"
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="true"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                   </svg>
-                  Mon Espace
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors duration-300 ease-out"
-                >
-                  Déconnexion
+                  Mon espace
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-3 h-3 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
                 </button>
-              </>
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-2xl shadow-md border border-gray-100 py-1.5 z-50">
+                    <Link
+                      href="/profil"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-riviera-navy transition-colors duration-200"
+                    >
+                      Profil
+                    </Link>
+                    <Link
+                      href="/profil"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-riviera-navy transition-colors duration-200"
+                    >
+                      Abonnement
+                    </Link>
+                    <div className="h-px bg-gray-100 my-1" />
+                    <button
+                      onClick={() => { handleSignOut(); setDropdownOpen(false); }}
+                      className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors duration-200"
+                    >
+                      Déconnexion
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <button
@@ -134,13 +168,12 @@ export default function SharedHeader() {
                 >
                   Se connecter
                 </button>
-                {/* Primary CTA */}
-                <Link
-                  href="/#tarifs"
+                <button
+                  onClick={openSignIn}
                   className="px-5 py-2 bg-riviera-navy text-white text-sm font-semibold rounded-full hover:bg-gray-900 transition-colors duration-300 ease-out shadow-sm"
                 >
-                  Obtenir mon Pass
-                </Link>
+                  Mon espace
+                </button>
               </>
             )}
           </div>

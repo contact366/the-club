@@ -92,58 +92,62 @@ export default function SharedFooter() {
 
   return (
     <>
-      <footer className="bg-white border-t border-gray-200 pt-12 pb-8">
+      <footer className="bg-white border-t border-gray-100 pt-10 pb-8">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top row: logo + nav */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-10">
+          {/* Grid: 3 columns */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* Col 1: Brand */}
             <div>
-              <div className="font-serif font-bold text-2xl tracking-wide text-riviera-navy mb-1">
+              <div className="font-serif font-bold text-xl tracking-wide text-riviera-navy mb-1">
                 THE <span className="text-riviera-gold">CLUB</span>
               </div>
-              <p className="text-sm text-gray-400">Pass Privilège · Riviera &amp; au-delà</p>
+              <p className="text-sm text-gray-400 mt-1">Pass Privilège · Riviera &amp; au-delà</p>
             </div>
-            <nav aria-label="Navigation footer" className="flex flex-wrap gap-x-8 gap-y-3">
-              {FOOTER_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-medium text-gray-500 hover:text-riviera-navy transition-colors duration-300 ease-out"
-                >
-                  {link.label}
-                </Link>
-              ))}
+
+            {/* Col 2: Navigation */}
+            <nav aria-label="Navigation footer">
+              <ul className="space-y-2">
+                {FOOTER_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-500 hover:text-riviera-navy transition-colors duration-300 ease-out"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </nav>
-          </div>
 
-          {/* Divider */}
-          <div className="h-px bg-gray-100 mb-8" />
-
-          {/* Bottom row: legal + copyright */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
+            {/* Col 3: Legal */}
+            <div className="space-y-2">
               <button
                 onClick={() => setLegalModal('cgv')}
-                className="text-xs text-gray-400 hover:text-gray-700 transition-colors duration-300 ease-out focus:outline-none focus:underline"
+                className="block text-sm text-gray-500 hover:text-gray-700 transition-colors duration-300 ease-out focus:outline-none focus:underline"
               >
-                Conditions Générales de Vente
+                CGV
               </button>
               <button
                 onClick={() => setLegalModal('mentions')}
-                className="text-xs text-gray-400 hover:text-gray-700 transition-colors duration-300 ease-out focus:outline-none focus:underline"
+                className="block text-sm text-gray-500 hover:text-gray-700 transition-colors duration-300 ease-out focus:outline-none focus:underline"
               >
                 Mentions légales
               </button>
               <button
                 onClick={() => setLegalModal('confidentialite')}
-                className="text-xs text-gray-400 hover:text-gray-700 transition-colors duration-300 ease-out focus:outline-none focus:underline"
+                className="block text-sm text-gray-500 hover:text-gray-700 transition-colors duration-300 ease-out focus:outline-none focus:underline"
               >
-                Politique de confidentialité
+                Confidentialité
               </button>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-400">Propulsé par <span className="text-gray-600 font-medium">Instant&amp;You</span></p>
-              <p className="text-xs text-gray-400">© 2026 The Club. Tous droits réservés.</p>
-            </div>
+          </div>
+
+          {/* Bottom: copyright */}
+          <div className="h-px bg-gray-100 mb-6" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-xs text-gray-400">© 2026 The Club. Tous droits réservés.</p>
+            <p className="text-xs text-gray-400">Propulsé par <span className="text-gray-500 font-medium">Instant&amp;You</span></p>
           </div>
         </div>
       </footer>
