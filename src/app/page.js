@@ -126,8 +126,6 @@ const LEGAL_CONTENT = {
 export default function Home() {
 
   // --- ÉTATS ---
-  const [wordIndex, setWordIndex] = useState(0);
-  const words = ["Surclassé.", "Réinventé.", "Privilégié.", "Digitalisé."];
   const [ecoIndex, setEcoIndex] = useState(0);
   const [parrIndex, setParrIndex] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
@@ -622,14 +620,12 @@ export default function Home() {
   }, [user]);
 
   useEffect(() => {
-    const wordInterval = setInterval(() => setWordIndex(prev => (prev + 1) % words.length), 3000);
     const ecoInterval = setInterval(() => setEcoIndex(prev => (prev + 1) % ecoData.length), 4000);
     const parrInterval = setInterval(() => setParrIndex(prev => (prev + 1) % parrainageData.length), 5000);
     window.openReactPinModal = openPinModal;
     window.toggleReactFavorite = (partnerId) => toggleFavorite(partnerId);
     window.reactFavorites = favorites;
     return () => {
-      clearInterval(wordInterval);
       clearInterval(ecoInterval);
       clearInterval(parrInterval);
     };
@@ -870,25 +866,23 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 px-4 overflow-hidden min-h-[90vh] flex items-center justify-center text-center">
+      <section className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover z-0">
           <source src="/intro.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-riviera-navy/60 z-0"></div>
-        <div className="max-w-4xl mx-auto relative z-10 flex flex-col items-center">
-          <span className="text-riviera-gold font-bold tracking-widest text-sm uppercase mb-6 block drop-shadow-lg">Édition locale • Bientôt partout en France</span>
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8 text-white drop-shadow-xl h-32 md:h-auto">
-            L'Art de vivre, <br />
-            <span className="text-gradient inline-block transition-opacity duration-500">{words[wordIndex]}</span>
+        <div className="absolute inset-0 bg-black/60 z-0"></div>
+        <div className="max-w-[1200px] mx-auto px-6 relative z-10 flex flex-col items-center">
+          <h1 className="text-6xl md:text-7xl font-semibold leading-tight mb-6 text-white">
+            L&apos;Art de vivre,<br />à prix d&apos;élite.
           </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light drop-shadow-md">
-            Accédez à l'élite des restaurants, spas et loisirs de votre région avec des privilèges allant jusqu'à -50%. Votre pass exclusif, 100% digital.
+          <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-xl mx-auto font-light">
+            Restaurants, spas et loisirs d&apos;exception. Jusqu&apos;à −50&nbsp;% chez les meilleurs établissements de votre région.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-            <a href="#tarifs" className="bg-riviera-gold text-riviera-navy font-bold px-10 py-4 rounded-full hover:bg-white transition-all shadow-xl hover:-translate-y-1">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#tarifs" className="bg-white text-riviera-navy font-semibold px-10 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-300 ease-out shadow-md hover:-translate-y-0.5">
               Obtenir mon Pass
             </a>
-            <a href="#carte" className="bg-white/20 backdrop-blur-md text-white border border-white/30 flex items-center justify-center px-10 py-4 font-medium rounded-full hover:bg-white/30 transition-colors">
+            <a href="#carte" className="bg-white/10 text-white border border-white/30 flex items-center justify-center px-10 py-4 font-medium rounded-2xl hover:bg-white/20 transition-all duration-300 ease-out">
               Explorer les adresses
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </a>
@@ -896,84 +890,99 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CINQ UNIVERS */}
+      {/* GASTRONOMIE */}
       <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">Cinq univers. Une seule carte.</h2>
-            <p className="text-gray-500 text-lg">L'excellence sélectionnée par The Club, en ville et en ligne.</p>
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-16">
+            <div className="md:w-1/2">
+              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
+            </div>
+            <div className="md:w-1/2">
+              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Gastronomie</span>
+              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Tables d&apos;exception.</h2>
+              <p className="text-gray-500 text-lg mb-8">Des tables étoilées aux bistrots cachés — sélectionnés pour leur excellence. Jusqu&apos;à −50&nbsp;% sur votre premier dîner.</p>
+              <Link href="/gastronomie" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
+                Découvrir les tables
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {/* Gastronomie */}
-            <Link href="/gastronomie" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-              <div className="absolute top-4 left-4">
-                <span className="bg-riviera-gold text-riviera-navy text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Jusqu'à -50%</span>
-              </div>
-              <div className="absolute bottom-0 left-0 p-5">
-                <h3 className="text-white font-bold text-2xl mb-1">Gastronomie</h3>
-                <p className="text-gray-300 text-xs leading-snug">Tables étoilées, bistrots cachés et coffee shops pointus.</p>
-              </div>
-            </Link>
+        </div>
+      </section>
 
-            {/* Bien-être */}
-            <Link href="/bien-etre" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
-              <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-              <div className="absolute top-4 left-4">
-                <span className="bg-riviera-azure text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Jusqu'à -40%</span>
-              </div>
-              <div className="absolute bottom-0 left-0 p-5">
-                <h3 className="text-white font-bold text-2xl mb-1">Bien-être</h3>
-                <p className="text-gray-300 text-xs leading-snug">Spas prestigieux, instituts de beauté et salles de sport privées.</p>
-              </div>
-            </Link>
+      {/* LOISIRS */}
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row-reverse items-center gap-16">
+            <div className="md:w-1/2">
+              <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
+            </div>
+            <div className="md:w-1/2">
+              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Loisirs</span>
+              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Activités uniques.</h2>
+              <p className="text-gray-500 text-lg mb-8">Simulateurs, activités indoor, expériences inédites. Des moments mémorables à moindre coût.</p>
+              <Link href="/loisirs" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
+                Voir les loisirs
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Loisirs */}
-            <Link href="/loisirs" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300 col-span-2 md:col-span-1">
-              <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-              <div className="absolute top-4 left-4">
-                <span className="bg-riviera-gold text-riviera-navy text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Jusqu'à -50%</span>
-              </div>
-              <div className="absolute bottom-0 left-0 p-5">
-                <h3 className="text-white font-bold text-2xl mb-1">Loisirs</h3>
-                <p className="text-gray-300 text-xs leading-snug">Activités indoor, simulateurs et expériences inédites.</p>
-              </div>
-            </Link>
+      {/* BIEN-ÊTRE */}
+      <section className="py-24 bg-white">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-16">
+            <div className="md:w-1/2">
+              <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
+            </div>
+            <div className="md:w-1/2">
+              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Bien-être</span>
+              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Votre espace zen.</h2>
+              <p className="text-gray-500 text-lg mb-8">Spas prestigieux, instituts de beauté et salles de sport privées. Prenez soin de vous à prix privilégié.</p>
+              <Link href="/bien-etre" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
+                Explorer le bien-être
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Exclu Web */}
-            <Link href="/exclu-web" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
-              <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" alt="Exclu Web" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-              <div className="absolute top-4 left-4">
-                <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-white/30">Offres Nationales</span>
+      {/* COMMENT ÇA MARCHE */}
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-4">Comment ça marche.</h2>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">Trois étapes simples pour accéder à tous vos privilèges.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              {
+                icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>),
+                title: "Créez votre compte",
+                desc: "Inscrivez-vous en 2 minutes et choisissez votre formule."
+              },
+              {
+                icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>),
+                title: "Trouvez vos adresses",
+                desc: "Explorez la carte interactive et repérez les établissements partenaires."
+              },
+              {
+                icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>),
+                title: "Profitez de vos remises",
+                desc: "Présentez l'app à la caisse et le commerçant valide votre avantage en quelques secondes."
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-riviera-navy flex items-center justify-center text-white mb-6 shadow-md">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-riviera-navy mb-3">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
-              <div className="absolute bottom-0 left-0 p-5">
-                <h3 className="text-white font-bold text-2xl mb-1">Exclu Web</h3>
-                <p className="text-gray-300 text-xs leading-snug">Réductions exclusives sur vos marques préférées en ligne.</p>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
-              </div>
-            </Link>
-
-            {/* E-billetterie */}
-            <Link href="/e-billetterie" className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-md hover:shadow-2xl transition-shadow duration-300">
-              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80" alt="E-billetterie" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-              <div className="absolute top-4 left-4">
-                <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-white/30">Concerts & Parcs</span>
-              </div>
-              <div className="absolute bottom-0 left-0 p-5">
-                <h3 className="text-white font-bold text-2xl mb-1">E-billetterie</h3>
-                <p className="text-gray-300 text-xs leading-snug">Vos places de spectacles, cinémas et parcs d'attractions à prix réduits.</p>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-white/90 text-riviera-navy text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Bientôt disponible</span>
-              </div>
-            </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -1001,10 +1010,8 @@ export default function Home() {
 
       {/* Économies */}
       <style dangerouslySetInnerHTML={{ __html: `@keyframes ecoProgress { from { width: 0% } to { width: 100% } }` }} />
-      <section id="economies" className="py-24 bg-riviera-navy text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-riviera-azure rounded-full opacity-10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 bg-riviera-gold rounded-full opacity-10 blur-3xl"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <section id="economies" className="py-24 bg-riviera-navy text-white">
+        <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-16">
             <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-2 block">Le calcul est vite fait</span>
             <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4">Rentabilisé dès le premier soir.</h2>
@@ -1102,10 +1109,8 @@ export default function Home() {
       </section>
 
       {/* Application Mobile PWA */}
-      <section className="py-20 bg-riviera-navy text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-riviera-gold rounded-full opacity-10 blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-riviera-azure rounded-full opacity-10 blur-3xl pointer-events-none"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <section className="py-20 bg-riviera-navy text-white overflow-hidden">
+        <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2 text-center md:text-left">
               <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block"><Emoji symbol="📱" label="mobile" size={16} /> Application Mobile</span>
@@ -1261,26 +1266,7 @@ export default function Home() {
 
             {/* Pass Céleste */}
             <div className="bg-riviera-navy text-white rounded-[2rem] p-8 border-2 border-riviera-gold/30 flex flex-col relative transform md:-translate-y-4 shadow-2xl">
-              <div
-                className="absolute top-0 right-8 transform -translate-y-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide"
-                style={{
-                  background: 'linear-gradient(135deg, #F5C842, #F59E0B, #F5C842)',
-                  backgroundSize: '200% 200%',
-                  animation: 'neonGlow 2s ease-in-out infinite, shimmer 3s linear infinite',
-                  boxShadow: '0 0 10px #F5C84280, 0 0 20px #F5C84250, 0 0 40px #F5C84230',
-                }}
-              >LE PLUS CHOISI</div>
-              <style>{`
-                @keyframes neonGlow {
-                  0%, 100% { box-shadow: 0 0 8px #F5C84290, 0 0 18px #F5C84260, 0 0 35px #F5C84240; }
-                  50% { box-shadow: 0 0 15px #F5C842cc, 0 0 30px #F5C84299, 0 0 55px #F5C84266; }
-                }
-                @keyframes shimmer {
-                  0% { background-position: 0% 50%; }
-                  50% { background-position: 100% 50%; }
-                  100% { background-position: 0% 50%; }
-                }
-              `}</style>
+              <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-riviera-gold text-riviera-navy text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide shadow-md">LE PLUS CHOISI</div>
               <h3 className="font-serif text-2xl font-bold mb-2 text-riviera-gold"><Emoji symbol="✨" label="céleste" size={24} /> Pass Céleste</h3>
               <p className="text-gray-300 text-sm mb-6 h-10"><em>L'accès illimité. Conçu pour ceux qui veulent l'élite sans compromis.</em></p>
               <div className="mb-8"><span className="text-5xl font-bold tracking-tight">59€</span><span className="text-gray-400"> / an</span></div>
@@ -1302,9 +1288,8 @@ export default function Home() {
       </section>
 
       {/* Parrainage */}
-      <section className="py-16 bg-gradient-to-r from-riviera-azure to-blue-900 text-white relative border-y border-white/10 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
+      <section className="py-16 bg-riviera-navy text-white relative border-y border-white/10 overflow-hidden">
+        <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
           <div className="md:w-1/2 text-center md:text-left">
             <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider border border-white/30 mb-6"><Emoji symbol="🎁" label="cadeau" size={16} /> Programme Ambassadeur</div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Partagez l'excellence. Soyez récompensé.</h2>
@@ -1349,7 +1334,7 @@ export default function Home() {
       {/* B2B */}
       <section id="b2b" className="relative py-24 bg-riviera-navy text-white overflow-hidden">
         <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80" className="absolute inset-0 w-full h-full object-cover opacity-20" alt="Restaurant Interior" />
-        <div className="absolute inset-0 bg-gradient-to-t from-riviera-navy via-riviera-navy/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-riviera-navy/70"></div>
         <div className="relative max-w-4xl mx-auto px-4 text-center z-10">
           <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block">Espace Professionnels</span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">Attirez la clientèle que vous méritez.</h2>
