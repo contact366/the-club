@@ -1,4 +1,9 @@
-"use client";
+return (
+  <>
+    <div style={{background: "red", padding: "40px", color: "white"}}>
+      TEST SUPPRESSION
+    </div>
+        "use client";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import Script from 'next/script';
