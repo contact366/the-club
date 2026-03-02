@@ -886,32 +886,21 @@ export default function Home() {
       Rentabilisé dès la première sortie.
     </h2>
 
-    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-12">
-      Avec le Pass Céleste, une sortie suffit souvent à amortir l’abonnement.
+    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
+      Avec le Pass Céleste, une seule sortie suffit souvent à amortir votre abonnement.
     </p>
 
-    <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
-
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">Économie moyenne / sortie</p>
-        <p className="text-2xl font-semibold mt-2">~35€*</p>
-      </div>
-
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">2 sorties / mois</p>
-        <p className="text-2xl font-semibold mt-2">~70€ d’économies</p>
-      </div>
-
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">Pass Céleste</p>
-        <p className="text-2xl font-semibold mt-2">14,90€ / mois</p>
-        <p className="text-sm text-gray-400 mt-1">Amorti dès 1 sortie</p>
-      </div>
-
+    <div className="text-left max-w-md mx-auto mb-8">
+      <p className="text-gray-300 text-lg mb-3">En moyenne :</p>
+      <ul className="space-y-2 text-gray-200 text-lg">
+        <li>• ~35€ d’économie par sortie</li>
+        <li>• ~70€ d’économie par mois (2 sorties)</li>
+        <li>• 14,90€ / mois, amorti dès la première utilisation</li>
+      </ul>
     </div>
 
     <p className="text-xs text-gray-500 mt-8">
-      *Estimations indicatives, variables selon l’usage et les offres partenaires.
+      Estimations indicatives selon l’usage et les offres partenaires.
     </p>
 
   </div>
