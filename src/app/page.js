@@ -890,26 +890,24 @@ export default function Home() {
       Avec le Pass Céleste, une seule sortie suffit souvent à amortir votre abonnement.
     </p>
 
-    <p className="text-gray-300 text-base max-w-2xl mx-auto mb-12">
-      En moyenne :
-    </p>
+    <p className="text-gray-400 text-base font-semibold mb-8">En moyenne :</p>
 
     <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">Économie moyenne / sortie</p>
+        <p className="text-sm text-gray-400">Économie par sortie</p>
         <p className="text-2xl font-semibold mt-2">~35€</p>
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">2 sorties / mois</p>
-        <p className="text-2xl font-semibold mt-2">~70€ d&apos;économies</p>
+        <p className="text-sm text-gray-400">Économie par mois (2 sorties)</p>
+        <p className="text-2xl font-semibold mt-2">~70€</p>
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
         <p className="text-sm text-gray-400">Pass Céleste</p>
         <p className="text-2xl font-semibold mt-2">14,90€ / mois</p>
-        <p className="text-sm text-gray-400 mt-1">Amorti dès la 1ère utilisation</p>
+        <p className="text-sm text-gray-400 mt-1">Amorti dès la première utilisation</p>
       </div>
 
     </div>
