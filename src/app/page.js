@@ -880,46 +880,42 @@ export default function Home() {
 
       {/* Économies */}
       <section id="economies" className="py-24 bg-riviera-navy text-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-2 block">Le calcul est vite fait</span>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4">Rentabilisé dès le premier soir.</h2>
-            <p className="text-gray-300 max-w-2xl mx-auto">Concrètement, voici ce qu'il se passe lors d'une sortie en amoureux avec et sans l'application The Club.</p>
-          </div>
-          <div className="flex flex-col md:flex-row gap-8 justify-center items-center max-w-5xl mx-auto">
-            <div className="w-full md:w-1/3 bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-8 rounded-[2rem]">
-              <h3 className="font-bold text-xl text-gray-400 mb-6 text-center">Une soirée classique</h3>
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center text-sm"><span className="text-gray-300">Dîner pour deux</span><span className="text-white font-mono">120 €</span></div>
-                <div className="flex justify-between items-center text-sm"><span className="text-gray-300">Activité de loisir</span><span className="text-white font-mono">100 €</span></div>
-                <hr className="border-slate-700" />
-                <div className="flex justify-between items-center"><span className="font-bold">Total Payé</span><span className="text-xl font-bold text-white font-mono">220 €</span></div>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center justify-center w-12 h-12 bg-riviera-gold text-riviera-navy font-bold rounded-full z-10 -mx-6 shadow-xl">VS</div>
-            <div className="w-full md:w-5/12 bg-gradient-to-br from-riviera-azure/20 to-slate-800 border-2 border-riviera-azure p-8 rounded-[2rem] transform md:scale-105 shadow-2xl relative min-h-[350px]">
-              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[2rem] bg-slate-700/50 overflow-hidden">
-                <div key={ecoIndex} style={{ height: '100%', backgroundColor: '#0284C7', animation: 'ecoProgress 4s linear forwards' }}></div>
-              </div>
-              <div className="relative" style={{ minHeight: '260px' }}>
-                {ecoData.map((eco, idx) => (
-                  <div
-                    key={idx}
-                    className="absolute inset-0"
-                    style={{ opacity: idx === ecoIndex ? 1 : 0, transition: 'opacity 700ms ease-in-out', pointerEvents: idx === ecoIndex ? 'auto' : 'none' }}
-                  >
-                    <h3 className="font-bold text-xl text-white mb-6 text-center" dangerouslySetInnerHTML={{ __html: eco.title }}></h3>
-                    <div className="space-y-4 mb-6" dangerouslySetInnerHTML={{ __html: eco.details }}></div>
-                    <div className={`font-bold text-center py-3 rounded-xl transition-colors shadow-lg ${eco.colorClass} ${eco.textColor}`}>{eco.savings}</div>
-                    <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: eco.desc }}></p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+  <div className="max-w-[1200px] mx-auto px-6 text-center">
 
+    <h2 className="text-4xl md:text-5xl font-semibold mb-6">
+      Rentabilisé dès la première sortie.
+    </h2>
+
+    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-12">
+      Avec le Pass Céleste, une sortie suffit souvent à amortir l’abonnement.
+    </p>
+
+    <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
+
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <p className="text-sm text-gray-400">Économie moyenne / sortie</p>
+        <p className="text-2xl font-semibold mt-2">~35€*</p>
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <p className="text-sm text-gray-400">2 sorties / mois</p>
+        <p className="text-2xl font-semibold mt-2">~70€ d’économies</p>
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <p className="text-sm text-gray-400">Pass Céleste</p>
+        <p className="text-2xl font-semibold mt-2">14,90€ / mois</p>
+        <p className="text-sm text-gray-400 mt-1">Amorti dès 1 sortie</p>
+      </div>
+
+    </div>
+
+    <p className="text-xs text-gray-500 mt-8">
+      *Estimations indicatives, variables selon l’usage et les offres partenaires.
+    </p>
+
+  </div>
+</section>
       {/* Profil Utilisateur Idéal */}
       <section className="py-24 bg-riviera-sand">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
