@@ -869,15 +869,27 @@ export default function Home() {
       Avec le Pass Céleste, une seule sortie suffit souvent à amortir votre abonnement.
     </p>
 
-    <p className="text-gray-300 text-base max-w-2xl mx-auto mb-6">
-      En moyenne :
+    <p className="text-gray-400 text-sm font-semibold tracking-widest uppercase mb-4">
+      En moyenne
     </p>
 
-    <ul className="text-gray-300 text-base max-w-2xl mx-auto mb-8 space-y-2 list-none">
-      <li>• ~35€ d&apos;économie par sortie</li>
-      <li>• ~70€ d&apos;économie par mois (2 sorties)</li>
-      <li>• 14,90€ / mois, amorti dès la première utilisation</li>
-    </ul>
+    <div className="max-w-md mx-auto mb-6 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm" role="table" aria-label="Estimations d'économies">
+      {[
+        { label: "Économie par sortie", value: "~35€" },
+        { label: "Économie par mois (2 sorties)", value: "~70€" },
+        { label: "Abonnement", value: "14,90€ / mois" },
+        { label: "Point d'équilibre", value: "Dès la première utilisation" },
+      ].map(({ label, value }, i, arr) => (
+        <div
+          key={label}
+          role="row"
+          className={`flex items-center justify-between px-5 py-4 ${i < arr.length - 1 ? "border-b border-white/10" : ""}`}
+        >
+          <span role="cell" className="text-gray-300 text-sm">{label}</span>
+          <span role="cell" className="text-white font-semibold text-sm tabular-nums">{value}</span>
+        </div>
+      ))}
+    </div>
 
     <p className="text-xs text-gray-500">
       Estimations indicatives selon l&apos;usage et les offres partenaires.
