@@ -886,32 +886,36 @@ export default function Home() {
       Rentabilisé dès la première sortie.
     </h2>
 
-    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-12">
-      Avec le Pass Céleste, une sortie suffit souvent à amortir l’abonnement.
+    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-4">
+      Avec le Pass Céleste, une seule sortie suffit souvent à amortir votre abonnement.
+    </p>
+
+    <p className="text-gray-300 text-base max-w-2xl mx-auto mb-12">
+      En moyenne :
     </p>
 
     <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
         <p className="text-sm text-gray-400">Économie moyenne / sortie</p>
-        <p className="text-2xl font-semibold mt-2">~35€*</p>
+        <p className="text-2xl font-semibold mt-2">~35€</p>
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
         <p className="text-sm text-gray-400">2 sorties / mois</p>
-        <p className="text-2xl font-semibold mt-2">~70€ d’économies</p>
+        <p className="text-2xl font-semibold mt-2">~70€ d&apos;économies</p>
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
         <p className="text-sm text-gray-400">Pass Céleste</p>
         <p className="text-2xl font-semibold mt-2">14,90€ / mois</p>
-        <p className="text-sm text-gray-400 mt-1">Amorti dès 1 sortie</p>
+        <p className="text-sm text-gray-400 mt-1">Amorti dès la 1ère utilisation</p>
       </div>
 
     </div>
 
     <p className="text-xs text-gray-500 mt-8">
-      *Estimations indicatives, variables selon l’usage et les offres partenaires.
+      Estimations indicatives selon l&apos;usage et les offres partenaires.
     </p>
 
   </div>
