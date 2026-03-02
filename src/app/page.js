@@ -879,7 +879,6 @@ export default function Home() {
       </section>
 
       {/* Économies */}
-      <style dangerouslySetInnerHTML={{ __html: `@keyframes ecoProgress { from { width: 0% } to { width: 100% } }` }} />
       <section id="economies" className="py-24 bg-riviera-navy text-white">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-16">
