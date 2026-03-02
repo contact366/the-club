@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import WeatherWidget from '@/components/WeatherWidget';
 import Emoji from '@/components/Emoji';
+import { getImageSrc, PLACEHOLDER_IMAGE } from '@/lib/imageUtils';
 
 export default function EspaceMembre() {
   const router = useRouter();
@@ -955,8 +956,13 @@ export default function EspaceMembre() {
                 {favoris.map((fav) => (
                   <li key={fav.id} className="flex items-center justify-between group overflow-hidden" style={{ transition: 'opacity 350ms ease, max-height 350ms ease, padding 350ms ease', opacity: removingFavIds.has(fav.id) ? 0 : 1, maxHeight: removingFavIds.has(fav.id) ? '0' : '200px', padding: removingFavIds.has(fav.id) ? '0 20px' : '20px' }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 group-hover:scale-110 transition-transform">
-                        <span className="text-lg"><Emoji symbol="❤️" label="favori" size={20} /></span>
+                      <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-pink-50 group-hover:scale-110 transition-transform">
+                        <img
+                          src={getImageSrc(fav.partners?.photo_url)}
+                          alt={fav.partners?.name || 'Établissement'}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
+                        />
                       </div>
                       <div>
                         <p className="text-lg font-semibold text-gray-900">{fav.partners?.name || 'Établissement'}</p>
