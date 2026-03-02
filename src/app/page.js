@@ -760,60 +760,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* GASTRONOMIE */}
+      {/* Un univers de privilèges */}
       <section className="py-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center gap-16">
-            <div className="md:w-1/2">
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
-            </div>
-            <div className="md:w-1/2">
-              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Gastronomie</span>
-              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Tables d&apos;exception.</h2>
-              <p className="text-gray-500 text-lg mb-8">Des tables étoilées aux bistrots cachés — sélectionnés pour leur excellence. Jusqu&apos;à −50&nbsp;% sur votre premier dîner.</p>
-              <Link href="/gastronomie" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
-                Découvrir les tables
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-4">Un univers de privilèges.</h2>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">Gastronomie, loisirs, bien-être — sélectionnés pour leur excellence.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10">
+            <div className="flex flex-col">
+              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover mb-6" />
+              <span className="text-riviera-azure text-xs font-semibold uppercase tracking-widest mb-2 block">Gastronomie</span>
+              <h3 className="text-2xl font-semibold text-riviera-navy mb-3">Tables d&apos;exception.</h3>
+              <p className="text-gray-500 text-sm mb-4 flex-1">Des tables étoilées aux bistrots cachés — sélectionnés pour leur excellence.</p>
+              <Link href="/gastronomie" className="inline-flex items-center text-riviera-navy font-semibold text-sm hover:text-riviera-azure transition-colors duration-300 ease-out">
+                Découvrir les tables →
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* LOISIRS */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row-reverse items-center gap-16">
-            <div className="md:w-1/2">
-              <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
-            </div>
-            <div className="md:w-1/2">
-              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Loisirs</span>
-              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Activités uniques.</h2>
-              <p className="text-gray-500 text-lg mb-8">Simulateurs, activités indoor, expériences inédites. Des moments mémorables à moindre coût.</p>
-              <Link href="/loisirs" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
-                Voir les loisirs
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            <div className="flex flex-col">
+              <img src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?auto=format&fit=crop&w=800&q=80" alt="Loisirs" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover mb-6" />
+              <span className="text-riviera-azure text-xs font-semibold uppercase tracking-widest mb-2 block">Loisirs</span>
+              <h3 className="text-2xl font-semibold text-riviera-navy mb-3">Activités uniques.</h3>
+              <p className="text-gray-500 text-sm mb-4 flex-1">Simulateurs, activités indoor, expériences inédites. Des moments mémorables à moindre coût.</p>
+              <Link href="/loisirs" className="inline-flex items-center text-riviera-navy font-semibold text-sm hover:text-riviera-azure transition-colors duration-300 ease-out">
+                Voir les loisirs →
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BIEN-ÊTRE */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center gap-16">
-            <div className="md:w-1/2">
-              <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover" />
-            </div>
-            <div className="md:w-1/2">
-              <span className="text-riviera-azure text-sm font-semibold uppercase tracking-widest mb-4 block">Bien-être</span>
-              <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-6 leading-tight">Votre espace zen.</h2>
-              <p className="text-gray-500 text-lg mb-8">Spas prestigieux, instituts de beauté et salles de sport privées. Prenez soin de vous à prix privilégié.</p>
-              <Link href="/bien-etre" className="inline-flex items-center text-riviera-navy font-semibold hover:text-riviera-azure transition-colors duration-300 ease-out">
-                Explorer le bien-être
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            <div className="flex flex-col">
+              <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" alt="Bien-être" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover mb-6" />
+              <span className="text-riviera-azure text-xs font-semibold uppercase tracking-widest mb-2 block">Bien-être</span>
+              <h3 className="text-2xl font-semibold text-riviera-navy mb-3">Votre espace zen.</h3>
+              <p className="text-gray-500 text-sm mb-4 flex-1">Spas prestigieux, instituts de beauté et salles de sport privées. Prenez soin de vous à prix privilégié.</p>
+              <Link href="/bien-etre" className="inline-flex items-center text-riviera-navy font-semibold text-sm hover:text-riviera-azure transition-colors duration-300 ease-out">
+                Explorer le bien-être →
               </Link>
             </div>
           </div>
@@ -890,204 +869,43 @@ export default function Home() {
       Avec le Pass Céleste, une seule sortie suffit souvent à amortir votre abonnement.
     </p>
 
-    <p className="text-gray-300 text-base max-w-2xl mx-auto mb-12">
+    <p className="text-gray-300 text-base max-w-2xl mx-auto mb-6">
       En moyenne :
     </p>
 
-    <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
+    <ul className="text-gray-300 text-base max-w-2xl mx-auto mb-8 space-y-2 list-none">
+      <li>• ~35€ d&apos;économie par sortie</li>
+      <li>• ~70€ d&apos;économie par mois (2 sorties)</li>
+      <li>• 14,90€ / mois, amorti dès la première utilisation</li>
+    </ul>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">Économie moyenne / sortie</p>
-        <p className="text-2xl font-semibold mt-2">~35€</p>
-      </div>
-
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">2 sorties / mois</p>
-        <p className="text-2xl font-semibold mt-2">~70€ d&apos;économies</p>
-      </div>
-
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <p className="text-sm text-gray-400">Pass Céleste</p>
-        <p className="text-2xl font-semibold mt-2">14,90€ / mois</p>
-        <p className="text-sm text-gray-400 mt-1">Amorti dès la 1ère utilisation</p>
-      </div>
-
-    </div>
-
-    <p className="text-xs text-gray-500 mt-8">
+    <p className="text-xs text-gray-500">
       Estimations indicatives selon l&apos;usage et les offres partenaires.
     </p>
 
   </div>
 </section>
-      {/* Profil Utilisateur Idéal */}
-      <section className="py-24 bg-riviera-sand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="text-riviera-azure font-semibold tracking-wider text-sm uppercase mb-2 block">Pour qui ?</span>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">The Club est fait pour vous.</h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Que vous soyez citadin actif, amoureux ou voyageur, The Club s'adapte à votre style de vie.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                emoji: "💑",
-                title: "Couples citadins",
-                desc: "Dîners romantiques, sorties bien-être, week-ends en amoureux. Profitez de chaque moment à moindre coût.",
-                tags: ["Restaurants", "Spas", "Loisirs"],
-                usage: "Dîners en couple, spa le week-end"
-              },
-              {
-                emoji: "👔",
-                title: "Jeunes professionnels",
-                desc: "Afterwork entre collègues, déjeuners d'affaires, activités sportives. L'art de vivre en ville sans se ruiner.",
-                tags: ["Afterwork", "Déjeuners", "Sport"],
-                usage: "Restaurants le midi, afterwork"
-              },
-              {
-                emoji: "✈️",
-                title: "Voyageurs réguliers",
-                desc: "De passage sur la Côte d'Azur ? Découvrez les meilleures adresses locales avec des remises exclusives.",
-                tags: ["Découverte", "Gastronomie", "Culture"],
-                usage: "Activités, bons restaurants locaux"
-              },
-              {
-                emoji: "🌟",
-                title: "Amateurs de bons plans",
-                desc: "Sorties week-end, activités inédites, bonnes tables. Vivez l'excellence sans sacrifier votre budget.",
-                tags: ["Week-end", "Activités", "Bonne table"],
-                usage: "Spa, activités, sorties week-end"
-              }
-            ].map((profile, idx) => (
-              <div key={idx} className="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div className="text-5xl mb-4"><Emoji symbol={profile.emoji} label={profile.title} size={48} /></div>
-                <h3 className="font-bold text-lg text-riviera-navy mb-2">{profile.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1">{profile.desc}</p>
-                <p className="text-xs text-riviera-azure font-semibold mb-3 italic">&ldquo;{profile.usage}&rdquo;</p>
-                <div className="flex flex-wrap gap-2">
-                  {profile.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="text-xs font-semibold bg-riviera-sand text-riviera-navy px-3 py-1 rounded-full border border-gray-200">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Application Mobile PWA */}
       <section className="py-20 bg-riviera-navy text-white overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2 text-center md:text-left">
-              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block"><Emoji symbol="📱" label="mobile" size={16} /> Application Mobile</span>
+              <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-4 block">Application Mobile</span>
               <h2 className="font-serif text-3xl md:text-4xl font-bold mb-6">Toujours dans<br className="hidden md:block" /> votre poche.</h2>
-              <p className="text-gray-300 text-lg mb-8">The Club fonctionne comme une vraie application mobile, directement depuis votre navigateur. Zéro téléchargement, 100% disponible.</p>
-              <div className="space-y-4">
-                {[
-                  { icon: "📲", text: "Ajoutez The Club à votre écran d'accueil en un tap" },
-                  { icon: "🔔", text: "Notifications, accès rapide, expérience native" },
-                  { icon: "💯", text: "100% digital, toujours dans votre poche" },
-                  { icon: "🚀", text: "Compatible iOS & Android, sans passer par l'App Store" }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-4">
-                    <span className="text-2xl flex-shrink-0"><Emoji symbol={item.icon} size={24} /></span>
-                    <p className="text-gray-200 text-sm font-medium">{item.text}</p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-gray-300 text-lg mb-8">Sans téléchargement. Ajoutez The Club à votre écran d&apos;accueil depuis votre navigateur.</p>
+              <a href="#tarifs" className="inline-block bg-white text-riviera-navy font-semibold px-8 py-3 rounded-2xl hover:bg-gray-100 transition-all duration-300 ease-out shadow-md">Obtenir mon Pass</a>
             </div>
-            <div className="md:w-1/2 flex justify-center">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
-                <div className="text-7xl mb-4"><Emoji symbol="📱" label="mobile" size={72} /></div>
-                <h3 className="font-bold text-xl text-white mb-2">Installez l'app</h3>
-                <p className="text-gray-300 text-sm mb-6 leading-relaxed">Sans téléchargement. Directement depuis votre navigateur mobile, ajoutez The Club à votre écran d'accueil.</p>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
-                    <p className="text-white font-bold"><Emoji symbol="🍎" label="iOS" size={18} /> iOS</p>
-                    <p className="text-gray-400 text-xs mt-1">Safari → Partager → Écran d'accueil</p>
-                  </div>
-                  <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/20">
-                    <p className="text-white font-bold"><Emoji symbol="🤖" label="Android" size={18} /> Android</p>
-                    <p className="text-gray-400 text-xs mt-1">Chrome → Menu → Ajouter à l'écran</p>
-                  </div>
-                </div>
+            <div className="md:w-1/2 flex justify-center gap-4">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-5 text-center shadow-lg">
+                <p className="text-white font-bold mb-2">iOS</p>
+                <p className="text-gray-400 text-xs">Safari → Partager → Écran d&apos;accueil</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-5 text-center shadow-lg">
+                <p className="text-white font-bold mb-2">Android</p>
+                <p className="text-gray-400 text-xs">Chrome → Menu → Ajouter à l&apos;écran</p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Grille ROI sur 3/6/12 mois */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="text-riviera-gold font-semibold tracking-wider text-sm uppercase mb-2 block">Retour sur investissement</span>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold text-riviera-navy mb-3">Le calcul est évident.</h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Basé sur 2 sorties par mois avec une économie moyenne de 35€ par sortie. Vos économies s'accumulent chaque mois.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-
-            {/* Pass Explorer ROI */}
-            <div className="rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-              <div className="bg-riviera-sand px-8 py-6 border-b border-gray-200">
-                <h3 className="font-serif text-2xl font-bold text-riviera-navy"><Emoji symbol="🚀" label="explorer" size={24} /> Pass Explorer</h3>
-                <p className="text-riviera-azure font-bold text-xl mt-1">9,90 € / mois</p>
-                <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-400 uppercase tracking-wide">
-                  <span>Durée</span>
-                  <span>Coût</span>
-                  <span>Économies</span>
-                  <span className="text-green-600">Gain net</span>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {[
-                  { period: "3 mois", cost: "29,70 €", savings: "210 €", net: "+180,30 €" },
-                  { period: "6 mois", cost: "59,40 €", savings: "420 €", net: "+360,60 €" },
-                  { period: "12 mois", cost: "118,80 €", savings: "840 €", net: "+721,20 €" }
-                ].map((row, idx) => (
-                  <div key={idx} className={`grid grid-cols-4 px-8 py-4 text-sm items-center ${idx === 2 ? 'bg-green-50/50' : ''}`}>
-                    <span className="font-bold text-riviera-navy">{row.period}</span>
-                    <span className="text-gray-500">{row.cost}</span>
-                    <span className="text-gray-700 font-medium">{row.savings}</span>
-                    <span className={`font-bold ${idx === 2 ? 'text-green-600 text-base' : 'text-green-500'}`}>{row.net}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Pass Céleste ROI */}
-            <div className="rounded-3xl border-2 border-riviera-gold/40 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-              <div className="bg-riviera-navy px-8 py-6 border-b border-riviera-gold/20">
-                <h3 className="font-serif text-2xl font-bold text-riviera-gold"><Emoji symbol="✨" label="céleste" size={24} /> Pass Céleste</h3>
-                <p className="text-gray-300 font-bold text-xl mt-1">59 € / an <span className="text-xs font-normal text-gray-400">(paiement unique)</span></p>
-                <div className="grid grid-cols-4 mt-4 text-xs font-bold text-gray-500 uppercase tracking-wide">
-                  <span>Durée</span>
-                  <span>Coût**</span>
-                  <span>Économies</span>
-                  <span className="text-riviera-gold">Gain net</span>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {[
-                  { period: "3 mois", cost: "~14,75 €", savings: "210 €", net: "+195,25 €" },
-                  { period: "6 mois", cost: "~29,50 €", savings: "420 €", net: "+390,50 €" },
-                  { period: "12 mois", cost: "59 €", savings: "840 €", net: "+781 €" }
-                ].map((row, idx) => (
-                  <div key={idx} className={`grid grid-cols-4 px-8 py-4 text-sm items-center ${idx === 2 ? 'bg-green-50' : ''}`}>
-                    <span className="font-bold text-riviera-navy">{row.period}</span>
-                    <span className="text-gray-500">{row.cost}</span>
-                    <span className="text-gray-700 font-medium">{row.savings}</span>
-                    <span className={`font-bold ${idx === 2 ? 'text-green-600 text-base' : 'text-green-500'}`}>{row.net}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-          <p className="text-center text-xs text-gray-400 mt-6">* Estimation basée sur 2 sorties/mois avec une économie moyenne de 35€ par sortie. Résultats indicatifs, variables selon l'usage.<br />** Le Pass Céleste (59€) est réglé en une seule fois à l'année. Le coût prorata indique la fraction du coût annuel sur la période.</p>
         </div>
       </section>
 
@@ -1195,9 +1013,9 @@ export default function Home() {
                 <p className="text-gray-500 text-sm">L'accès illimité. Rentabilisé dès la première sortie.</p>
               </div>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-riviera-navy tracking-tight">59€</span>
-                <span className="text-gray-400 text-sm ml-1">/ an</span>
-                <p className="text-xs text-riviera-azure font-medium mt-1">Soit 0,66€/jour</p>
+                <span className="text-4xl font-bold text-riviera-navy tracking-tight">14,90€</span>
+                <span className="text-gray-400 text-sm ml-1">/ mois</span>
+                <p className="text-sm text-gray-500 mt-1">ou 129€ / an</p>
               </div>
               <ul className="space-y-3 mb-5 flex-1 text-sm text-gray-700">
                 <li className="flex items-center gap-2"><svg className="w-4 h-4 text-riviera-azure shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> <span className="font-semibold">Offres Découvertes illimitées (-50%)</span></li>
