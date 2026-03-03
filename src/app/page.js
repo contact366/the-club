@@ -5,6 +5,7 @@ import Script from 'next/script';
 import Link from 'next/link';
 import InstallPopup from '@/components/InstallPopup';
 import Emoji from '@/components/Emoji';
+import ExplorationShowcaseSection from '@/components/ExplorationShowcaseSection';
 
 // --- DONNÉES STATIQUES ---
 const ecoData = [
@@ -777,6 +778,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Exploration Riviera */}
+      <ExplorationShowcaseSection />
 
       {/* Un univers de privilèges */}
       <section className="py-24 bg-white">
