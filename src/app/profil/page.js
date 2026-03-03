@@ -8,6 +8,14 @@ import WeatherWidget from '@/components/WeatherWidget';
 import Emoji from '@/components/Emoji';
 import { getImageSrc, PLACEHOLDER_IMAGE } from '@/lib/imageUtils';
 
+// Configuration des badges par type (emoji, couleur Tailwind)
+const BADGE_CONFIG = {
+  explorer: { emoji: '🗺️', label: 'explorer', color: 'bg-blue-500' },
+  gourmet: { emoji: '🍽️', label: 'gourmet', color: 'bg-amber-500' },
+  wellness: { emoji: '🧘', label: 'wellness', color: 'bg-teal-500' },
+  gold: { emoji: '👑', label: 'gold', color: 'bg-yellow-500' },
+};
+
 export default function EspaceMembre() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -28,6 +36,11 @@ export default function EspaceMembre() {
   const [deleting, setDeleting] = useState(false);
   const [favoris, setFavoris] = useState([]);
   const [removingFavIds, setRemovingFavIds] = useState(new Set());
+
+  // États pour les badges et récompenses
+  const [badgesData, setBadgesData] = useState([]);
+  const [rewardClaimed, setRewardClaimed] = useState(false);
+  const [rewardMessage, setRewardMessage] = useState('');
 
   // États pour la section "Mes informations"
   const [newEmail, setNewEmail] = useState('');
@@ -109,6 +122,39 @@ export default function EspaceMembre() {
         .order('created_at', { ascending: false });
 
       if (dataFavoris) setFavoris(dataFavoris);
+
+      // Charger les badges actifs et la progression de l'utilisateur
+      const { data: dataBadges } = await supabase
+        .from('badges')
+        .select('id, code, title, badge_type, required_count, plan_required')
+        .eq('is_active', true);
+
+      const { data: dataProgress } = await supabase
+        .from('user_badges_progress')
+        .select('badge_id, current_count, is_unlocked, unlocked_at')
+        .eq('user_id', user.id);
+
+      if (dataBadges) {
+        const progressMap = {};
+        if (dataProgress) {
+          dataProgress.forEach((p) => { progressMap[p.badge_id] = p; });
+        }
+        const merged = dataBadges.map((badge) => {
+          const prog = progressMap[badge.id] || {};
+          return {
+            id: badge.id,
+            code: badge.code,
+            title: badge.title,
+            badge_type: badge.badge_type,
+            required_count: badge.required_count,
+            plan_required: badge.plan_required,
+            current_count: prog.current_count ?? 0,
+            is_unlocked: prog.is_unlocked ?? false,
+            unlocked_at: prog.unlocked_at ?? null,
+          };
+        });
+        setBadgesData(merged);
+      }
 
       setIsAuthenticated(true);
       setLoading(false);
@@ -207,6 +253,31 @@ export default function EspaceMembre() {
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
   }, [profil]);
+
+  // Réclamer automatiquement la récompense si le badge riviera_explorer est débloqué
+  useEffect(() => {
+    if (rewardClaimed) return;
+    const explorerBadge = badgesData.find((b) => b.code === 'riviera_explorer' && b.is_unlocked);
+    if (!explorerBadge) return;
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      fetch('/api/badges/reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, badgeCode: 'riviera_explorer' }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setRewardClaimed(true);
+          if (data.success && !data.alreadyClaimed && data.message) {
+            setRewardMessage(data.message);
+            setTimeout(() => setRewardMessage(''), 5000);
+          }
+        })
+        .catch((err) => console.error('Erreur réclamation récompense badge:', err.message));
+    });
+  }, [badgesData, rewardClaimed]);
 
   // Fonction pour rediriger vers Stripe Customer Portal
   const handleGererAbonnement = async () => {
@@ -382,6 +453,26 @@ export default function EspaceMembre() {
       } catch {
         prompt('Copiez ce texte pour partager vos coups de cœur :', `${textePartage}\n\n${urlPartage}`);
       }
+    }
+  };
+
+  // Réclamer la récompense d'un badge débloqué via l'API
+  const handleClaimReward = async (userId, badgeCode) => {
+    if (rewardClaimed) return;
+    try {
+      const response = await fetch('/api/badges/reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, badgeCode }),
+      });
+      const data = await response.json();
+      setRewardClaimed(true);
+      if (data.success && !data.alreadyClaimed && data.message) {
+        setRewardMessage(data.message);
+        setTimeout(() => setRewardMessage(''), 5000);
+      }
+    } catch (err) {
+      console.error('Erreur réclamation récompense badge:', err.message);
     }
   };
 
@@ -643,6 +734,12 @@ export default function EspaceMembre() {
         }
         .neon-rotating-container::after { content: ''; position: absolute; inset: 2px; background: #0a0a0a; border-radius: 9999px; z-index: 1; }
         @keyframes rotate-border { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes badge-unlock {
+          0% { transform: scale(0.95); opacity: 0.8; }
+          50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(234,179,8,0.3); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .badge-unlocked { animation: badge-unlock 0.6s ease-out; }
       `}} />
 
       <div className="max-w-3xl mx-auto space-y-8">
@@ -855,6 +952,56 @@ export default function EspaceMembre() {
             )}
           </div>
         </div>
+
+        {/* 🗺️ EXPLORATION RIVIERA — Badges */}
+        {badgesData.filter((b) => b.plan_required === 'all' || (b.plan_required === 'celeste' && isCeleste)).length > 0 && (
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">Exploration Riviera</h2>
+
+            {/* Toast récompense */}
+            {rewardMessage && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-2xl text-sm font-medium flex items-center gap-2">
+                <Emoji symbol="🎉" label="récompense" size={18} />
+                {rewardMessage}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {badgesData
+                .filter((b) => b.plan_required === 'all' || (b.plan_required === 'celeste' && isCeleste))
+                .map((badge) => {
+                  const config = BADGE_CONFIG[badge.badge_type] || { emoji: '🏅', label: 'badge', color: 'bg-gray-400' };
+                  const progress = Math.min(badge.current_count / badge.required_count, 1);
+
+                  return (
+                    <div
+                      key={badge.id}
+                      className={`bg-white rounded-3xl shadow-sm border border-gray-200/60 p-5 flex flex-col gap-3 ${badge.is_unlocked ? 'badge-unlocked' : 'opacity-70'}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl ${badge.is_unlocked ? config.color : 'bg-gray-200'}`}>
+                          {badge.is_unlocked
+                            ? <Emoji symbol={config.emoji} label={config.label} size={20} />
+                            : <Emoji symbol="🔒" label="verrouillé" size={20} />}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{badge.title}</p>
+                          <p className="text-xs text-gray-500">{badge.current_count} / {badge.required_count}</p>
+                        </div>
+                      </div>
+                      {/* Barre de progression */}
+                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${badge.is_unlocked ? config.color : 'bg-gray-300'}`}
+                          style={{ width: `${progress * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
 
         {/* ℹ️ MES INFORMATIONS */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
