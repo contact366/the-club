@@ -274,6 +274,24 @@ export default function Home() {
       setCurrentPin("");
       setModalStep("amount");
       setBillAmount("");
+
+      // 🏅 Validation automatique des badges d'exploration (non bloquant)
+      try {
+        if (currentPartner) {
+          await fetch('/api/badges/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: user.id,
+              establishmentId: currentPartner.id,
+              partnerCategory: currentPartner.category || '',
+            }),
+          });
+        }
+      } catch (badgeErr) {
+        // Non bloquant : si la validation badge échoue, l'offre reste validée normalement
+        console.error('Erreur validation badge (non bloquant):', badgeErr.message);
+      }
     } catch (err) {
       console.error("Erreur enregistrement offre :", err.message);
       if (err.code === '23505') {
