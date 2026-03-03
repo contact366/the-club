@@ -51,6 +51,19 @@ export default function EspaceMembre() {
   const [authMessage, setAuthMessage] = useState({ text: '', type: '' });
   const [authLoading, setAuthLoading] = useState(false);
 
+  // 🏅 ÉTATS POUR LES BADGES EXPLORATION RIVIERA
+  const [badgeProgression, setBadgeProgression] = useState({
+    explorer: 0,     // nb établissements distincts
+    gourmet: 0,      // nb restaurants distincts
+    wellness: 0,     // nb bien-être/hôtel distincts
+    insider: 0,      // nb établissements distincts (Céleste uniquement)
+  });
+  const [badgesRewarded, setBadgesRewarded] = useState({
+    badge_rewarded_explorer: false,
+    badge_rewarded_insider: false,
+  });
+  const [badgeRewardError, setBadgeRewardError] = useState('');
+
   useEffect(() => {
     async function chargerDonnees() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -109,6 +122,56 @@ export default function EspaceMembre() {
         .order('created_at', { ascending: false });
 
       if (dataFavoris) setFavoris(dataFavoris);
+
+      // 🏅 BADGES EXPLORATION RIVIERA : calcul dynamique
+      const { data: dataUtilisations } = await supabase
+        .from('utilisations')
+        .select('establishment_id, partners ( category )')
+        .eq('user_id', user.id);
+
+      if (dataUtilisations) {
+        // Dédupliquer par establishment_id
+        const seen = new Set();
+        const uniqueUtilisations = dataUtilisations.filter(u => {
+          if (seen.has(u.establishment_id)) return false;
+          seen.add(u.establishment_id);
+          return true;
+        });
+
+        const gourmetCategories = ['restaurant', 'gastronomie'];
+        const wellnessCategories = ['bien-être', 'bien_etre', 'spa', 'hôtel', 'hotel'];
+
+        const totalDistinct = uniqueUtilisations.length;
+        const gourmetDistinct = uniqueUtilisations.filter(u => {
+          const cat = (u.partners?.category || '').toLowerCase();
+          return gourmetCategories.some(g => cat.includes(g));
+        }).length;
+        const wellnessDistinct = uniqueUtilisations.filter(u => {
+          const cat = (u.partners?.category || '').toLowerCase();
+          return wellnessCategories.some(w => cat.includes(w));
+        }).length;
+
+        setBadgeProgression({
+          explorer: totalDistinct,
+          gourmet: gourmetDistinct,
+          wellness: wellnessDistinct,
+          insider: totalDistinct,
+        });
+      }
+
+      // Récupérer les flags de récompense badges
+      const { data: badgeFlags } = await supabase
+        .from('profiles')
+        .select('badge_rewarded_explorer, badge_rewarded_insider')
+        .eq('id', user.id)
+        .single();
+
+      if (badgeFlags) {
+        setBadgesRewarded({
+          badge_rewarded_explorer: badgeFlags.badge_rewarded_explorer || false,
+          badge_rewarded_insider: badgeFlags.badge_rewarded_insider || false,
+        });
+      }
 
       setIsAuthenticated(true);
       setLoading(false);
@@ -853,6 +916,160 @@ export default function EspaceMembre() {
                 </span>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* 🗺️ EXPLORATION RIVIERA — BADGES */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
+          <div className="mb-5">
+            <h3 className="text-2xl font-semibold tracking-tight text-gray-900">Exploration Riviera</h3>
+            <p className="text-sm text-gray-500 mt-1">Débloquez des badges en découvrant la Côte d&apos;Azur.</p>
+            {badgeRewardError && (
+              <p className="mt-2 text-xs text-red-600 bg-red-50 rounded-xl px-3 py-2">{badgeRewardError}</p>
+            )}
+          </div>
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes badge-unlock { 0% { transform: scale(0.95); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+            .badge-unlocked { animation: badge-unlock 0.5s ease forwards; }
+            @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+            .badge-shimmer { background: linear-gradient(90deg, #fbbf24 0%, #fef3c7 40%, #fbbf24 60%, #d97706 100%); background-size: 200% auto; animation: shimmer 2.5s linear infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+          `}} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Badge Riviera Explorer */}
+            {(() => {
+              const progress = Math.min(badgeProgression.explorer, 3);
+              const unlocked = badgeProgression.explorer >= 3;
+              const rewarded = badgesRewarded.badge_rewarded_explorer;
+              return (
+                <div className={`rounded-2xl p-4 border transition-all ${unlocked ? 'badge-unlocked bg-blue-50 border-blue-200 shadow-md' : 'bg-gray-50 border-gray-200 opacity-80'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{unlocked ? '🗺️' : '🔒'}</span>
+                      <div>
+                        <p className={`font-semibold text-sm ${unlocked ? 'text-blue-800' : 'text-gray-500'}`}>Riviera Explorer</p>
+                        <p className="text-xs text-gray-400">3 établissements distincts</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${unlocked ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-500'}`}>{progress}/3</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className={`h-2 rounded-full transition-all duration-700 ${unlocked ? 'bg-blue-500' : 'bg-gray-400'}`} style={{width: `${(progress / 3) * 100}%`}} />
+                  </div>
+                  {unlocked && !rewarded && (
+                    <button
+                      onClick={async () => {
+                        setBadgeRewardError('');
+                        const { data: { user } } = await supabase.auth.getUser();
+                        const res = await fetch('/api/badges/reward', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId: user.id, badgeId: 'explorer' }) });
+                        if (res.ok) {
+                          setBadgesRewarded(prev => ({ ...prev, badge_rewarded_explorer: true }));
+                        } else {
+                          const err = await res.json().catch(() => ({}));
+                          setBadgeRewardError(err.error || 'Erreur lors du claim de la récompense.');
+                        }
+                      }}
+                      className="mt-3 w-full text-xs font-semibold py-1.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    >
+                      Réclamer la récompense
+                    </button>
+                  )}
+                  {unlocked && rewarded && (
+                    <p className="mt-3 text-xs text-center text-blue-600 font-medium">✅ Récompense réclamée</p>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Badge Riviera Gourmet */}
+            {(() => {
+              const progress = Math.min(badgeProgression.gourmet, 3);
+              const unlocked = badgeProgression.gourmet >= 3;
+              return (
+                <div className={`rounded-2xl p-4 border transition-all ${unlocked ? 'badge-unlocked bg-orange-50 border-orange-200 shadow-md' : 'bg-gray-50 border-gray-200 opacity-80'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{unlocked ? '🍽️' : '🔒'}</span>
+                      <div>
+                        <p className={`font-semibold text-sm ${unlocked ? 'text-orange-800' : 'text-gray-500'}`}>Riviera Gourmet</p>
+                        <p className="text-xs text-gray-400">3 restaurants distincts</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${unlocked ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-gray-500'}`}>{progress}/3</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className={`h-2 rounded-full transition-all duration-700 ${unlocked ? 'bg-orange-500' : 'bg-gray-400'}`} style={{width: `${(progress / 3) * 100}%`}} />
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Badge Riviera Wellness */}
+            {(() => {
+              const progress = Math.min(badgeProgression.wellness, 2);
+              const unlocked = badgeProgression.wellness >= 2;
+              return (
+                <div className={`rounded-2xl p-4 border transition-all ${unlocked ? 'badge-unlocked bg-green-50 border-green-200 shadow-md' : 'bg-gray-50 border-gray-200 opacity-80'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{unlocked ? '🧘' : '🔒'}</span>
+                      <div>
+                        <p className={`font-semibold text-sm ${unlocked ? 'text-green-800' : 'text-gray-500'}`}>Riviera Wellness</p>
+                        <p className="text-xs text-gray-400">2 établissements bien-être / hôtel</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${unlocked ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>{progress}/2</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className={`h-2 rounded-full transition-all duration-700 ${unlocked ? 'bg-green-500' : 'bg-gray-400'}`} style={{width: `${(progress / 2) * 100}%`}} />
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Badge Gold Riviera Insider — Céleste uniquement */}
+            {isCeleste && (() => {
+              const progress = Math.min(badgeProgression.insider, 6);
+              const unlocked = badgeProgression.insider >= 6;
+              const rewarded = badgesRewarded.badge_rewarded_insider;
+              return (
+                <div className={`rounded-2xl p-4 border transition-all ${unlocked ? 'badge-unlocked bg-yellow-50 border-yellow-300 shadow-md' : 'bg-gray-50 border-gray-200 opacity-80'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{unlocked ? '👑' : '🔒'}</span>
+                      <div>
+                        <p className={`font-semibold text-sm ${unlocked ? 'badge-shimmer' : 'text-gray-500'}`}>Gold Riviera Insider</p>
+                        <p className="text-xs text-gray-400">6 établissements distincts · Céleste</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${unlocked ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-200 text-gray-500'}`}>{progress}/6</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className={`h-2 rounded-full transition-all duration-700 ${unlocked ? 'bg-yellow-400' : 'bg-gray-400'}`} style={{width: `${(progress / 6) * 100}%`}} />
+                  </div>
+                  {unlocked && !rewarded && (
+                    <button
+                      onClick={async () => {
+                        setBadgeRewardError('');
+                        const { data: { user } } = await supabase.auth.getUser();
+                        const res = await fetch('/api/badges/reward', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId: user.id, badgeId: 'insider' }) });
+                        if (res.ok) {
+                          setBadgesRewarded(prev => ({ ...prev, badge_rewarded_insider: true }));
+                        } else {
+                          const err = await res.json().catch(() => ({}));
+                          setBadgeRewardError(err.error || 'Erreur lors du claim de la récompense.');
+                        }
+                      }}
+                      className="mt-3 w-full text-xs font-semibold py-1.5 rounded-xl bg-yellow-400 text-yellow-900 hover:bg-yellow-500 transition-colors"
+                    >
+                      Réclamer la récompense
+                    </button>
+                  )}
+                  {unlocked && rewarded && (
+                    <p className="mt-3 text-xs text-center text-yellow-700 font-medium">✅ Récompense réclamée</p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
 
