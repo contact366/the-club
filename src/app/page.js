@@ -6,6 +6,7 @@ import Link from 'next/link';
 import InstallPopup from '@/components/InstallPopup';
 import Emoji from '@/components/Emoji';
 import ExplorationShowcaseSection from '@/components/ExplorationShowcaseSection';
+import { generatePartnerSlug } from '@/lib/slugUtils';
 
 // --- DONNÉES STATIQUES ---
 const ecoData = [
@@ -655,6 +656,7 @@ export default function Home() {
               <p style="font-size:12px;color:#64748b;margin-top:4px;margin-bottom:12px;line-height:1.3;">${loc.desc}</p>
               <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:10px;font-weight:bold;padding:6px 8px;border-radius:6px;margin-bottom:6px;text-align:center;">${loc.offerDecouverte}</div>
               <div style="background:#eff6ff;border:1px solid #bfdbfe;color:#0284c7;font-size:10px;font-weight:bold;padding:6px 8px;border-radius:6px;margin-bottom:12px;text-align:center;">${loc.offerPermanente}</div>
+              <a href="/experiences/${generatePartnerSlug(loc.name, loc.desc)}" style="display:block;width:100%;background:#F8FAFC;color:#0F172A;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:1px solid #E2E8F0;cursor:pointer;margin-bottom:6px;text-decoration:none;">Voir la fiche →</a>
               <button onclick="window.openReactPinModal('${safeName}', 'decouverte')" style="display:block;width:100%;background:#0F172A;color:white;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;">
                 <img src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2b50.svg' alt='⭐' width='14' height='14' style='display:inline-block;vertical-align:middle;margin-right:4px;' /> Offre Découverte (-50%)
               </button>

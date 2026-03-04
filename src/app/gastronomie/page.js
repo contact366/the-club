@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Emoji from '@/components/Emoji';
 import { supabase } from '@/lib/supabase';
 import { getImageSrc, PLACEHOLDER_IMAGE } from '@/lib/imageUtils';
+import { generatePartnerSlug } from '@/lib/slugUtils';
 
 const VILLES = ["Toutes", "Nice", "Cannes", "Monaco", "Antibes", "Cagnes-sur-Mer"];
 
@@ -15,7 +17,7 @@ export default function GastronomiePage() {
     async function fetchPartners() {
       const { data, error } = await supabase
         .from('partners')
-        .select('id, name, address, category, photo_url, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente')
+        .select('id, name, slug, address, category, photo_url, offer_decouverte, offer_permanente, discount_decouverte, discount_permanente')
         .ilike('category', '%gastronomie%')
         .order('name', { ascending: true });
       if (!error) setPartners(data || []);
@@ -77,7 +79,7 @@ export default function GastronomiePage() {
         ) : partnersFiltres.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {partnersFiltres.map((partner) => (
-              <div key={partner.id} className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-md group">
+              <Link key={partner.id} href={`/experiences/${partner.slug || generatePartnerSlug(partner.name, partner.address)}`} className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-md group cursor-pointer block">
                 <img
                   src={getImageSrc(partner.photo_url)}
                   alt={partner.name}
@@ -98,7 +100,7 @@ export default function GastronomiePage() {
                     </span>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
