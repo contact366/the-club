@@ -756,27 +756,72 @@ export default function Home() {
       <InstallPopup />
 
 
-      {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
+      {/* Hero Premium */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background image + video fallback */}
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover z-0">
           <source src="/intro.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/60 z-0"></div>
-        <div className="max-w-[1200px] mx-auto px-6 relative z-10 flex flex-col items-center">
-          <h1 className="text-6xl md:text-7xl font-semibold leading-tight mb-6 text-white">
-            L&apos;Art de vivre,<br />à prix d&apos;élite.
+        {/* Multi-layer gradient overlay pour un effet premium */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80 z-[1]"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 z-[1]"></div>
+        
+        {/* Contenu principal */}
+        <div className="max-w-[1200px] mx-auto px-6 relative z-10 flex flex-col items-center text-center">
+          
+          {/* Badge premium au-dessus du titre */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2 mb-8 animate-fade-in-down">
+            <span className="w-2 h-2 bg-riviera-gold rounded-full animate-pulse"></span>
+            <span className="text-white/90 text-xs font-semibold uppercase tracking-widest">Club Privilège Riviera</span>
+          </div>
+          
+          {/* Titre principal */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-8 text-white tracking-tight animate-fade-in-up">
+            Le club qui transforme<br className="hidden sm:block" />
+            vos sorties en <span className="text-transparent bg-clip-text bg-gradient-to-r from-riviera-gold via-amber-300 to-riviera-gold">économies.</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-xl mx-auto font-light">
-            Restaurants, spas et loisirs d&apos;exception. Jusqu&apos;à −50&nbsp;% chez les meilleurs établissements de votre région.
+          
+          {/* Sous-titre */}
+          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light leading-relaxed animate-fade-in-up-delay">
+            Restaurants, spas et expériences sur la Côte d&apos;Azur.<br className="hidden md:block" />
+            Rentabilisé dès votre première sortie.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#tarifs" className="bg-white text-riviera-navy font-semibold px-10 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-300 ease-out shadow-md hover:-translate-y-0.5">
-              Obtenir mon Pass
+          
+          {/* Double CTA */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8 animate-fade-in-up-delay-2">
+            {/* Bouton principal */}
+            <a href="#tarifs" className="group relative bg-white text-riviera-navy font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-300 ease-out shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:bg-gray-50 overflow-hidden">
+              <span className="relative z-10">Rejoindre le Club</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-riviera-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </a>
-            <a href="#carte" className="bg-white/10 text-white border border-white/30 flex items-center justify-center px-10 py-4 font-medium rounded-2xl hover:bg-white/20 transition-all duration-300 ease-out">
-              Explorer les adresses
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            {/* Bouton secondaire */}
+            <a href="#carte" className="group border-2 border-white/30 text-white font-semibold px-10 py-4 rounded-2xl text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/60 hover:-translate-y-1">
+              Découvrir les établissements
             </a>
+          </div>
+          
+          {/* Indicateur prix */}
+          <p className="text-white/60 text-sm font-medium mb-16 animate-fade-in-up-delay-3">
+            Dès <span className="text-riviera-gold font-bold">9,90€</span>/mois · Sans engagement
+          </p>
+          
+          {/* Barre de crédibilité */}
+          <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-3 animate-fade-in-up-delay-3">
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full bg-riviera-gold/80 flex items-center justify-center text-riviera-navy text-xs font-bold border-2 border-white/20">R</div>
+              <div className="w-8 h-8 rounded-full bg-riviera-azure/80 flex items-center justify-center text-white text-xs font-bold border-2 border-white/20">S</div>
+              <div className="w-8 h-8 rounded-full bg-emerald-500/80 flex items-center justify-center text-white text-xs font-bold border-2 border-white/20">L</div>
+            </div>
+            <p className="text-white/70 text-sm">
+              Déjà <span className="text-white font-semibold">{partners.length > 0 ? `+${partners.length}` : '+50'}</span> établissements partenaires sur la Riviera
+            </p>
+          </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-1.5">
+            <div className="w-1.5 h-3 bg-white/60 rounded-full animate-scroll-indicator"></div>
           </div>
         </div>
       </section>
