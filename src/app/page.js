@@ -70,6 +70,7 @@ export default function Home() {
   const [parrIndex, setParrIndex] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
   const [openPlanDetail, setOpenPlanDetail] = useState(null);
+  const [simSorties, setSimSorties] = useState(3);
 
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState('none');
@@ -926,46 +927,174 @@ export default function Home() {
         <div className="h-[400px] md:h-[500px]"></div>
       </section>
 
-      {/* Économies */}
-      <section id="economies" className="py-24 bg-riviera-navy text-white">
-  <div className="max-w-[1200px] mx-auto px-6 text-center">
+      {/* Économies — Démonstration & Simulateur */}
+      <section id="economies" className="py-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-[1200px] mx-auto px-6">
 
-    <h2 className="text-4xl md:text-5xl font-semibold mb-6">
-      Rentabilisé dès la première sortie.
-    </h2>
+          {/* PARTIE 1 : Démonstration lifestyle */}
+          <div className="text-center mb-16">
+            <span className="text-riviera-azure font-semibold tracking-wider text-sm uppercase mb-2 block">Concrètement</span>
+            <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-4">Une semaine avec The Club</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">Découvrez comment un membre peut profiter du Club et rentabiliser son abonnement en quelques sorties.</p>
+          </div>
 
-    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-4">
-      Avec le Pass Céleste, une seule sortie suffit souvent à amortir votre abonnement.
-    </p>
+          {/* 3 cartes journées */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
 
-    <p className="text-gray-400 text-sm font-semibold tracking-widest uppercase mb-4">
-      En moyenne
-    </p>
+            {/* Carte Mercredi */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-2xl">🍝</div>
+                <div>
+                  <p className="text-xs font-bold text-riviera-azure uppercase tracking-widest">Mercredi</p>
+                  <h3 className="text-lg font-bold text-riviera-navy">Dîner en ville</h3>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mb-1 font-medium">Lou Pantail — Nice</p>
+              <p className="text-sm text-gray-400 mb-6">Un dîner entre amis dans un restaurant partenaire.</p>
+              <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Addition moyenne</span>
+                  <span className="text-riviera-navy font-semibold">70 €</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Offre membre</span>
+                  <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full text-xs">-30%</span>
+                </div>
+                <hr className="border-gray-200" />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-riviera-navy">Économie</span>
+                  <span className="text-xl font-bold text-green-600">21 €</span>
+                </div>
+              </div>
+            </div>
 
-    <div className="max-w-md mx-auto mb-6 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm" role="table" aria-label="Estimations d'économies">
-      {[
-        { label: "Économie par sortie", value: "~35€" },
-        { label: "Économie par mois (2 sorties)", value: "~70€" },
-        { label: "Abonnement", value: "14,90€ / mois" },
-        { label: "Point d'équilibre", value: "Dès la première utilisation" },
-      ].map(({ label, value }, i, arr) => (
-        <div
-          key={label}
-          role="row"
-          className={`flex items-center justify-between px-5 py-4 ${i < arr.length - 1 ? "border-b border-white/10" : ""}`}
-        >
-          <span role="cell" className="text-gray-300 text-sm">{label}</span>
-          <span role="cell" className="text-white font-semibold text-sm tabular-nums">{value}</span>
+            {/* Carte Vendredi */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl">🍸</div>
+                <div>
+                  <p className="text-xs font-bold text-riviera-azure uppercase tracking-widest">Vendredi</p>
+                  <h3 className="text-lg font-bold text-riviera-navy">Cocktails</h3>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mb-1 font-medium">Bar partenaire — Cannes</p>
+              <p className="text-sm text-gray-400 mb-6">Un verre pour commencer le week-end.</p>
+              <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Addition moyenne</span>
+                  <span className="text-riviera-navy font-semibold">40 €</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Offre membre</span>
+                  <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full text-xs">Cocktail offert</span>
+                </div>
+                <hr className="border-gray-200" />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-riviera-navy">Économie</span>
+                  <span className="text-xl font-bold text-green-600">12 €</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Carte Dimanche */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-sky-50 flex items-center justify-center text-2xl">🧖</div>
+                <div>
+                  <p className="text-xs font-bold text-riviera-azure uppercase tracking-widest">Dimanche</p>
+                  <h3 className="text-lg font-bold text-riviera-navy">Spa & bien-être</h3>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mb-1 font-medium">Kaleis Spa — Nice</p>
+              <p className="text-sm text-gray-400 mb-6">Une pause détente pour finir la semaine.</p>
+              <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Addition moyenne</span>
+                  <span className="text-riviera-navy font-semibold">70 €</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Offre membre</span>
+                  <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full text-xs">-50%</span>
+                </div>
+                <hr className="border-gray-200" />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-riviera-navy">Économie</span>
+                  <span className="text-xl font-bold text-green-600">35 €</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bloc résumé semaine */}
+          <div className="max-w-lg mx-auto bg-riviera-navy rounded-3xl p-8 text-center text-white shadow-xl mb-24">
+            <p className="text-sm font-semibold text-riviera-gold uppercase tracking-widest mb-2">Total économisé cette semaine</p>
+            <p className="text-5xl font-bold mb-3">68 €</p>
+            <p className="text-gray-400 text-sm">Un simple week-end suffit souvent à rentabiliser votre abonnement.</p>
+          </div>
+
+          {/* PARTIE 2 : Simulateur interactif d'économies */}
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-semibold text-riviera-navy mb-4">Et vous, combien pouvez-vous économiser ?</h2>
+              <p className="text-gray-500 text-lg">Déplacez le curseur pour simuler vos économies mensuelles.</p>
+            </div>
+
+            <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100">
+
+              {/* Slider */}
+              <div className="mb-10">
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-sm font-bold text-riviera-navy uppercase tracking-wider">Sorties par mois</label>
+                  <span className="text-3xl font-bold text-riviera-azure tabular-nums">{simSorties}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="8"
+                  value={simSorties}
+                  onChange={(e) => setSimSorties(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-riviera-azure"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-2">
+                  <span>1 sortie</span>
+                  <span>8 sorties</span>
+                </div>
+              </div>
+
+              {/* Résultats */}
+              <div className="space-y-4 mb-8">
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm">Économie estimée</span>
+                  <span className="text-riviera-navy font-bold text-lg tabular-nums">{simSorties * 20} €</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm">Abonnement Explorer</span>
+                  <span className="text-gray-400 font-semibold text-sm">- 9,90 €</span>
+                </div>
+                <div className="flex justify-between items-center py-4 bg-green-50 rounded-2xl px-5">
+                  <span className="text-green-700 font-bold">Votre gain estimé</span>
+                  <span className="text-2xl font-bold text-green-600 tabular-nums">
+                    {(simSorties * 20 - 9.9).toFixed(2).replace('.', ',')} € <span className="text-sm font-normal text-green-500">/ mois</span>
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center mb-8">Les économies varient selon les établissements partenaires et les offres disponibles.</p>
+
+              {/* CTA */}
+              <div className="text-center">
+                <a href="#carte" className="inline-flex items-center gap-2 bg-riviera-navy text-white font-bold px-8 py-4 rounded-2xl hover:bg-slate-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                  Découvrir les établissements
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
         </div>
-      ))}
-    </div>
-
-    <p className="text-xs text-gray-500">
-      Estimations indicatives selon l&apos;usage et les offres partenaires.
-    </p>
-
-  </div>
-</section>
+      </section>
       {/* Application Mobile PWA */}
       <section className="py-20 bg-riviera-navy text-white overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-6">
