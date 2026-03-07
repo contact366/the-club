@@ -6,7 +6,7 @@ import Emoji from '@/components/Emoji';
 // Données statiques des badges (section marketing/showcase)
 const badges = [
   {
-    emoji: '🗺️',
+    emoji: '🌴',
     title: 'Riviera Explorer',
     description: '3 établissements validés',
     current: 2,
@@ -16,7 +16,7 @@ const badges = [
     isGold: false,
   },
   {
-    emoji: '🍽️',
+    emoji: '🍛',
     title: 'Riviera Gourmet',
     description: '3 restaurants validés',
     current: 1,
