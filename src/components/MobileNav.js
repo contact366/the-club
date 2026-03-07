@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { label: "Avantages", href: "/#economies" },
   { label: "Abonnements", href: "/#tarifs" },
   { label: "FAQ", href: "/#faq" },
+  { label: "La Cuisine du Club", href: "/cuisine-du-club" },
 ];
 
 export default function MobileNav({ open, onClose, user, onSignIn, onSignOut }) {
