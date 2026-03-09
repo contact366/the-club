@@ -1022,30 +1022,32 @@ export default function EspaceMembre() {
               {favoris.map((fav) => (
                 <div
                   key={fav.id}
-                  className="bg-white rounded-[20px] overflow-hidden border border-gray-100 dashboard-card"
+                  className="bg-white rounded-2xl overflow-hidden shadow-md dashboard-card"
                   style={{ opacity: removingFavIds.has(fav.id) ? 0 : 1, transition: 'opacity 350ms ease, box-shadow 0.2s ease, transform 0.2s ease' }}
                 >
-                  {/* Image */}
-                  <div className="h-28 overflow-hidden bg-gray-100 relative">
+                  {/* 16:9 image with name overlay */}
+                  <div className="relative aspect-video overflow-hidden">
                     <img
                       src={getImageSrc(fav.partners?.photo_url)}
                       alt={fav.partners?.name || 'Établissement'}
                       className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 p-2.5">
+                      <p className="text-white font-bold text-xs leading-snug drop-shadow truncate">{fav.partners?.name || 'Établissement'}</p>
+                    </div>
                   </div>
                   {/* Info */}
-                  <div className="p-3">
-                    <p className="font-bold text-riviera-navy text-sm truncate leading-snug">{fav.partners?.name || 'Établissement'}</p>
-                    {fav.partners?.category && (
-                      <p className="text-xs text-gray-400 truncate mt-0.5">{fav.partners.category}</p>
-                    )}
-                    {fav.partners?.address && (
-                      <p className="text-xs text-gray-400 truncate">{fav.partners.address}</p>
+                  <div className="px-3 py-2.5">
+                    {(fav.partners?.address || fav.partners?.category) && (
+                      <p className="text-xs text-gray-500 truncate">
+                        {fav.partners?.address || fav.partners?.category}
+                      </p>
                     )}
                     <button
                       onClick={() => removeFavori(fav.id)}
-                      className="mt-2 text-xs text-gray-300 hover:text-red-400 transition-colors"
+                      className="mt-1.5 text-xs text-gray-300 hover:text-red-400 transition-colors"
                       title="Retirer des favoris"
                     >
                       Retirer

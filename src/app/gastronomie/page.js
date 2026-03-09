@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Emoji from '@/components/Emoji';
 import { supabase } from '@/lib/supabase';
-import { getImageSrc, PLACEHOLDER_IMAGE } from '@/lib/imageUtils';
 import { generatePartnerSlug } from '@/lib/slugUtils';
+import EstablishmentCard from '@/components/EstablishmentCard';
 
 const VILLES = ["Toutes", "Nice", "Cannes", "Monaco", "Antibes", "Cagnes-sur-Mer"];
 
@@ -78,30 +77,23 @@ export default function GastronomiePage() {
           </div>
         ) : partnersFiltres.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {partnersFiltres.map((partner) => (
-              <Link key={partner.id} href={`/experiences/${partner.slug || generatePartnerSlug(partner.name, partner.address)}`} className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-md group cursor-pointer block">
-                <img
-                  src={getImageSrc(partner.photo_url)}
-                  alt={partner.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
+            {partnersFiltres.map((partner) => {
+              let offerLabel;
+              if (partner.offer_decouverte || partner.offer_permanente) {
+                const discount = partner.discount_decouverte ?? partner.discount_permanente;
+                offerLabel = discount ? `-${discount}%` : 'Offre exclusive';
+              }
+              return (
+                <EstablishmentCard
+                  key={partner.id}
+                  href={`/experiences/${partner.slug || generatePartnerSlug(partner.name, partner.address)}`}
+                  name={partner.name}
+                  image={partner.photo_url}
+                  city={partner.address}
+                  offerLabel={offerLabel}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-5">
-                  <h3 className="text-white font-bold text-xl mb-1">{partner.name}</h3>
-                  {partner.address && (
-                    <p className="text-gray-300 text-xs mb-2">{partner.address}</p>
-                  )}
-                  {(partner.offer_decouverte || partner.offer_permanente) && (
-                    <span className="inline-block bg-riviera-gold text-riviera-navy text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                      {partner.discount_decouverte ?? partner.discount_permanente
-                        ? `-${partner.discount_decouverte ?? partner.discount_permanente}%`
-                        : 'Offre exclusive'}
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-24">
