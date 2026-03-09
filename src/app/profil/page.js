@@ -709,8 +709,8 @@ export default function EspaceMembre() {
 
   return (
     <>
-    <div className="min-h-screen bg-[#F5F5F7] p-6 md:p-12">
-      
+    <div className="min-h-screen bg-riviera-sand">
+
       {/* CSS DE L'EFFET NÉON (Inchangé) */}
       <style dangerouslySetInnerHTML={{__html: `
         .theme-celeste { --neon-color-head: #ffffff; --neon-color-tail: #EAB308; }
@@ -740,227 +740,216 @@ export default function EspaceMembre() {
           100% { transform: scale(1); opacity: 1; }
         }
         .badge-unlocked { animation: badge-unlock 0.6s ease-out; }
+        @keyframes progress-fill {
+          from { width: 0%; }
+          to { width: var(--progress-width); }
+        }
+        .progress-bar-animated { animation: progress-fill 1s ease-out forwards; }
+        .dashboard-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .dashboard-card:hover { box-shadow: 0 8px 30px rgba(15,23,42,0.10); transform: translateY(-1px); }
+        @keyframes section-fade-in {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .section-animate { animation: section-fade-in 0.5s ease-out both; }
       `}} />
 
-      <div className="max-w-3xl mx-auto space-y-8">
-        
+      <div className="max-w-2xl mx-auto px-5 pb-24">
+
         {/* BOUTON RETOUR */}
-        <div className="pt-2">
-          <Link href="/" className="inline-flex items-center gap-3 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors group">
-            <div className="p-2 bg-white rounded-full shadow-sm border border-gray-200/60 group-hover:scale-105 transition-transform">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="pt-6 pb-2">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-riviera-navy transition-colors group">
+            <div className="p-1.5 bg-white rounded-full shadow-sm border border-gray-100 group-hover:scale-105 transition-transform">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </div>
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
         </div>
 
-        {/* 🌟 EN-TÊTE DU PROFIL + WIDGET MÉTÉO COMBINÉS */}
-        <div className="space-y-4">
-          {/* En-tête avec le prénom */}
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bonjour, {userFirstName}</h1>
-            <p className="text-gray-500 mt-2">Prêt pour votre prochaine sortie ?</p>
+        {/* ── 1. HEADER ── */}
+        <div className="pt-4 pb-6 flex items-start justify-between gap-4 section-animate">
+          <div className="flex-1 min-w-0">
+            <p className="text-gray-400 text-sm mb-1">Prêt pour votre prochaine sortie ?</p>
+            <h1 className="text-3xl font-bold text-riviera-navy leading-tight">Bonjour, {userFirstName} 👋</h1>
           </div>
 
-          {/* Widget météo */}
-          <div>
-            <WeatherWidget />
-          </div>
-        </div>
-
-        {/* CONTENEUR PRINCIPAL OPTIMISÉ POUR MOBILE */}
-        <div className="flex flex-col gap-4 md:gap-6">
-
-          {/* 1. BLOC IDENTITÉ & DÉCONNEXION (Simplifié : sans le bonjour en double) */}
-          <div className="flex items-center justify-between bg-white/50 p-3 rounded-2xl border border-gray-200/50">
-            <div className="flex items-center gap-3">
-              <label className="relative cursor-pointer group shrink-0">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                />
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt="Avatar"
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-white shadow-inner group-hover:opacity-80 transition-opacity"
-                  />
-                ) : (
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-gray-200 to-gray-100 text-gray-700 rounded-full flex items-center justify-center text-lg font-bold shadow-inner border border-white">
-                    {userFirstName.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                {uploadingAvatar ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
-                    <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                )}
-              </label>
-              <div className="min-w-0">
-                <p className="text-sm text-gray-500 font-medium">Membre</p>
-                <h2 className="text-lg md:text-xl font-bold tracking-tight text-gray-900 truncate">
-                  {userFirstName}
-                </h2>
+          {/* Avatar cliquable pour upload */}
+          <label className="relative cursor-pointer group shrink-0 mt-1">
+            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-lg group-hover:opacity-80 transition-opacity"
+              />
+            ) : (
+              <div className="w-14 h-14 bg-gradient-to-br from-riviera-gold to-amber-500 text-white rounded-full flex items-center justify-center text-2xl font-bold shadow-lg border-2 border-white">
+                {userFirstName.charAt(0).toUpperCase()}
               </div>
-            </div>
-            {/* Bouton engrenage → Stripe Portal */}
-            {profil?.stripe_customer_id && (
-            <button
-              onClick={handleGererAbonnement}
-              className="p-2.5 bg-white text-gray-600 rounded-full shadow-sm border border-gray-200/60 hover:scale-105 active:scale-95 transition-all"
-              title="Gérer mon abonnement"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
             )}
-          </div>
-
-          {/* 2. LA CARTE VIP */}
-          <div className={`relative ${isCercle ? 'bg-carbon border border-white/20' : 'bg-[#0A0A0A]'} rounded-3xl p-4 md:p-8 text-white shadow-xl overflow-hidden min-h-[140px] flex items-center w-full`}>
-            {/* Reflet argenté exclusif au Cercle */}
-            {isCercle && <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-0"></div>}
-
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full"></div>
-            <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
-
-            <div className="relative z-10 flex flex-col md:flex-row justify-between w-full min-h-0 items-start md:items-center gap-8">
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Statut du membre</p>
-                <div className={`neon-rotating-container inline-block ${neonThemeClass}`}>
-                  <div className="relative z-10 flex items-center gap-3 px-5 py-2 rounded-full">
-                    <span className={`text-xl font-bold tracking-tight capitalize ${isCercle ? 'text-slate-300' : isCeleste ? 'text-yellow-400' : 'text-blue-400'}`}>
-                      Pass {profil?.subscription_type || 'Aucun'}
-                    </span>
-                    <span className="flex w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-                  </div>
-                </div>
-                {profil?.subscription_type === 'aventurier' && countdown && !countdown.expired && countdown.hours !== undefined && (
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    <span className="text-xs text-gray-400 uppercase tracking-wider">Expire dans</span>
-                    <div className="flex gap-1">
-                      <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.hours).padStart(2, '0')}h</span>
-                      <span className="text-gray-500">:</span>
-                      <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.minutes).padStart(2, '0')}m</span>
-                      <span className="text-gray-500">:</span>
-                      <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.seconds).padStart(2, '0')}s</span>
-                    </div>
-                  </div>
-                )}
-                {profil?.subscription_type === 'aventurier' && countdown?.expired && (
-                  <p className="mt-4 text-red-400 text-sm font-semibold"><Emoji symbol="⏰" label="expiré" size={16} /> Votre pass a expiré</p>
-                )}
-              </div>
-
-              <div className="relative h-20 w-full md:w-64 overflow-hidden">
-                <div className={`absolute right-0 top-0 w-full text-left md:text-right transition-all duration-700 ease-in-out transform ${activeSlide === 0 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8 pointer-events-none'}`}>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em] mb-1">Total Économisé</p>
-                  <p className="text-4xl md:text-5xl font-light tracking-tighter text-white">
-                    {profil?.montant_economise ?? '0.00'}<span className="text-xl md:text-2xl text-gray-400 ml-1">€</span>
-                  </p>
-                </div>
-                <div className={`absolute right-0 top-0 w-full text-left md:text-right transition-all duration-700 ease-in-out transform ${activeSlide === 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em] mb-1">Membre depuis</p>
-                  <p className="text-3xl font-light tracking-tight text-white mt-2">
-                    {profil?.created_at ? new Date(profil.created_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : 'Récemment'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3. MENU D'ACTIONS */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => supabase.auth.signOut().then(() => router.push('/'))}
-              className="flex items-center justify-center gap-2 p-3 bg-white rounded-2xl text-sm font-semibold text-red-500 border border-gray-200 shadow-sm active:bg-red-50 transition-colors"
-            >
-              Déconnexion
-            </button>
-            <Link
-              href="/espace-partenaire"
-              className="flex items-center justify-center gap-2 p-3 bg-white rounded-2xl text-sm font-semibold text-gray-700 border border-gray-200 shadow-sm active:bg-gray-50 text-center transition-colors"
-            >
-              Espace Partenaire
-            </Link>
-          </div>
-
-          {/* Bouton Supprimer mon compte */}
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="w-full mt-3 flex items-center justify-center gap-2 p-3 bg-white rounded-2xl text-xs font-medium text-gray-400 border border-gray-100 hover:text-red-500 hover:border-red-200 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            Supprimer mon compte
-          </button>
-
-        </div>
-
-        {/* 🌟 NOUVEAU : LA JAUGE DES OFFRES */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Offres Découverte du mois</h3>
-            <p className="text-sm text-gray-500">
-              {isCercle ? "Accès illimité et prioritaire — Pass Le Cercle." : isCeleste ? "Votre pass vous donne un accès illimité." : "Passez Céleste pour débloquer l'illimité."}
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {isCercle || isCeleste ? (
-              // Affichage Céleste : Infini
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${isCercle ? 'text-slate-500 bg-slate-100' : 'text-yellow-500 bg-yellow-50'}`}>
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+            {uploadingAvatar ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
+                <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Illimité
               </div>
             ) : (
-              // Affichage Explorer : Jauge 3 pastilles
-              <div className="flex flex-col items-end gap-1">
-                <div className="flex gap-2">
-                  {[1, 2, 3].map((num) => (
-                    <div 
-                      key={num} 
-                      className={`w-8 h-2.5 rounded-full transition-colors ${
-                        offresUtiliseesMois >= num ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]' : 'bg-gray-200'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  {offresUtiliseesMois} / 3 utilisées
-                </span>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/25 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
               </div>
+            )}
+          </label>
+        </div>
+
+        {/* Widget météo */}
+        <div className="mb-6 section-animate" style={{ animationDelay: '0.05s' }}>
+          <WeatherWidget />
+        </div>
+
+        {/* ── 2. MEMBERSHIP HERO CARD ── */}
+        <div
+          className={`relative rounded-[24px] overflow-hidden mb-6 shadow-2xl section-animate ${isCercle ? 'bg-carbon border border-white/20' : ''}`}
+          style={{ animationDelay: '0.1s' }}
+        >
+          {/* Dark navy gradient background */}
+          {!isCercle && (
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1a2744] to-[#0F172A]" />
+          )}
+          {isCercle && <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-0" />}
+          {/* Decorative glows */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-riviera-gold/10 blur-3xl rounded-full pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-56 h-56 bg-riviera-azure/10 blur-3xl rounded-full pointer-events-none" />
+
+          <div className="relative z-10 p-7">
+            {/* Top row: pass badge + settings */}
+            <div className="flex items-start justify-between mb-7">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Statut du membre</p>
+                <div className={`neon-rotating-container inline-block ${neonThemeClass}`}>
+                  <div className="relative z-10 flex items-center gap-2 px-5 py-2 rounded-full">
+                    <span className={`text-base font-bold tracking-tight capitalize ${isCercle ? 'text-slate-300' : isCeleste ? 'text-yellow-400' : 'text-blue-400'}`}>
+                      Pass {profil?.subscription_type || 'Aucun'}
+                    </span>
+                    <span className="flex w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                  </div>
+                </div>
+              </div>
+              {profil?.stripe_customer_id && (
+                <button
+                  onClick={handleGererAbonnement}
+                  className="p-2 bg-white/10 text-gray-300 rounded-xl hover:bg-white/20 active:scale-95 transition-all"
+                  title="Gérer mon abonnement"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Savings highlight */}
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em] mb-2">Total économisé</p>
+              <p className="text-5xl font-light tracking-tighter text-white">
+                {profil?.montant_economise ?? '0.00'}<span className="text-2xl text-gray-400 ml-1">€</span>
+              </p>
+            </div>
+
+            {/* Bottom row: discoveries + member since */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-2.5">
+                {isCercle || isCeleste ? (
+                  <p className="text-white text-sm font-medium">
+                    <span className={`${isCeleste ? 'text-yellow-400' : 'text-slate-300'} mr-1`}>✦</span>
+                    Découvertes illimitées
+                  </p>
+                ) : (
+                  <p className="text-white text-sm font-medium">
+                    Découvertes restantes ce mois :&nbsp;
+                    <span className="font-bold text-riviera-gold">{Math.max(0, 3 - offresUtiliseesMois)}</span>
+                  </p>
+                )}
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500 uppercase tracking-wider">Membre depuis</p>
+                <p className="text-sm text-gray-300 font-medium">
+                  {profil?.created_at ? new Date(profil.created_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : 'Récemment'}
+                </p>
+              </div>
+            </div>
+
+            {/* Countdown pour Aventurier */}
+            {profil?.subscription_type === 'aventurier' && countdown && !countdown.expired && countdown.hours !== undefined && (
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-gray-400 uppercase tracking-wider">Expire dans</span>
+                <div className="flex gap-1">
+                  <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.hours).padStart(2, '0')}h</span>
+                  <span className="text-gray-500">:</span>
+                  <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.minutes).padStart(2, '0')}m</span>
+                  <span className="text-gray-500">:</span>
+                  <span className="bg-white/10 px-2 py-1 rounded text-white font-mono text-sm">{String(countdown.seconds).padStart(2, '0')}s</span>
+                </div>
+              </div>
+            )}
+            {profil?.subscription_type === 'aventurier' && countdown?.expired && (
+              <p className="mt-5 text-red-400 text-sm font-semibold"><Emoji symbol="⏰" label="expiré" size={16} /> Votre pass a expiré</p>
             )}
           </div>
         </div>
 
-        {/* 🗺️ EXPLORATION RIVIERA — Badges */}
+        {/* Actions rapides */}
+        <div className="grid grid-cols-2 gap-3 mb-8 section-animate" style={{ animationDelay: '0.15s' }}>
+          <button
+            onClick={() => supabase.auth.signOut().then(() => router.push('/'))}
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-white rounded-[18px] text-sm font-semibold text-red-500 border border-gray-100 shadow-sm hover:shadow active:scale-95 transition-all"
+          >
+            Déconnexion
+          </button>
+          <Link
+            href="/espace-partenaire"
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-white rounded-[18px] text-sm font-semibold text-riviera-navy border border-gray-100 shadow-sm hover:shadow active:scale-95 text-center transition-all"
+          >
+            Espace Partenaire
+          </Link>
+        </div>
+
+        {/* ── 3. À DÉCOUVRIR AUJOURD'HUI ── */}
+        <div className="mb-8 section-animate" style={{ animationDelay: '0.2s' }}>
+          <h2 className="text-2xl font-bold text-riviera-navy mb-4">À découvrir aujourd&apos;hui</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: '🍽️', label: 'Restaurants', colorFrom: '#FFF8EE', colorTo: '#FFF0D6', accent: '#B45309', border: '#FDE68A' },
+              { icon: '🏄', label: 'Activités', colorFrom: '#EFF6FF', colorTo: '#DBEAFE', accent: '#1D4ED8', border: '#BFDBFE' },
+              { icon: '🧘', label: 'Bien-être', colorFrom: '#F0FDF4', colorTo: '#DCFCE7', accent: '#047857', border: '#A7F3D0' },
+            ].map(({ icon, label, colorFrom, colorTo, accent, border }) => (
+              <Link
+                key={label}
+                href="/carte"
+                className="dashboard-card rounded-[20px] p-4 flex flex-col items-center gap-2.5 border text-center active:scale-95 transition-all"
+                style={{ background: `linear-gradient(135deg, ${colorFrom}, ${colorTo})`, borderColor: border }}
+              >
+                <span className="text-2xl">{icon}</span>
+                <p className="text-xs font-semibold leading-tight" style={{ color: accent }}>{label}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ── 4. EXPLORATION RIVIERA — Badges ── */}
         {badgesData.filter((b) => b.plan_required === 'all' || (b.plan_required === 'celeste' && isCeleste)).length > 0 && (
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">Exploration Riviera</h2>
+          <div className="mb-8 section-animate" style={{ animationDelay: '0.25s' }}>
+            <h2 className="text-2xl font-bold text-riviera-navy mb-4">Exploration Riviera</h2>
 
             {/* Toast récompense */}
             {rewardMessage && (
-              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-2xl text-sm font-medium flex items-center gap-2">
+              <div className="mb-4 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-[18px] text-sm font-medium flex items-center gap-2">
                 <Emoji symbol="🎉" label="récompense" size={18} />
                 {rewardMessage}
               </div>
@@ -976,24 +965,24 @@ export default function EspaceMembre() {
                   return (
                     <div
                       key={badge.id}
-                      className={`bg-white rounded-3xl shadow-sm border border-gray-200/60 p-5 flex flex-col gap-3 ${badge.is_unlocked ? 'badge-unlocked' : 'opacity-70'}`}
+                      className={`bg-white rounded-[20px] border border-gray-100 p-5 flex flex-col gap-4 dashboard-card ${badge.is_unlocked ? 'badge-unlocked' : 'opacity-60'}`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl ${badge.is_unlocked ? config.color : 'bg-gray-200'}`}>
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${badge.is_unlocked ? config.color : 'bg-gray-100'}`}>
                           {badge.is_unlocked
-                            ? <Emoji symbol={config.emoji} label={config.label} size={20} />
-                            : <Emoji symbol="🔒" label="verrouillé" size={20} />}
+                            ? <Emoji symbol={config.emoji} label={config.label} size={24} />
+                            : <Emoji symbol="🔒" label="verrouillé" size={22} />}
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-900 text-sm">{badge.title}</p>
-                          <p className="text-xs text-gray-500">{badge.current_count} / {badge.required_count}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-riviera-navy">{badge.title}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{badge.current_count} / {badge.required_count} complétés</p>
                         </div>
                       </div>
-                      {/* Barre de progression */}
-                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                      {/* Larger progress bar */}
+                      <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${badge.is_unlocked ? config.color : 'bg-gray-300'}`}
-                          style={{ width: `${progress * 100}%` }}
+                          className={`h-full rounded-full transition-all duration-700 progress-bar-animated ${badge.is_unlocked ? config.color : 'bg-gray-300'}`}
+                          style={{ width: `${progress * 100}%`, '--progress-width': `${progress * 100}%` }}
                         />
                       </div>
                     </div>
@@ -1003,85 +992,16 @@ export default function EspaceMembre() {
           </div>
         )}
 
-        {/* ℹ️ MES INFORMATIONS */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Mes informations</h3>
-          {infoMessage.text && (
-            <div className={`p-3 rounded-xl text-sm mb-4 ${infoMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-              {infoMessage.text}
-            </div>
-          )}
-          <div className="space-y-4">
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Email</label>
-              {editingEmail ? (
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder={userEmail}
-                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  />
-                  <button
-                    onClick={handleUpdateEmail}
-                    className="px-4 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
-                  >
-                    Confirmer
-                  </button>
-                  <button
-                    onClick={() => { setEditingEmail(false); setNewEmail(''); }}
-                    className="px-3 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm hover:bg-gray-200 transition-colors"
-                  >
-                    Annuler
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{userEmail}</span>
-                  <button
-                    onClick={() => setEditingEmail(true)}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    Modifier
-                  </button>
-                </div>
-              )}
-            </div>
-            {/* Téléphone */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Téléphone</label>
-              <div className="flex gap-2">
-                <input
-                  type="tel"
-                  value={newPhone}
-                  onChange={(e) => setNewPhone(e.target.value)}
-                  placeholder="+33 6 00 00 00 00"
-                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                />
-                <button
-                  onClick={handleUpdatePhone}
-                  disabled={savingPhone}
-                  className="px-4 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-60"
-                >
-                  {savingPhone ? 'Sauvegarde...' : 'Sauvegarder'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ❤️ MES COUPS DE CŒUR */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Mes coups de cœur</h2>
+        {/* ── 5. MES COUPS DE CŒUR ── */}
+        <div className="mb-8 section-animate" style={{ animationDelay: '0.3s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-riviera-navy">Mes coups de cœur</h2>
             {favoris.length > 0 && (
               <button
                 onClick={handlePartagerFavoris}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all"
+                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-xs font-semibold shadow hover:shadow-md active:scale-95 transition-all"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
                 Partager
@@ -1089,135 +1009,244 @@ export default function EspaceMembre() {
             )}
           </div>
 
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 overflow-hidden">
-            {favoris.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl"><Emoji symbol="🤍" label="aucun favori" size={32} /></span>
-                </div>
-                <p className="text-gray-500 text-lg">Aucun coup de cœur pour le moment.</p>
-                <p className="text-gray-400 text-sm mt-1">Explorez la carte et ajoutez vos adresses préférées !</p>
+          {favoris.length === 0 ? (
+            <div className="bg-white rounded-[20px] p-10 text-center border border-gray-100">
+              <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Emoji symbol="🤍" label="aucun favori" size={32} />
               </div>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {favoris.map((fav) => (
-                  <li key={fav.id} className="flex items-center justify-between group overflow-hidden" style={{ transition: 'opacity 350ms ease, max-height 350ms ease, padding 350ms ease', opacity: removingFavIds.has(fav.id) ? 0 : 1, maxHeight: removingFavIds.has(fav.id) ? '0' : '200px', padding: removingFavIds.has(fav.id) ? '0 20px' : '20px' }}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-pink-50 group-hover:scale-110 transition-transform">
-                        <img
-                          src={getImageSrc(fav.partners?.photo_url)}
-                          alt={fav.partners?.name || 'Établissement'}
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
-                        />
-                      </div>
-                      <div>
-                        <p className="text-lg font-semibold text-gray-900">{fav.partners?.name || 'Établissement'}</p>
-                        <p className="text-sm text-gray-500">{fav.partners?.category || ''}{fav.partners?.address ? ` • ${fav.partners.address}` : ''}</p>
-                      </div>
-                    </div>
+              <p className="text-gray-500 font-medium">Aucun coup de cœur pour le moment.</p>
+              <p className="text-gray-400 text-sm mt-1">Explorez la carte et ajoutez vos adresses préférées !</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {favoris.map((fav) => (
+                <div
+                  key={fav.id}
+                  className="bg-white rounded-[20px] overflow-hidden border border-gray-100 dashboard-card"
+                  style={{ opacity: removingFavIds.has(fav.id) ? 0 : 1, transition: 'opacity 350ms ease, box-shadow 0.2s ease, transform 0.2s ease' }}
+                >
+                  {/* Image */}
+                  <div className="h-28 overflow-hidden bg-gray-100 relative">
+                    <img
+                      src={getImageSrc(fav.partners?.photo_url)}
+                      alt={fav.partners?.name || 'Établissement'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
+                    />
+                  </div>
+                  {/* Info */}
+                  <div className="p-3">
+                    <p className="font-bold text-riviera-navy text-sm truncate leading-snug">{fav.partners?.name || 'Établissement'}</p>
+                    {fav.partners?.category && (
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{fav.partners.category}</p>
+                    )}
+                    {fav.partners?.address && (
+                      <p className="text-xs text-gray-400 truncate">{fav.partners.address}</p>
+                    )}
                     <button
                       onClick={() => removeFavori(fav.id)}
-                      className="p-2 text-gray-300 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
+                      className="mt-2 text-xs text-gray-300 hover:text-red-400 transition-colors"
                       title="Retirer des favoris"
                     >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      Retirer
                     </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── 6. ACTIVITÉ RÉCENTE ── */}
+        <div className="mb-8 section-animate" style={{ animationDelay: '0.35s' }}>
+          <h2 className="text-2xl font-bold text-riviera-navy mb-4">Activité récente</h2>
+
+          {historique.length === 0 ? (
+            <div className="bg-white rounded-[20px] p-10 text-center border border-gray-100">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-gray-500 font-medium">Aucune offre utilisée pour le moment.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {historique.slice(0, 4).map((item) => (
+                <div key={item.id} className="bg-white rounded-[20px] p-4 flex items-center gap-4 border border-gray-100 dashboard-card">
+                  <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-riviera-navy truncate">{item.partners?.name || 'Établissement inconnu'}</p>
+                    <p className="text-xs text-gray-400 capitalize mt-0.5">Offre {item.offer_type}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold text-gray-700">
+                      {new Date(item.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(item.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              {historique.length > 4 && (
+                <p className="text-center text-xs text-gray-400 pt-1">
+                  + {historique.length - 4} autre{historique.length - 4 > 1 ? 's' : ''} dans votre historique
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── 7. PROGRAMME AMBASSADEUR ── */}
+        <div className="mb-8 section-animate" style={{ animationDelay: '0.4s' }}>
+          <div className="relative rounded-[24px] overflow-hidden shadow-xl">
+            {/* Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1a2744] to-[#0c2340]" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-riviera-gold/15 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-riviera-azure/10 blur-3xl rounded-full pointer-events-none" />
+
+            <div className="relative z-10 p-6">
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-riviera-gold/20 rounded-2xl flex items-center justify-center shrink-0">
+                  <Emoji symbol="🎁" label="cadeau" size={24} />
+                </div>
+                <div>
+                  <p className="font-bold text-lg text-white">Programme Ambassadeur</p>
+                  <p className="text-blue-300 text-sm">2 mois offerts par filleul Céleste</p>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="bg-white/10 rounded-[18px] p-4 mb-5 flex items-center gap-4">
+                <div className="flex-1 text-center border-r border-white/10 pr-4">
+                  <p className="text-3xl font-bold text-white">{profil?.referral_count ?? 0}</p>
+                  <p className="text-blue-300 text-xs mt-0.5">ami{(profil?.referral_count ?? 0) !== 1 ? 's' : ''} parrainé{(profil?.referral_count ?? 0) !== 1 ? 's' : ''}</p>
+                </div>
+                <div className="flex-1 text-center pl-4">
+                  <p className="text-3xl font-bold text-riviera-gold">{((profil?.referral_count ?? 0) * 2)}</p>
+                  <p className="text-blue-300 text-xs mt-0.5">mois offerts gagnés</p>
+                </div>
+              </div>
+
+              {/* Referral link */}
+              {profil?.referral_code ? (
+                <div className="bg-white/10 rounded-[18px] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-3">Votre lien d&apos;invitation</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-mono text-white/70 flex-1 truncate">
+                      {typeof window !== 'undefined' ? `${window.location.origin}/?ref=${profil.referral_code}` : `https://theclub-app.fr/?ref=${profil.referral_code}`}
+                    </span>
+                    <button
+                      onClick={async () => {
+                        const link = `${window.location.origin}/?ref=${profil.referral_code}`;
+                        if (navigator.share) {
+                          try { await navigator.share({ title: 'The Club', text: "Rejoins The Club !", url: link }); } catch (e) { if (e.name !== 'AbortError') console.error(e); }
+                        } else {
+                          try { await navigator.clipboard.writeText(link); alert('Lien copié ! 📋'); }
+                          catch { prompt('Votre lien :', link); }
+                        }
+                      }}
+                      className="shrink-0 bg-riviera-gold text-riviera-navy text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-amber-400 active:scale-95 transition-all shadow-lg"
+                    >
+                      Copier le lien
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-blue-300 text-sm text-center">Accédez à l&apos;accueil pour générer votre lien de parrainage.</p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* 🎁 PROGRAMME AMBASSADEUR */}
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-6">Programme Ambassadeur</h2>
-          <div className="bg-gradient-to-br from-riviera-azure to-blue-900 rounded-3xl p-6 text-white shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl"><Emoji symbol="🎁" label="cadeau" size={32} /></span>
-              <div>
-                <p className="font-bold text-lg">Invitez vos amis, soyez récompensé !</p>
-                <p className="text-blue-200 text-sm">Pour chaque filleul au Pass Céleste : 2 mois offerts</p>
+        {/* ── 8. MES INFORMATIONS ── */}
+        <div className="mb-6 section-animate" style={{ animationDelay: '0.45s' }}>
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.15em] mb-3 px-1">Mes informations</h3>
+          <div className="bg-white rounded-[20px] border border-gray-100 p-6">
+            {infoMessage.text && (
+              <div className={`p-3 rounded-[14px] text-sm mb-5 ${infoMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                {infoMessage.text}
               </div>
-            </div>
-            <div className="bg-white/10 rounded-2xl p-4 mb-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-1">Vos filleuls</p>
-              <p className="text-3xl font-bold">{profil?.referral_count ?? 0}</p>
-              <p className="text-blue-200 text-sm mt-1">ami{(profil?.referral_count ?? 0) !== 1 ? 's' : ''} parrainé{(profil?.referral_count ?? 0) !== 1 ? 's' : ''}</p>
-            </div>
-            {profil?.referral_code ? (
-              <div className="bg-white/10 rounded-2xl p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-2">Votre lien d&apos;invitation</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-white break-all flex-1">
-                    {typeof window !== 'undefined' ? `${window.location.origin}/?ref=${profil.referral_code}` : `https://theclub-app.fr/?ref=${profil.referral_code}`}
-                  </span>
+            )}
+            <div className="space-y-5">
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Email</label>
+                {editingEmail ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      placeholder={userEmail}
+                      className="flex-1 px-4 py-2.5 border border-gray-200 rounded-[14px] text-sm focus:ring-2 focus:ring-riviera-azure focus:border-riviera-azure outline-none transition-all"
+                    />
+                    <button
+                      onClick={handleUpdateEmail}
+                      className="px-4 py-2.5 bg-riviera-navy text-white rounded-[14px] text-sm font-semibold hover:opacity-90 transition-opacity"
+                    >
+                      Confirmer
+                    </button>
+                    <button
+                      onClick={() => { setEditingEmail(false); setNewEmail(''); }}
+                      className="px-3 py-2.5 bg-gray-100 text-gray-600 rounded-[14px] text-sm hover:bg-gray-200 transition-colors"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">{userEmail}</span>
+                    <button
+                      onClick={() => setEditingEmail(true)}
+                      className="text-xs font-semibold text-riviera-azure hover:opacity-80 transition-opacity"
+                    >
+                      Modifier
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* Téléphone */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Téléphone</label>
+                <div className="flex gap-2">
+                  <input
+                    type="tel"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="+33 6 00 00 00 00"
+                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-[14px] text-sm focus:ring-2 focus:ring-riviera-azure focus:border-riviera-azure outline-none transition-all"
+                  />
                   <button
-                    onClick={async () => {
-                      const link = `${window.location.origin}/?ref=${profil.referral_code}`;
-                      if (navigator.share) {
-                        try { await navigator.share({ title: 'The Club', text: "Rejoins The Club !", url: link }); } catch (e) { if (e.name !== 'AbortError') console.error(e); }
-                      } else {
-                        try { await navigator.clipboard.writeText(link); alert('Lien copié ! 📋'); }
-                        catch { prompt('Votre lien :', link); }
-                      }
-                    }}
-                    className="shrink-0 bg-white text-riviera-navy text-xs font-bold px-3 py-2 rounded-xl hover:bg-gray-100 transition"
+                    onClick={handleUpdatePhone}
+                    disabled={savingPhone}
+                    className="px-4 py-2.5 bg-riviera-navy text-white rounded-[14px] text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
                   >
-                    Copier
+                    {savingPhone ? 'Sauvegarde...' : 'Sauvegarder'}
                   </button>
                 </div>
               </div>
-            ) : (
-              <p className="text-blue-200 text-sm text-center">Accédez à l&apos;accueil pour générer votre lien de parrainage.</p>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* L'HISTORIQUE (Inchangé) */}
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-6">Activité récente</h2>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 overflow-hidden">
-            {historique.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 text-lg">Aucune offre utilisée pour le moment.</p>
-              </div>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {historique.map((item) => (
-                  <li key={item.id} className="p-5 hover:bg-gray-50 transition-colors flex items-center justify-between group">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-lg font-semibold text-gray-900">{item.partners?.name || 'Établissement inconnu'}</p>
-                        <p className="text-sm text-gray-500 capitalize">Offre {item.offer_type}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">
-                        {new Date(item.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {new Date(item.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+        {/* Bouton Supprimer mon compte */}
+        <div className="mb-4 section-animate" style={{ animationDelay: '0.5s' }}>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white rounded-[18px] text-xs font-medium text-gray-400 border border-gray-100 hover:text-red-500 hover:border-red-200 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Supprimer mon compte
+          </button>
         </div>
 
       </div>
