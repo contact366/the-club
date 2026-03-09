@@ -765,10 +765,10 @@ export default function Home() {
   const todayPartners = (() => {
     if (!partners.length) return [];
     const resto    = partners.filter(p => /restaurant|gastro|cuisine|brasserie|bistro/i.test(p.category || ''));
-    const wellness = partners.filter(p => /spa|bien.tre|wellness|beauté|soin|massage|yoga/i.test(p.category || ''));
+    const wellness = partners.filter(p => /spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage|yoga/i.test(p.category || ''));
     const other    = partners.filter(p =>
       !(/restaurant|gastro|cuisine|brasserie|bistro/i.test(p.category || '')) &&
-      !(/spa|bien.tre|wellness|beauté|soin|massage|yoga/i.test(p.category || ''))
+      !(/spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage|yoga/i.test(p.category || ''))
     );
     const combined = [...resto.slice(0, 2), ...wellness.slice(0, 1), ...other.slice(0, 2)];
     const unique   = combined.filter((p, i, a) => a.findIndex(pp => pp.id === p.id) === i);
@@ -782,16 +782,16 @@ export default function Home() {
   const getCategoryEmoji = (cat = '') => {
     const c = cat.toLowerCase();
     if (/restaurant|gastro|cuisine|brasserie|bistro/.test(c)) return '🍽️';
-    if (/spa|bien.tre|wellness|beauté|soin|massage/.test(c))  return '🧘';
+    if (/spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage/.test(c))  return '🧘';
     if (/sport|fitness|yoga/.test(c))                         return '💪';
-    if (/hôtel|hotel|hébergement/.test(c))                    return '🏨';
-    if (/loisir|activité|simulat/.test(c))                    return '🎯';
+    if (/h\u00f4tel|hotel|h\u00e9bergement/.test(c))          return '🏨';
+    if (/loisir|activit\u00e9|simulat/.test(c))               return '🎯';
     return '⭐';
   };
   const getCategoryBg = (cat = '') => {
     const c = cat.toLowerCase();
-    if (/restaurant|gastro|cuisine|brasserie|bistro/.test(c)) return '#FFF3E8';
-    if (/spa|bien.tre|wellness|beauté|soin|massage/.test(c))  return '#F0FFF4';
+    if (/restaurant|gastro|cuisine|brasserie|bistro/.test(c))               return '#FFF3E8';
+    if (/spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage/.test(c)) return '#F0FFF4';
     return '#F0F4FF';
   };
 
@@ -1064,7 +1064,7 @@ export default function Home() {
 
             {/* 8. ACCOUNT INFO */}
             <div className="dash-fade-in-6" style={{ background: '#fff', borderRadius: '24px', padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-              <h3 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#1B2A4A', margin: '0 0 14px', letterSpacing: '-0.01em', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#8896A6' }}>
+              <h3 style={{ fontSize: '0.72rem', fontWeight: '700', color: '#8896A6', margin: '0 0 14px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 Mon compte
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
