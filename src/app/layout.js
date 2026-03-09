@@ -3,6 +3,7 @@ import './globals.css';
 import TwemojiLoader from '@/components/TwemojiLoader';
 import SharedHeader from '@/components/SharedHeader';
 import SharedFooter from '@/components/SharedFooter';
+import BottomNav from '@/components/BottomNav';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -29,10 +30,11 @@ export default function RootLayout({ children }) {
     <html lang="fr" className={inter.className}>
       <body className="antialiased bg-white text-gray-900">
         <SharedHeader />
-        <div className="pt-16">
+        <div className="pt-16 pb-16 lg:pb-0">
           {children}
         </div>
         <SharedFooter />
+        <BottomNav />
         <TwemojiLoader />
       </body>
     </html>
