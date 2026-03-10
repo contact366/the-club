@@ -6,6 +6,7 @@ import Link from 'next/link';
 import InstallPopup from '@/components/InstallPopup';
 import Emoji from '@/components/Emoji';
 import ExplorationShowcaseSection from '@/components/ExplorationShowcaseSection';
+import DiscoverFeed from '@/components/DiscoverFeed';
 import { generatePartnerSlug } from '@/lib/slugUtils';
 
 // --- DONNÉES STATIQUES ---
@@ -826,6 +827,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Discovery Feed */}
+      <DiscoverFeed partners={partners} partnersLoading={partnersLoading} />
 
       {/* Exploration Riviera */}
       <ExplorationShowcaseSection />
