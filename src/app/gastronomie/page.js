@@ -11,6 +11,7 @@ export default function GastronomiePage() {
   const [villeActive, setVilleActive] = useState("Toutes");
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMember, setIsMember] = useState(null);
 
   useEffect(() => {
     async function fetchPartners() {
@@ -23,6 +24,25 @@ export default function GastronomiePage() {
       setLoading(false);
     }
     fetchPartners();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkMembership() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (cancelled) return;
+      if (!user) { setIsMember(false); return; }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_type')
+        .eq('id', user.id)
+        .single();
+      if (!cancelled) {
+        setIsMember(!!profile?.subscription_type && profile.subscription_type !== 'none');
+      }
+    }
+    checkMembership();
+    return () => { cancelled = true; };
   }, []);
 
   const partnersFiltres = villeActive === "Toutes"
@@ -91,6 +111,7 @@ export default function GastronomiePage() {
                   image={partner.photo_url}
                   city={partner.address}
                   offerLabel={offerLabel}
+                  isMember={isMember}
                 />
               );
             })}
