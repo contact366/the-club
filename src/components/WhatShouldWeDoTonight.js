@@ -48,10 +48,10 @@ export default function WhatShouldWeDoTonight({ partners = [], isMember }) {
           {/* Text content */}
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-2">
-              What should we do tonight?
+              Que fait-on ce soir ?
             </h2>
             <p className="text-white/70 text-base leading-relaxed">
-              Discover a place to try around you.
+              Découvrez un lieu à tester autour de vous.
             </p>
           </div>
 
@@ -66,7 +66,7 @@ export default function WhatShouldWeDoTonight({ partners = [], isMember }) {
               <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M12 2L9.5 9.5H2l6 4.5-2.5 7.5L12 17l6.5 4.5L16 14l6-4.5h-7.5z" />
               </svg>
-              Suggest places
+              Proposer des lieux
             </button>
           </div>
         </div>
