@@ -12,8 +12,9 @@ import { getImageSrc, PLACEHOLDER_IMAGE } from '@/lib/imageUtils';
  *   city        – city or address shown below the image (optional)
  *   rating      – rating shown next to city (optional)
  *   offerLabel  – member offer badge text, e.g. "-20%" or "Offre exclusive" (optional)
+ *   isMember    – when explicitly false, offer is shown blurred with a lock CTA (optional)
  */
-export default function EstablishmentCard({ href, name, image, city, rating, offerLabel }) {
+export default function EstablishmentCard({ href, name, image, city, rating, offerLabel, isMember }) {
   return (
     <Link
       href={href}
@@ -43,9 +44,36 @@ export default function EstablishmentCard({ href, name, image, city, rating, off
           </p>
         )}
         {offerLabel && (
-          <span className="inline-block bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold px-3 py-1 rounded-full">
-            {offerLabel}
-          </span>
+          isMember === false ? (
+            /* Non-member: blurred label + lock icon + unlock CTA */
+            <div className="space-y-1">
+              <span className="inline-block bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold px-3 py-1 rounded-full blur-sm select-none pointer-events-none" aria-hidden="true">
+                {offerLabel}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <svg
+                  className="w-3 h-3 text-amber-600 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-[10px] font-semibold text-amber-700">
+                  Unlock this offer with The Club
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Member (or isMember not provided): full visibility */
+            <span className="inline-block bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold px-3 py-1 rounded-full">
+              {offerLabel}
+            </span>
+          )
         )}
       </div>
     </Link>
