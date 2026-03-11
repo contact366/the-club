@@ -6,6 +6,7 @@ import Link from 'next/link';
 import InstallPopup from '@/components/InstallPopup';
 import Emoji from '@/components/Emoji';
 import ExplorationShowcaseSection from '@/components/ExplorationShowcaseSection';
+import WhatShouldWeDoTonight from '@/components/WhatShouldWeDoTonight';
 import { generatePartnerSlug } from '@/lib/slugUtils';
 
 // --- DONNÉES STATIQUES ---
@@ -829,6 +830,9 @@ export default function Home() {
 
       {/* Exploration Riviera */}
       <ExplorationShowcaseSection />
+
+      {/* What should we do tonight? */}
+      <WhatShouldWeDoTonight partners={partners} isMember={subscription !== 'none'} />
 
       {/* Un univers de privilèges */}
       <section className="py-24 bg-white">
