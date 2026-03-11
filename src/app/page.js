@@ -835,13 +835,13 @@ export default function Home() {
       <WhatShouldWeDoTonight partners={partners} isMember={subscription !== 'none'} />
 
       {/* Un univers de privilèges */}
-      <section className="py-24 bg-white">
+      <section className="py-32 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-4">Un univers de privilèges.</h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">Gastronomie, loisirs, bien-être — sélectionnés pour leur excellence.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 gap-12">
             <div className="flex flex-col">
               <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Gastronomie" className="rounded-2xl shadow-md w-full aspect-[4/3] object-cover mb-6" />
               <span className="text-riviera-azure text-xs font-semibold uppercase tracking-widest mb-2 block">Gastronomie</span>
@@ -874,13 +874,13 @@ export default function Home() {
       </section>
 
       {/* COMMENT ÇA MARCHE */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-32 bg-gray-50">
         <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-semibold text-riviera-navy mb-4">Comment ça marche.</h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">Trois étapes simples pour accéder à tous vos privilèges.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 gap-12">
             {[
               {
                 icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>),
