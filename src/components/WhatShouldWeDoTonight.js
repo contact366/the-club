@@ -32,7 +32,7 @@ export default function WhatShouldWeDoTonight({ partners = [], isMember }) {
   };
 
   return (
-    <section className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-14">
       {/* Main discovery card */}
       <div className="bg-riviera-navy rounded-3xl p-8 sm:p-10 shadow-xl overflow-hidden relative">
         {/* Decorative blobs */}
@@ -99,7 +99,7 @@ export default function WhatShouldWeDoTonight({ partners = [], isMember }) {
                   Roll again
                 </button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {suggestions.map((partner) => {
                   let offerLabel;
                   if (partner.offer_decouverte || partner.offer_permanente) {
