@@ -1224,7 +1224,14 @@ export default function Home() {
               </div>
               <div className="mb-6">
                 <h3 className="font-serif text-xl font-bold text-riviera-navy mb-1 flex items-center gap-2"><Emoji symbol="✨" label="céleste" size={20} /> Pass Céleste</h3>
-                <p className="text-gray-500 text-sm">L'accès illimité. Rentabilisé dès la première sortie.</p>
+                <p className="font-semibold text-riviera-navy text-sm mb-1">Rentabilisé dès la première sortie.</p>
+                <p className="text-gray-500 text-xs mb-3">En moyenne, une seule sortie suffit à amortir votre accès annuel — chaque utilisation suivante est un pur bénéfice.</p>
+                <div className="space-y-1.5">
+                  <div className="bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-600">Économie moyenne / sortie : ~35€*</div>
+                  <div className="bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-600">Économies estimées / mois : ~70€ (2 sorties)</div>
+                  <div className="bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-600">Pass Céleste amorti : dès 1 sortie (14,90€)</div>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">*Estimations indicatives, variables selon l&apos;usage et les offres.</p>
               </div>
               <div className="mb-6">
                 <span className="text-4xl font-bold text-riviera-navy tracking-tight">14,90€</span>
