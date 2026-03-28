@@ -120,7 +120,8 @@ export default function ExplorationShowcaseSection() {
                 className={`group relative bg-white/[0.07] backdrop-blur-sm border border-white/[0.1] rounded-3xl p-6
                   hover:bg-white/[0.12] hover:border-white/[0.2] hover:scale-[1.03] hover:shadow-2xl
                   transition-all duration-500 ease-out cursor-default
-                  ${badge.isGold ? 'ring-1 ring-yellow-500/20' : ''}`}
+                  ${badge.isGold ? 'ring-1 ring-yellow-500/20' : ''}
+                  ${!badge.unlocked ? 'opacity-60' : ''}`}
               >
                 {/* Halo doré pour le badge Gold uniquement */}
                 {badge.isGold && (
@@ -140,7 +141,7 @@ export default function ExplorationShowcaseSection() {
                   <p className="text-gray-400 text-sm mb-4">{badge.description}</p>
 
                   {/* Barre de progression */}
-                  <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-2">
+                  <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-2">
                     <div
                       className={`h-full ${colors.bar} rounded-full transition-all duration-1000 ease-out ${delay}`}
                       style={{ width: progressWidth }}

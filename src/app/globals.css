@@ -129,3 +129,43 @@ input[type="range"]::-moz-range-thumb {
   border: 3px solid white;
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
 }
+
+/* ======================================================= */
+/* DASHBOARD PREMIUM STYLES                                 */
+/* ======================================================= */
+
+/* Dashboard fade-in animation */
+@keyframes dashFadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.dash-fade-in   { animation: dashFadeInUp 0.45s ease both; }
+.dash-fade-in-2 { animation: dashFadeInUp 0.45s ease 0.08s both; }
+.dash-fade-in-3 { animation: dashFadeInUp 0.45s ease 0.16s both; }
+.dash-fade-in-4 { animation: dashFadeInUp 0.45s ease 0.24s both; }
+.dash-fade-in-5 { animation: dashFadeInUp 0.45s ease 0.32s both; }
+.dash-fade-in-6 { animation: dashFadeInUp 0.45s ease 0.40s both; }
+.dash-fade-in-7 { animation: dashFadeInUp 0.45s ease 0.48s both; }
+
+/* Card hover lift */
+.dash-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dash-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.10) !important;
+}
+
+/* Progress bar smooth fill */
+.dash-progress-bar {
+  transition: width 0.8s ease;
+}
+
+/* Gold gradient text */
+.dash-gold-text {
+  background: linear-gradient(135deg, #C6A96C, #e8c87e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

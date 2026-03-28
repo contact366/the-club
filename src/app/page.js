@@ -750,6 +750,53 @@ export default function Home() {
   }, [partners, userLocation]);
 
   // ============================================================
+  // DASHBOARD COMPUTED VALUES (visual-only, no data fetches)
+  // ============================================================
+  const passLabel =
+    subscription === 'celeste'   ? 'Pass Céleste ✨' :
+    subscription === 'explorer'  ? 'Pass Explorer 🚀' :
+    subscription === 'aventurier'? 'Pass Aventurier 🤠' : null;
+
+  const passDiscoveryText =
+    subscription === 'celeste'    ? 'Offres découvertes illimitées ce mois' :
+    subscription === 'explorer'   ? 'Jusqu\'à 5 offres découvertes par mois' :
+    subscription === 'aventurier' ? 'Accès valable 72 heures' : null;
+
+  // Diversified list of partners to suggest today
+  const todayPartners = (() => {
+    if (!partners.length) return [];
+    const resto    = partners.filter(p => /restaurant|gastro|cuisine|brasserie|bistro/i.test(p.category || ''));
+    const wellness = partners.filter(p => /spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage|yoga/i.test(p.category || ''));
+    const other    = partners.filter(p =>
+      !(/restaurant|gastro|cuisine|brasserie|bistro/i.test(p.category || '')) &&
+      !(/spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage|yoga/i.test(p.category || ''))
+    );
+    const combined = [...resto.slice(0, 2), ...wellness.slice(0, 1), ...other.slice(0, 2)];
+    const unique   = combined.filter((p, i, a) => a.findIndex(pp => pp.id === p.id) === i);
+    return (unique.length > 0 ? unique : partners).slice(0, 5);
+  })();
+
+  // Favorite partners objects
+  const favPartners = partners.filter(p => favorites.includes(p.id));
+
+  // Helper: category emoji
+  const getCategoryEmoji = (cat = '') => {
+    const c = cat.toLowerCase();
+    if (/restaurant|gastro|cuisine|brasserie|bistro/.test(c)) return '🍽️';
+    if (/spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage/.test(c))  return '🧘';
+    if (/sport|fitness|yoga/.test(c))                         return '💪';
+    if (/h\u00f4tel|hotel|h\u00e9bergement/.test(c))          return '🏨';
+    if (/loisir|activit\u00e9|simulat/.test(c))               return '🎯';
+    return '⭐';
+  };
+  const getCategoryBg = (cat = '') => {
+    const c = cat.toLowerCase();
+    if (/restaurant|gastro|cuisine|brasserie|bistro/.test(c))               return '#FFF3E8';
+    if (/spa|bien[\s-]?\u00eatre|wellness|beaut\u00e9|soin|massage/.test(c)) return '#F0FFF4';
+    return '#F0F4FF';
+  };
+
+  // ============================================================
   // RENDU
   // ============================================================
   return (
@@ -757,8 +804,314 @@ export default function Home() {
 
       <InstallPopup />
 
+      {/* ======================================================= */}
+      {/* ESPACE MEMBRE — Dashboard Premium                        */}
+      {/* Visible uniquement quand l'utilisateur est connecté      */}
+      {/* ======================================================= */}
+      {user && (
+        <div style={{ background: '#F7F5F0', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif' }}>
 
-      {/* Hero Premium */}
+          {/* ---- HEADER ---- */}
+          <div className="dash-fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '28px 20px 12px', maxWidth: '520px', margin: '0 auto' }}>
+            <div>
+              <p style={{ fontSize: '0.82rem', color: '#8896A6', margin: '0 0 4px', fontWeight: '400' }}>
+                Prêt pour votre prochaine sortie ?
+              </p>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#1B2A4A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.2 }}>
+                Bonjour, {user?.user_metadata?.first_name || user?.email?.split('@')[0]} 👋
+              </h1>
+            </div>
+            <Link href="/profil">
+              <div style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg, #1B2A4A 0%, #2d4a7a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C6A96C', fontWeight: '700', fontSize: '1.1rem', cursor: 'pointer', flexShrink: 0, border: '2px solid rgba(198,169,108,0.3)' }}>
+                {(user?.user_metadata?.first_name || user?.email || 'M')[0].toUpperCase()}
+              </div>
+            </Link>
+          </div>
+
+          {/* ---- MAIN CONTENT ---- */}
+          <div style={{ maxWidth: '520px', margin: '0 auto', padding: '8px 20px 40px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            {/* 2. MEMBERSHIP HERO CARD */}
+            {subscription !== 'none' ? (
+              <div className="dash-fade-in-2" style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #0d1c3a 100%)', borderRadius: '24px', padding: '28px', color: '#fff', boxShadow: '0 8px 32px rgba(27,42,74,0.28)', position: 'relative', overflow: 'hidden' }}>
+                {/* Decorative circles */}
+                <div style={{ position: 'absolute', top: '-55px', right: '-55px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(198,169,108,0.07)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-40px', left: '-30px', width: '130px', height: '130px', borderRadius: '50%', background: 'rgba(198,169,108,0.04)', pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  {/* Pass name + status badge */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C6A96C' }}>
+                      {passLabel}
+                    </span>
+                    <span style={{ background: 'rgba(198,169,108,0.15)', border: '1px solid rgba(198,169,108,0.3)', borderRadius: '20px', padding: '3px 10px', fontSize: '0.68rem', color: 'rgba(255,255,255,0.65)' }}>
+                      Actif
+                    </span>
+                  </div>
+                  {/* Savings */}
+                  <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 6px' }}>Total économisé</p>
+                  <p style={{ fontSize: '3.4rem', fontWeight: '800', color: '#fff', lineHeight: 1, letterSpacing: '-0.05em', margin: '0 0 22px' }}>
+                    {Math.round(displayedSavings)} €
+                  </p>
+                  {/* Divider */}
+                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', marginBottom: '14px' }} />
+                  {/* Status line */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)' }}>
+                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#4ade80', display: 'inline-block', flexShrink: 0 }} />
+                    {passDiscoveryText}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="dash-fade-in-2" style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #0d1c3a 100%)', borderRadius: '24px', padding: '32px 28px', color: '#fff', boxShadow: '0 8px 32px rgba(27,42,74,0.25)', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⭐</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#C6A96C', marginBottom: '8px', margin: '0 0 8px' }}>Activez votre Pass</h3>
+                <p style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.55)', marginBottom: '20px', margin: '0 0 20px' }}>
+                  Choisissez un abonnement pour commencer à économiser sur la Riviera.
+                </p>
+                <a href="#tarifs" style={{ display: 'inline-block', background: '#C6A96C', color: '#1B2A4A', fontWeight: '700', padding: '12px 28px', borderRadius: '14px', textDecoration: 'none', fontSize: '0.88rem' }}>
+                  Voir les abonnements
+                </a>
+              </div>
+            )}
+
+            {/* 3. DISCOVER TODAY */}
+            {todayPartners.length > 0 && subscription !== 'none' && (
+              <div className="dash-fade-in-3">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <h2 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#1B2A4A', letterSpacing: '-0.02em', margin: 0 }}>
+                    À découvrir aujourd&apos;hui
+                  </h2>
+                  <a href="#carte" style={{ fontSize: '0.78rem', color: '#0284C7', fontWeight: '600', textDecoration: 'none' }}>Voir tout →</a>
+                </div>
+                <div className="hide-scrollbar" style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', marginRight: '-20px', paddingRight: '20px' }}>
+                  {todayPartners.map((partner) => (
+                    <div
+                      key={partner.id}
+                      className="dash-card-hover"
+                      onClick={() => openPinModal(partner.name, 'decouverte')}
+                      style={{ background: '#fff', borderRadius: '20px', padding: '18px 14px', minWidth: '148px', maxWidth: '160px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', cursor: 'pointer', flexShrink: 0, border: '1px solid rgba(0,0,0,0.04)' }}
+                    >
+                      <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: getCategoryBg(partner.category), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', marginBottom: '12px' }}>
+                        {getCategoryEmoji(partner.category)}
+                      </div>
+                      <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1B2A4A', margin: '0 0 4px', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {partner.name}
+                      </p>
+                      <p style={{ fontSize: '0.65rem', fontWeight: '600', color: '#0284C7', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {partner.category ? partner.category.split(/[\s&]/)[0] : 'Partenaire'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 4. EXPLORATION PROGRESS */}
+            {subscription !== 'none' && (
+              <div className="dash-fade-in-3 dash-card-hover" style={{ background: '#fff', borderRadius: '24px', padding: '22px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                  <h2 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#1B2A4A', margin: 0 }}>Exploration Riviera 🌴</h2>
+                  <a href="#exploration" style={{ fontSize: '0.75rem', color: '#0284C7', fontWeight: '600', textDecoration: 'none' }}>Voir tout →</a>
+                </div>
+                {[
+                  { emoji: '🌴', name: 'Riviera Explorer',  current: 2, required: 3, color: '#3B82F6', unlocked: false },
+                  { emoji: '🍛', name: 'Riviera Gourmet',   current: 1, required: 3, color: '#F59E0B', unlocked: false },
+                  { emoji: '🧘', name: 'Riviera Wellness',  current: 2, required: 2, color: '#10B981', unlocked: true  },
+                  { emoji: '👑', name: 'Gold Insider',      current: 4, required: 6, color: '#EAB308', unlocked: false },
+                ].map((badge, i, arr) => (
+                  <div key={badge.name} style={{ marginBottom: i < arr.length - 1 ? '14px' : 0, opacity: badge.unlocked ? 1 : 0.75 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${badge.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.05rem', flexShrink: 0 }}>
+                        {badge.emoji}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#1B2A4A' }}>{badge.name}</span>
+                          <span style={{ fontSize: '0.7rem', color: '#8896A6' }}>{badge.current}/{badge.required}</span>
+                        </div>
+                        <div style={{ height: '10px', background: '#F0F0EE', borderRadius: '6px', overflow: 'hidden' }}>
+                          <div className="dash-progress-bar" style={{ height: '100%', width: `${(badge.current / badge.required) * 100}%`, background: badge.color, borderRadius: '6px' }} />
+                        </div>
+                      </div>
+                      {badge.unlocked && (
+                        <span style={{ fontSize: '0.7rem', color: badge.color, fontWeight: '700', flexShrink: 0 }}>✓</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 5. FAVORITES */}
+            {subscription !== 'none' && favPartners.length > 0 && (
+              <div className="dash-fade-in-4">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <h2 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#1B2A4A', letterSpacing: '-0.02em', margin: 0 }}>
+                    Mes coups de cœur ❤️
+                  </h2>
+                  <span style={{ fontSize: '0.78rem', color: '#8896A6' }}>{favPartners.length} lieu{favPartners.length > 1 ? 'x' : ''}</span>
+                </div>
+                <div className="hide-scrollbar" style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', marginRight: '-20px', paddingRight: '20px' }}>
+                  {favPartners.slice(0, 6).map((partner) => (
+                    <div
+                      key={partner.id}
+                      className="dash-card-hover"
+                      onClick={() => openPinModal(partner.name, 'decouverte')}
+                      style={{ background: '#fff', borderRadius: '20px', padding: '18px 14px', minWidth: '148px', maxWidth: '160px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', cursor: 'pointer', flexShrink: 0, border: '1px solid rgba(0,0,0,0.04)' }}
+                    >
+                      <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#FFF0F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', marginBottom: '12px' }}>
+                        ❤️
+                      </div>
+                      <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1B2A4A', margin: '0 0 4px', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {partner.name}
+                      </p>
+                      <p style={{ fontSize: '0.65rem', fontWeight: '600', color: '#0284C7', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {partner.category ? partner.category.split(/[\s&]/)[0] : 'Partenaire'}
+                      </p>
+                      {partner.address && (
+                        <p style={{ fontSize: '0.65rem', color: '#8896A6', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {partner.address}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 6. RECENT ACTIVITY */}
+            {subscription !== 'none' && (
+              <div className="dash-fade-in-4 dash-card-hover" style={{ background: '#fff', borderRadius: '24px', padding: '22px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+                <h2 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#1B2A4A', margin: '0 0 16px', letterSpacing: '-0.01em' }}>
+                  Activité récente
+                </h2>
+                {totalSavings > 0 ? (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', background: '#F4FFF8', borderRadius: '14px', border: '1px solid #D1FAE5' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="16" height="16" fill="none" stroke="#059669" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: '0.82rem', fontWeight: '600', color: '#1B2A4A', margin: '0 0 2px' }}>Total économisé depuis votre inscription</p>
+                        <p style={{ fontSize: '0.72rem', color: '#8896A6', margin: 0 }}>Continuez à utiliser vos offres</p>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#059669', flexShrink: 0 }}>{Math.round(totalSavings)} €</span>
+                    </div>
+                    <p style={{ fontSize: '0.72rem', color: '#8896A6', textAlign: 'center', margin: '10px 0 0' }}>
+                      Consultez l&apos;historique complet sur votre profil
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '16px 0 8px' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🎯</div>
+                    <p style={{ fontSize: '0.83rem', fontWeight: '600', color: '#1B2A4A', margin: '0 0 6px' }}>Aucune activité pour l&apos;instant</p>
+                    <p style={{ fontSize: '0.75rem', color: '#8896A6', margin: 0 }}>
+                      Utilisez une offre chez un partenaire pour commencer à économiser
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 7. AMBASSADOR PROGRAM */}
+            {subscription !== 'none' && (
+              <div className="dash-fade-in-5 dash-card-hover" style={{ background: '#fff', borderRadius: '24px', padding: '22px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '18px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #FFF3CD, #FFE08A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
+                    🎁
+                  </div>
+                  <div>
+                    <h2 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#1B2A4A', margin: '0 0 2px' }}>Programme Ambassadeur</h2>
+                    <p style={{ fontSize: '0.75rem', color: '#8896A6', margin: 0 }}>2 mois offerts par ami parrainé</p>
+                  </div>
+                </div>
+                {referralLink ? (
+                  <div>
+                    <p style={{ fontSize: '0.78rem', color: '#8896A6', margin: '0 0 8px' }}>Votre lien personnel</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#F7F5F0', borderRadius: '14px', padding: '11px 14px', marginBottom: '10px' }}>
+                      <span style={{ flex: 1, fontSize: '0.75rem', color: '#1B2A4A', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {referralLink}
+                      </span>
+                      <button
+                        onClick={async () => {
+                          try { await navigator.clipboard.writeText(referralLink); alert('Lien copié ! 📋'); }
+                          catch { prompt('Votre lien de parrainage :', referralLink); }
+                        }}
+                        style={{ background: 'linear-gradient(135deg, #C6A96C, #b8964f)', color: '#fff', border: 'none', borderRadius: '10px', padding: '8px 14px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                      >
+                        Copier le lien
+                      </button>
+                    </div>
+                    {typeof navigator !== 'undefined' && navigator.share && (
+                      <button
+                        onClick={() => navigator.share({ title: 'The Club — Mon invitation', text: "Rejoins The Club avec mon lien d'invitation !", url: referralLink })}
+                        style={{ width: '100%', background: '#F7F5F0', color: '#1B2A4A', border: 'none', borderRadius: '14px', padding: '11px', fontSize: '0.83rem', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        📤 Partager
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleGenerateReferral}
+                    disabled={referralLoading}
+                    style={{ width: '100%', background: referralLoading ? '#e5e7eb' : 'linear-gradient(135deg, #1B2A4A 0%, #2d4a7a 100%)', color: referralLoading ? '#9ca3af' : '#fff', border: 'none', borderRadius: '14px', padding: '14px', fontSize: '0.88rem', fontWeight: '700', cursor: referralLoading ? 'not-allowed' : 'pointer' }}
+                  >
+                    {referralLoading ? 'Génération...' : '🎁 Générer mon lien d\'invitation'}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* 8. ACCOUNT INFO */}
+            <div className="dash-fade-in-6" style={{ background: '#fff', borderRadius: '24px', padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+              <h3 style={{ fontSize: '0.72rem', fontWeight: '700', color: '#8896A6', margin: '0 0 14px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                Mon compte
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+                  <span style={{ fontSize: '0.82rem', color: '#8896A6' }}>Email</span>
+                  <span style={{ fontSize: '0.82rem', color: '#1B2A4A', fontWeight: '500', maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
+                </div>
+                <div style={{ height: '1px', background: '#F3F0EB' }} />
+                {user?.user_metadata?.phone && (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+                      <span style={{ fontSize: '0.82rem', color: '#8896A6' }}>Téléphone</span>
+                      <span style={{ fontSize: '0.82rem', color: '#1B2A4A', fontWeight: '500' }}>{user.user_metadata.phone}</span>
+                    </div>
+                    <div style={{ height: '1px', background: '#F3F0EB' }} />
+                  </>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+                  <span style={{ fontSize: '0.82rem', color: '#8896A6' }}>Abonnement</span>
+                  {passLabel ? (
+                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#C6A96C', background: '#FFF8EC', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(198,169,108,0.3)' }}>
+                      {passLabel}
+                    </span>
+                  ) : (
+                    <a href="#tarifs" style={{ fontSize: '0.72rem', color: '#0284C7', fontWeight: '600', textDecoration: 'none' }}>Choisir un pass →</a>
+                  )}
+                </div>
+                <div style={{ height: '1px', background: '#F3F0EB' }} />
+                <Link href="/profil" style={{ display: 'block', padding: '12px 0 4px', fontSize: '0.82rem', color: '#0284C7', fontWeight: '600', textDecoration: 'none' }}>
+                  Modifier mon profil →
+                </Link>
+              </div>
+            </div>
+
+            {/* Separator to landing page */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '4px 0' }}>
+              <div style={{ flex: 1, height: '1px', background: '#E8E2D9' }} />
+              <span style={{ fontSize: '0.72rem', color: '#8896A6', whiteSpace: 'nowrap', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Notre sélection</span>
+              <div style={{ flex: 1, height: '1px', background: '#E8E2D9' }} />
+            </div>
+
+          </div>
+        </div>
+      )}
+
+
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background image + video fallback */}
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover z-0">
@@ -829,7 +1182,9 @@ export default function Home() {
       </section>
 
       {/* Exploration Riviera */}
-      <ExplorationShowcaseSection />
+      <div id="exploration">
+        <ExplorationShowcaseSection />
+      </div>
 
       {/* What should we do tonight? */}
       <WhatShouldWeDoTonight partners={partners} isMember={subscription !== 'none'} />
