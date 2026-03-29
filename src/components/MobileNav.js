@@ -106,7 +106,7 @@ export default function MobileNav({ open, onClose, user, onSignIn, onSignOut }) 
                 </Link>
                 <button
                   onClick={() => { onSignOut(); onClose(); }}
-                  className="w-full text-sm font-medium text-red-500 hover:text-red-700 py-2 transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-red-400 rounded-lg"
+                  className="w-full text-sm font-medium text-gray-600 hover:text-riviera-navy py-2 transition-colors duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-riviera-navy rounded-lg"
                 >
                   Déconnexion
                 </button>
