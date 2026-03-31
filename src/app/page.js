@@ -7,6 +7,7 @@ import InstallPopup from '@/components/InstallPopup';
 import Emoji from '@/components/Emoji';
 import ExplorationShowcaseSection from '@/components/ExplorationShowcaseSection';
 import WhatShouldWeDoTonight from '@/components/WhatShouldWeDoTonight';
+import DiscoverSections from '@/components/DiscoverSections';
 import { generatePartnerSlug } from '@/lib/slugUtils';
 
 // --- DONNÉES STATIQUES ---
@@ -833,6 +834,9 @@ export default function Home() {
 
       {/* What should we do tonight? */}
       <WhatShouldWeDoTonight partners={partners} isMember={subscription !== 'none'} />
+
+      {/* Discover sections: New places · Popular among members · Exclusive offers */}
+      <DiscoverSections />
 
       {/* Un univers de privilèges */}
       <section className="py-32 bg-white">
