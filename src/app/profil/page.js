@@ -64,6 +64,13 @@ export default function EspaceMembre() {
   const [authMessage, setAuthMessage] = useState({ text: '', type: '' });
   const [authLoading, setAuthLoading] = useState(false);
 
+  // État pour la récupération de mot de passe
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetPasswordConfirm, setResetPasswordConfirm] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState({ text: '', type: '' });
+
   useEffect(() => {
     async function chargerDonnees() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -162,6 +169,35 @@ export default function EspaceMembre() {
 
     chargerDonnees();
   }, []);
+
+  // Detect PASSWORD_RECOVERY session from Supabase reset link
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsPasswordRecovery(true);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (resetPassword !== resetPasswordConfirm) {
+      setResetMessage({ text: 'Les mots de passe ne correspondent pas.', type: 'error' });
+      return;
+    }
+    setResetLoading(true);
+    setResetMessage({ text: '', type: '' });
+    const { error } = await supabase.auth.updateUser({ password: resetPassword });
+    if (error) {
+      setResetMessage({ text: error.message, type: 'error' });
+    } else {
+      setResetMessage({ text: 'Votre mot de passe a bien été modifié.', type: 'success' });
+      setIsPasswordRecovery(false);
+      setTimeout(() => { window.location.reload(); }, 2000);
+    }
+    setResetLoading(false);
+  };
 
   const handleGoogleSignIn = async () => {
     setAuthLoading(true);
@@ -494,6 +530,67 @@ export default function EspaceMembre() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7]">
         <p className="text-gray-500 animate-pulse">Chargement de votre espace VIP...</p>
+      </div>
+    );
+  }
+
+  if (isPasswordRecovery) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200/60 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Nouveau mot de passe</h2>
+            <p className="text-sm text-gray-500 mb-6">Choisissez un nouveau mot de passe sécurisé pour votre compte The Club.</p>
+            {resetMessage.text && (
+              <div className={`p-4 rounded-2xl text-sm mb-6 ${resetMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                {resetMessage.text}
+              </div>
+            )}
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nouveau mot de passe</label>
+                <input
+                  type="password"
+                  value={resetPassword}
+                  onChange={(e) => setResetPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Confirmer le nouveau mot de passe</label>
+                <input
+                  type="password"
+                  value={resetPasswordConfirm}
+                  onChange={(e) => setResetPasswordConfirm(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={resetLoading}
+                className="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-semibold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              >
+                {resetLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Chargement...
+                  </span>
+                ) : 'MODIFIER MON MOT DE PASSE'}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     );
   }

@@ -27,6 +27,7 @@ export default function SharedHeader() {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [forgotSent, setForgotSent] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data?.user ?? null));
@@ -45,6 +46,7 @@ export default function SharedHeader() {
   const openSignIn = () => {
     setAuthMode('login');
     setMessage({ text: '', type: '' });
+    setForgotSent(false);
     setIsAuthModalOpen(true);
   };
 
@@ -81,6 +83,22 @@ export default function SharedHeader() {
   };
 
   const handleSignOut = () => supabase.auth.signOut();
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ text: '', type: '' });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/profil`,
+    });
+    if (error) {
+      setMessage({ text: error.message, type: 'error' });
+    } else {
+      setForgotSent(true);
+      setMessage({ text: 'Un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte mail (et vos spams). 📩', type: 'success' });
+    }
+    setLoading(false);
+  };
 
   return (
     <>
@@ -202,11 +220,13 @@ export default function SharedHeader() {
               </svg>
             </button>
             <h3 id="auth-modal-title" className="font-serif text-3xl font-bold text-riviera-navy mb-2">
-              {authMode === 'signup' ? 'Rejoindre The Club' : 'Bon retour.'}
+              {authMode === 'signup' ? 'Rejoindre The Club' : authMode === 'forgot' ? 'Mot de passe oublié' : 'Bon retour.'}
             </h3>
             <p className="text-sm text-gray-500 mb-6">
               {authMode === 'signup'
                 ? 'Créez votre compte pour obtenir votre pass.'
+                : authMode === 'forgot'
+                ? 'Entrez votre adresse email. Nous vous enverrons un lien pour choisir un nouveau mot de passe.'
                 : 'Connectez-vous pour accéder à vos privilèges.'}
             </p>
             {message.text && (
@@ -214,6 +234,7 @@ export default function SharedHeader() {
                 {message.text}
               </div>
             )}
+            {authMode !== 'forgot' && (
             <div className="mb-4">
               <button
                 type="button"
@@ -235,6 +256,39 @@ export default function SharedHeader() {
                 <div className="flex-1 h-px bg-gray-200" />
               </div>
             </div>
+            )}
+
+            {authMode === 'forgot' ? (
+              <form className="space-y-4" onSubmit={handleForgotPassword}>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Adresse email *</label>
+                  <input
+                    type="email"
+                    placeholder="votre@email.com"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-navy focus:ring-2 focus:ring-riviera-navy/20 outline-none transition-all duration-300 ease-out"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || forgotSent}
+                  className="w-full bg-riviera-navy text-white font-bold py-3.5 rounded-2xl hover:bg-gray-900 transition-colors duration-300 ease-out disabled:opacity-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-riviera-navy"
+                >
+                  {loading ? 'Envoi…' : 'ENVOYER LE LIEN'}
+                </button>
+                <p className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode('login'); setMessage({ text: '', type: '' }); setForgotSent(false); }}
+                    className="text-sm text-gray-500 hover:text-riviera-navy transition-colors duration-300 ease-out focus:outline-none"
+                  >
+                    ← Retour à la connexion
+                  </button>
+                </p>
+              </form>
+            ) : (
             <form className="space-y-4" onSubmit={handleAuth}>
               {authMode === 'signup' && (
                 <div className="grid grid-cols-2 gap-3">
@@ -283,6 +337,17 @@ export default function SharedHeader() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-riviera-navy focus:ring-2 focus:ring-riviera-navy/20 outline-none transition-all duration-300 ease-out"
                 />
+                {authMode === 'login' && (
+                  <div className="text-right mt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('forgot'); setMessage({ text: '', type: '' }); }}
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors duration-300 ease-out focus:outline-none"
+                    >
+                      Mot de passe oublié ?
+                    </button>
+                  </div>
+                )}
               </div>
               <button
                 type="submit"
@@ -292,6 +357,8 @@ export default function SharedHeader() {
                 {loading ? 'Chargement…' : authMode === 'signup' ? 'Créer mon compte' : 'Se connecter'}
               </button>
             </form>
+            )}
+            {authMode !== 'forgot' && (
             <p className="text-center text-sm text-gray-500 mt-6">
               {authMode === 'login' ? (
                 <>Pas encore membre ?{' '}
@@ -313,6 +380,7 @@ export default function SharedHeader() {
                 </>
               )}
             </p>
+            )}
           </div>
         </div>
       )}
