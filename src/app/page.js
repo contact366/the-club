@@ -592,6 +592,32 @@ export default function Home() {
     window.openReactPinModal = openPinModal;
     window.toggleReactFavorite = (partnerId) => toggleFavorite(partnerId);
     window.reactFavorites = favorites;
+
+    // Fonction de test temporaire pour /api/offers/redeem.
+    // Appel depuis la console : window.testOfferRedemption('VOTRE_PIN')
+    window.testOfferRedemption = async (pin) => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) { console.error('Session error:', sessionError); return; }
+      if (!session) { console.error('Aucune session Supabase'); return; }
+      const response = await fetch('/api/offers/redeem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          offerId: 'd6985952-9873-45ee-92f9-378b17b5e095',
+          establishmentId: 'cd899657-5d30-40b8-8c90-722f6603bda7',
+          amount: 100,
+          pin,
+        }),
+      });
+      const data = await response.json();
+      console.log('HTTP', response.status);
+      console.log('Redeem response:', data);
+      return data;
+    };
+
     return () => {
       clearInterval(ecoInterval);
       clearInterval(parrInterval);
