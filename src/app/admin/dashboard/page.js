@@ -31,16 +31,16 @@ function StatCard({ label, value, description, color = '#e8d5a3', loading }) {
 
 // ─── Badge pass ──────────────────────────────────────────────────
 const PASS_COLORS = {
-  aventurier: '#6b9e78',
-  explorer:   '#4a90b8',
-  celeste:    '#9b6bd4',
-  autre:      '#555',
+  aventurier:       '#6b9e78',
+  explorer:         '#4a90b8',
+  celeste:          '#9b6bd4',
+  sans_abonnement:  '#444',
 };
 const PASS_LABELS = {
-  aventurier: 'Aventurier',
-  explorer:   'Explorer',
-  celeste:    'Céleste',
-  autre:      'Autre',
+  aventurier:       'Aventurier',
+  explorer:         'Explorer',
+  celeste:          'Céleste',
+  sans_abonnement:  'Sans abonnement',
 };
 
 function PassBar({ label, count, total, color }) {
@@ -104,7 +104,7 @@ export default function DashboardPage() {
   const stats = data?.stats || {};
   const pass = data?.passRepartition || {};
   const activite = data?.activiteRecente || [];
-  const totalMembres = (pass.aventurier || 0) + (pass.explorer || 0) + (pass.celeste || 0) + (pass.autre || 0);
+  const totalMembres = (pass.aventurier || 0) + (pass.explorer || 0) + (pass.celeste || 0) + (pass.sans_abonnement || 0);
 
   return (
     <div style={{ padding: '32px 28px', maxWidth: 1200 }}>
@@ -139,9 +139,9 @@ export default function DashboardPage() {
           loading={loading}
         />
         <StatCard
-          label="Partenaires actifs"
+          label="Partenaires"
           value={stats.partenairesActifs}
-          description="Établissements actifs"
+          description="Établissements partenaires"
           color="#4a90b8"
           loading={loading}
         />
@@ -180,7 +180,7 @@ export default function DashboardPage() {
           ) : totalMembres === 0 ? (
             <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>Aucune donnée.</p>
           ) : (
-            ['aventurier', 'explorer', 'celeste', 'autre'].map((key) =>
+            ['aventurier', 'explorer', 'celeste', 'sans_abonnement'].map((key) =>
               pass[key] > 0 ? (
                 <PassBar
                   key={key}
