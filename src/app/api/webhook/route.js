@@ -58,6 +58,21 @@ export async function POST(req) {
         updateData.expires_at = expiresAt.toISOString();
       }
 
+      // Enregistrer la date de début du premier abonnement payant (Explorer/Céleste)
+      // pour servir de référence à la période annuelle des offres Discovery.
+      // Ne jamais écraser : la première date doit rester la date de référence.
+      if (plan !== 'aventurier') {
+        const { data: existingProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('subscription_started_at')
+          .eq('id', userId)
+          .single();
+
+        if (!existingProfile?.subscription_started_at) {
+          updateData.subscription_started_at = new Date(session.created * 1000).toISOString();
+        }
+      }
+
       const { data, error } = await supabaseAdmin
         .from('profiles')
         .update(updateData)

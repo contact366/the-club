@@ -23,14 +23,14 @@ const ecoData = [
     colorClass: 'bg-white', textColor: 'text-riviera-navy'
   },
   {
-    title: 'Avec Le Pass <span class="text-riviera-gold">Céleste (59€/an)</span>',
+    title: 'Avec Le Pass <span class="text-riviera-gold">Céleste (14,90€/m)</span>',
     details: `
       <div class="flex justify-between items-center text-sm"><span class="text-gray-300">Dîner pour deux <span class="text-green-400 text-xs font-bold bg-green-500/20 px-2 py-0.5 rounded ml-1">-50%</span></span><span class="text-white font-mono">60 €</span></div>
       <div class="flex justify-between items-center text-sm mt-4"><span class="text-gray-300">Activité de loisir <span class="text-green-400 text-xs font-bold bg-green-500/20 px-2 py-0.5 rounded ml-1">-50%</span></span><span class="text-white font-mono">50 €</span></div>
       <hr class="border-riviera-azure/30 my-4">
       <div class="flex justify-between items-center"><span class="font-bold text-lg">Total Payé</span><span class="text-3xl font-bold text-white font-mono">110 €</span></div>`,
     savings: 'Économie sur la soirée : 110 €',
-    desc: 'Votre pass annuel à 59€ est <span class="text-white font-semibold underline decoration-riviera-gold">intégralement remboursé dès le premier soir</span> !',
+    desc: 'Votre pass mensuel à 14,90€ est <span class="text-white font-semibold underline decoration-riviera-gold">rentabilisé dès la première sortie</span> !',
     colorClass: 'bg-riviera-gold', textColor: 'text-riviera-navy'
   }
 ];
@@ -43,7 +43,7 @@ const parrainageData = [
 
 const faqData = [
   { q: "Comment fonctionne l'offre Découverte ?", a: "L'offre Découverte (allant jusqu'à -50%) est valable une seule fois par établissement partenaire. Une fois scannée et utilisée, vous bénéficiez automatiquement de l'offre Privilège permanente (ex: -10% ou -20%) pour toutes vos visites suivantes." },
-  { q: "Le Pass Explorer est-il avec engagement ?", a: "Non, le Pass Explorer (mensuel à 9,90€) est totalement sans engagement. Vous pouvez l'annuler en un seul clic depuis votre espace membre. Le Pass Céleste (59€/an) vous engage sur 12 mois pour vous offrir le tarif le plus avantageux possible et un accès illimité aux offres." },
+  { q: "Le Pass Explorer est-il avec engagement ?", a: "Non, le Pass Explorer (9,90€/mois) est totalement sans engagement. Vous pouvez l'annuler en un seul clic depuis votre espace membre. Le Pass Céleste (14,90€/mois) est également sans engagement et vous donne accès à des avantages exclusifs supplémentaires." },
   { q: "Comment utiliser The Club chez un partenaire ?", a: "Ouvrez l'application, sélectionnez le partenaire et présentez votre téléphone. Cliquez sur Utiliser l'offre. Le commerçant tape son code secret à 4 chiffres sur votre écran et la remise est appliquée sur votre facture instantanément." },
   { q: "Puis-je changer de pass après souscription ?", a: "Oui. Vous pouvez passer au Pass Céleste à tout moment depuis votre espace membre. La montée en gamme est immédiate. Pour un passage au Pass Explorer ou Aventurier, contactez le support." },
   { q: "Le Pass Aventurier est-il remboursable ?", a: "Le Pass Aventurier est un paiement unique non remboursable une fois activé. Il vous donne accès à la plateforme pendant 72 heures, idéal pour découvrir l'expérience lors d'un séjour." }
@@ -1303,7 +1303,7 @@ export default function Home() {
               <div className="text-riviera-azure mb-4" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>L&apos;Aventurier</div>
               <div className="font-display text-[44px] text-riviera-navy mb-0.5">4,99 €</div>
               <div className="text-stone text-[13px] mb-5">72 heures · Paiement unique</div>
-              <p className="text-riviera-navy/60 text-[14px] leading-relaxed mb-6 flex-1">Le pass éphémère. Découvrez la Côte d&apos;Azur le temps d&apos;un week-end.</p>
+              <p className="text-riviera-navy/60 text-[14px] leading-relaxed mb-6 flex-1">Le pass idéal pour découvrir The Club et profiter de la Côte d&apos;Azur pendant 72 heures.</p>
               <ul className="mb-7 space-y-0">
                 {['Accès 72H complet', '1 Offre Découverte −50%', 'Offres permanentes illimitées'].map((f) => (
                   <li key={f} className="py-2.5 border-t border-[rgba(24,22,17,0.07)] flex items-center gap-2.5 text-[13.5px] text-riviera-navy">
@@ -1325,7 +1325,7 @@ export default function Home() {
               <div className="text-riviera-azure mb-4" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pass Explorer</div>
               <div className="font-display text-[44px] text-riviera-navy mb-0.5">9,90 €</div>
               <div className="text-stone text-[13px] mb-5">par mois · Sans engagement</div>
-              <p className="text-riviera-navy/60 text-[14px] leading-relaxed mb-6 flex-1">La liberté totale. Accès mensuel illimité, annulable à tout moment.</p>
+              <p className="text-riviera-navy/60 text-[14px] leading-relaxed mb-6 flex-1">Le pass pensé pour profiter régulièrement des adresses, expériences et avantages The Club sur la Côte d&apos;Azur.</p>
               <ul className="mb-7 space-y-0">
                 {['Sans engagement', 'Jusqu\'à 5 Offres Découvertes /mois', 'Offres permanentes illimitées', 'Carte partenaires en temps réel'].map((f) => (
                   <li key={f} className="py-2.5 border-t border-[rgba(24,22,17,0.07)] flex items-center gap-2.5 text-[13.5px] text-riviera-navy">
@@ -1347,10 +1347,10 @@ export default function Home() {
               <div className="absolute -top-3 right-7 bg-verde text-white-warm text-[10px] font-semibold uppercase tracking-[0.08em] px-3 py-1.5 rounded-full" style={{ fontFamily: 'var(--font-mono)' }}>Recommandé</div>
               <div className="mb-4" style={{ color: '#E3D4B4', fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pass Céleste</div>
               <div className="font-display text-[44px] mb-0.5" style={{ color: '#FFFDF8' }}>14,90 €</div>
-              <div className="text-[13px] mb-5" style={{ color: '#DCE9EA' }}>par mois · ou 129 € / an</div>
-              <p className="text-[14px] leading-relaxed mb-6 flex-1" style={{ color: '#DCE9EA' }}>L&apos;accès illimité. Rentabilisé dès la première sortie.</p>
+              <div className="text-[13px] mb-5" style={{ color: '#DCE9EA' }}>par mois · Sans engagement</div>
+              <p className="text-[14px] leading-relaxed mb-6 flex-1" style={{ color: '#DCE9EA' }}>Tout l&apos;univers Explorer, avec davantage de privilèges, d&apos;expériences exclusives et d&apos;attentions réservées aux membres Céleste.</p>
               <ul className="mb-7 space-y-0">
-                {['Offres Découvertes illimitées', 'Offres permanentes illimitées', 'Événements privés The Club', 'Programme ambassadeur inclus'].map((f) => (
+                {['Offres Découvertes illimitées', 'Expériences exclusives Céleste', 'Événements privés The Club', 'Avantages partenaires premium', 'Programme ambassadeur inclus'].map((f) => (
                   <li key={f} className="py-2.5 flex items-center gap-2.5 text-[13.5px]" style={{ borderTop: '1px solid rgba(255,255,255,0.14)', color: '#FFFDF8' }}>
                     <span style={{ color: '#E3D4B4' }}>—</span>{f}
                   </li>
@@ -1641,10 +1641,10 @@ export default function Home() {
             <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex flex-col transition-shadow duration-300 ease-out hover:shadow-md">
               <div className="mb-6">
                 <h3 className="font-display text-xl font-medium text-riviera-navy mb-1 flex items-center gap-2"><Emoji symbol="🤠" label="aventurier" size={20} /> Pass Aventurier</h3>
-                <p className="text-stone text-sm">Le pass éphémère pour tester l&apos;expérience le temps d&apos;un week-end.</p>
+                <p className="text-stone text-sm">Le pass idéal pour découvrir The Club et profiter de la Côte d&apos;Azur pendant 72 heures.</p>
               </div>
               <div className="mb-6">
-                <span className="font-display text-4xl text-riviera-navy">4,90€</span>
+                <span className="font-display text-4xl text-riviera-navy">4,99€</span>
                 <span className="text-stone text-sm ml-1">paiement unique</span>
               </div>
               <ul className="space-y-3 mb-5 flex-1 text-sm text-riviera-navy/70">
@@ -1665,7 +1665,7 @@ export default function Home() {
             <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex flex-col transition-shadow duration-300 ease-out hover:shadow-md">
               <div className="mb-6">
                 <h3 className="font-display text-xl font-medium text-riviera-navy mb-1 flex items-center gap-2"><Emoji symbol="🚀" label="explorer" size={20} /> Pass Explorer</h3>
-                <p className="text-stone text-sm">Sans engagement. Testez l&apos;expérience illimitée, mois par mois.</p>
+                <p className="text-stone text-sm">Le pass pensé pour profiter régulièrement des adresses, expériences et avantages The Club.</p>
               </div>
               <div className="mb-6">
                 <span className="font-display text-4xl text-riviera-navy">9,90€</span>
@@ -1692,15 +1692,14 @@ export default function Home() {
               </div>
               <div className="mb-6">
                 <h3 className="font-display text-xl font-medium text-white mb-1 flex items-center gap-2"><Emoji symbol="✨" label="céleste" size={20} /> Pass Céleste</h3>
-                <p className="text-[#DCE9EA] text-sm">L&apos;accès illimité. Rentabilisé dès la première sortie.</p>
+                <p className="text-[#DCE9EA] text-sm">Tout l&apos;univers Explorer, avec davantage de privilèges, d&apos;expériences exclusives et d&apos;attentions réservées aux membres Céleste.</p>
               </div>
               <div className="mb-6">
                 <span className="font-display text-4xl text-white">14,90€</span>
                 <span className="text-[#DCE9EA] text-sm ml-1">/ mois</span>
-                <p className="text-sm text-[#DCE9EA] mt-1">ou 129€ / an</p>
               </div>
               <ul className="space-y-3 mb-5 flex-1 text-sm text-white">
-                {['Offres Découvertes illimitées', 'Offres permanentes illimitées', 'Événements privés The Club'].map((f) => (
+                {['Offres Découvertes illimitées', 'Expériences exclusives Céleste', 'Événements privés The Club'].map((f) => (
                   <li key={f} className="flex items-center gap-2"><span className="text-[#E3D4B4]">—</span>{f}</li>
                 ))}
               </ul>
