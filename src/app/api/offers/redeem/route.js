@@ -1,30 +1,3 @@
-/**
- * POST /api/offers/redeem
- *
- * Point d'entrée API sécurisé pour consommer une offre The Club.
- *
- * Body attendu :
- * {
- *   offerId         : string  (UUID de l'offre dans public.offers)
- *   establishmentId : string  (UUID du partenaire)
- *   amount          : number  (montant brut de la facture)
- *   pin             : string  (code PIN saisi par le commerçant)
- * }
- *
- * Données JAMAIS acceptées depuis le client :
- *   savedAmount, discount, subscriptionType, partnerId, benefitType
- *
- * Réponse succès :
- * {
- *   success: true,
- *   offerId, offerType,
- *   originalAmount, savedAmount, finalAmount, benefitLabel
- * }
- *
- * Réponse erreur :
- * { error: string, reason?: string }
- */
-
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { redeemOffer } from '@/lib/offers/redemption';
@@ -49,8 +22,11 @@ const REASON_MESSAGES = {
   ANNUAL_DISCOVERY_LIMIT: "Vous avez déjà utilisé l'offre Découverte de cet établissement cette année.",
   NO_SUBSCRIPTION: "Vous n'avez pas d'abonnement actif.",
   WRONG_PIN: "Code PIN incorrect.",
-  ESTABLISHMENT_MISMATCH: "L'établissement ne correspond pas à cette offre.",
+  OFFER_PARTNER_MISSING: "Cette offre n'est associée à aucun partenaire.",
+  PARTNER_MISMATCH: "L'établissement ne correspond pas à cette offre.",
   INVALID_AMOUNT: "Montant de facture invalide.",
+  SUBSCRIPTION_START_DATE_MISSING: "Date de début d'abonnement manquante — contactez le support.",
+  OFFER_USAGE_SAVE_FAILED: "Erreur d'enregistrement de l'utilisation. Veuillez réessayer.",
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -59,29 +35,37 @@ const REASON_MESSAGES = {
 
 export async function POST(req) {
   try {
-    // ── 1. Authentifier l'utilisateur ───────────────────────
-    // On utilise le client anon avec le cookie de session pour vérifier
-    // l'identité sans exposer le service role key au client.
-    const supabaseAuth = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        global: {
-          headers: { Cookie: req.headers.get('cookie') || '' },
-        },
-      }
-    );
+    // ── 1. Lire le token depuis Authorization: Bearer <token> ──
+    const authHeader = req.headers.get('authorization') || '';
+    const accessToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-
-    if (authError || !user) {
+    if (!accessToken) {
       return NextResponse.json(
         { error: 'Non authentifié. Veuillez vous connecter.', reason: 'UNAUTHENTICATED' },
         { status: 401 }
       );
     }
 
-    // ── 2. Lire et valider le body ──────────────────────────
+    // ── 2. Vérifier le token côté serveur (service role) ───────
+    // Le service role permet d'appeler auth.getUser(token)
+    // sans dépendre des cookies ni de @supabase/ssr.
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Session invalide ou expirée.', reason: 'INVALID_SESSION' },
+        { status: 401 }
+      );
+    }
+
+    // ── 3. Lire et valider le body ──────────────────────────
+    // userId n'est jamais lu depuis le body — l'identité vient
+    // exclusivement de user.id, issu du token vérifié ci-dessus.
     let body;
     try {
       body = await req.json();
@@ -104,7 +88,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'pin manquant.' }, { status: 400 });
     }
 
-    // ── 3. Appeler le moteur de consommation ───────────────
+    // ── 4. Appeler le moteur de consommation ───────────────
     const result = await redeemOffer({
       userId: user.id,
       offerId,
@@ -113,19 +97,17 @@ export async function POST(req) {
       pin,
     });
 
-    // ── 4. Déclencher la validation des badges (non bloquant) ──
+    // ── 5. Déclencher la validation des badges (non bloquant) ──
     try {
-      const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      );
       const { data: partner } = await supabaseAdmin
         .from('partners')
         .select('category')
         .eq('id', establishmentId)
         .single();
 
-      await fetch(`${req.headers.get('origin') || ''}/api/badges/validate`, {
+      const host = req.headers.get('host') || '';
+      const protocol = host.includes('localhost') ? 'http' : 'https';
+      await fetch(`${protocol}://${host}/api/badges/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
