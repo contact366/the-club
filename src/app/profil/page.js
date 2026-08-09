@@ -222,6 +222,20 @@ export default function EspaceMembre() {
     setAuthLoading(false);
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthMessage({ text: '', type: '' });
+    const { error } = await supabase.auth.resetPasswordForEmail(authEmail, {
+      redirectTo: `${window.location.origin}/profil`,
+    });
+    setAuthMessage(error
+      ? { text: error.message, type: 'error' }
+      : { text: 'Un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte mail (et vos spams). 📩', type: 'success' }
+    );
+    setAuthLoading(false);
+  };
+
   useEffect(() => {
     if (loading) return;
     const interval = setInterval(() => {
@@ -516,34 +530,83 @@ export default function EspaceMembre() {
             )}
 
             {(authMode === 'login' || authMode === 'signup') && (
-              <div className="mb-4">
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={authLoading}
-                  className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-2xl px-4 py-3 text-sm font-semibold text-gray-700 hover:shadow-md hover:bg-gray-50 transition-all disabled:opacity-50 focus:outline-none"
-                >
-                  <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    <path fill="none" d="M0 0h48v48H0z"/>
-                  </svg>
-                  Se connecter avec Google
-                </button>
-                <div className="flex items-center my-4 gap-3">
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                  <span className="text-xs text-gray-400">ou</span>
-                  <div className="flex-1 h-px bg-gray-200"></div>
+              <>
+                <div className="mb-4">
+                {/* Google button block */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    disabled={authLoading}
+                    className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-2xl px-4 py-3 text-sm font-semibold text-gray-700 hover:shadow-md hover:bg-gray-50 transition-all disabled:opacity-50 focus:outline-none"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                      <path fill="none" d="M0 0h48v48H0z"/>
+                    </svg>
+                    Se connecter avec Google
+                  </button>
+                  <div className="flex items-center my-4 gap-3">
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                    <span className="text-xs text-gray-400">ou</span>
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
-            <form onSubmit={handleAuth} className="space-y-4">
-              {authMode === 'signup' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
+            {authMode === 'forgot' && (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="mb-2">
+                  <h2 className="text-xl font-bold text-gray-900">Réinitialiser votre mot de passe</h2>
+                  <p className="text-sm text-gray-500 mt-2">Entrez l&apos;adresse email associée à votre compte The Club. Nous vous enverrons un lien pour choisir un nouveau mot de passe.</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Adresse email</label>
+                  <input
+                    type="email"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    required
+                    autoComplete="email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-semibold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                >
+                  {authLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Chargement...
+                    </span>
+                  ) : 'ENVOYER LE LIEN'}
+                </button>
+                <div className="mt-2 text-center">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode('login'); setAuthMessage({ text: '', type: '' }); }}
+                    className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    ← Retour à la connexion
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {(authMode === 'login' || authMode === 'signup') && (
+              <form onSubmit={handleAuth} className="space-y-4">
+                {authMode === 'signup' && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Prénom *</label>
                       <input
@@ -631,6 +694,17 @@ export default function EspaceMembre() {
                   autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
                   className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
+                {authMode === 'login' && (
+                  <div className="text-right mt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('forgot'); setAuthMessage({ text: '', type: '' }); }}
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      Mot de passe oublié ?
+                    </button>
+                  </div>
+                )}
               </div>
               {authMode === 'signup' && (
                 <div className="space-y-3 pt-1">
@@ -681,7 +755,9 @@ export default function EspaceMembre() {
                 ) : authMode === 'login' ? 'Se connecter' : 'Créer mon compte'}
               </button>
             </form>
+            )}
 
+            {(authMode === 'login' || authMode === 'signup') && (
             <div className="mt-6 text-center">
               <button
                 onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthMessage({ text: '', type: '' }); }}
@@ -690,6 +766,7 @@ export default function EspaceMembre() {
                 {authMode === 'login' ? "Pas encore membre ? Créer un compte" : "Déjà membre ? Se connecter"}
               </button>
             </div>
+            )}
           </div>
         </div>
       </div>
