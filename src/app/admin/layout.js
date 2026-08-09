@@ -8,7 +8,7 @@ import Link from 'next/link';
 const NAV_ITEMS = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '◻', active: true },
   { href: '/admin/members', label: 'Membres', icon: '◻', active: true },
-  { href: '/admin/partenaires', label: 'Partenaires', icon: '◻', active: false },
+  { href: '/admin/partners', label: 'Partenaires', icon: '◻', active: true },
   { href: '/admin/offres', label: 'Offres', icon: '◻', active: false },
   { href: '/admin/utilisations', label: 'Utilisations', icon: '◻', active: false },
   { href: '/admin/statistiques', label: 'Statistiques', icon: '◻', active: false },
@@ -30,7 +30,7 @@ const NAV_ICONS = {
       <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
     </svg>
   ),
-  '/admin/partenaires': (
+  '/admin/partners': (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
     </svg>
