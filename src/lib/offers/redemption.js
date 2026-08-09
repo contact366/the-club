@@ -14,24 +14,25 @@
  *   8. Mettre à jour profiles.montant_economise
  *
  * ⚠️  HYPOTHÈSES SUR public.offers :
- *   - Colonne `id`             : UUID primaire
- *   - Colonne `partner_id`     : UUID → FK vers partners
- *   - Colonne `is_active`      : boolean
- *   - Colonne `valid_from`     : date (nullable)
- *   - Colonne `valid_until`    : date (nullable)
- *   - Colonne `access_level`   : text (standard|premium|exclusive_explorer|exclusive_celeste)
- *   - Colonne `offer_category` : text (discovery|permanent|premium|…) – utilisé pour détecter
- *                                les Discovery ; si absent, fallback sur `offer_type`
- *   - Colonnes bénéfice par plan : aventurier_enabled, aventurier_benefit_type,
- *                                  aventurier_benefit_value, aventurier_benefit_label, etc.
+ *   - Colonne `id`           : UUID primaire
+ *   - Colonne `partner_id`   : UUID NOT NULL → FK vers partners
+ *   - Colonne `is_active`    : boolean
+ *   - Colonne `valid_from`   : date (nullable)
+ *   - Colonne `valid_until`  : date (nullable)
+ *   - Colonne `access_level` : text (standard|premium|exclusive_explorer|exclusive_celeste)
+ *   - Colonne `offer_type`   : text — 'discovery' pour les Discovery, autre valeur pour permanent
+ *   - Colonnes bénéfice par plan (lues depuis la base, jamais depuis le client) :
+ *       aventurier_enabled, aventurier_benefit_type ('percentage'|'custom'|…),
+ *       aventurier_benefit_value (number|null), aventurier_benefit_label
+ *       explorer_enabled,  explorer_benefit_type,  explorer_benefit_value,  explorer_benefit_label
+ *       celeste_enabled,   celeste_benefit_type,   celeste_benefit_value,   celeste_benefit_label
  *
  * ⚠️  HYPOTHÈSES SUR public.offer_usage :
- *   - Colonnes existantes + offer_uuid (UUID nullable → FK vers offers)
- *   - Colonnes utilisées ici : user_id, offer_uuid, offer_type, used_at
+ *   - Colonnes utilisées : user_id, offer_uuid (uuid), offer_id (text NOT NULL),
+ *                          offer_type (text NOT NULL), used_at
  *
  * ⚠️  HYPOTHÈSES SUR public.utilisations (compatibilité) :
  *   - user_id, establishment_id, offer_type, original_amount, saved_amount
- *   - partner_id (optionnel, via index existant)
  *
  * Si les colonnes réelles diffèrent, ajuster les noms ici sans toucher au reste.
  */
