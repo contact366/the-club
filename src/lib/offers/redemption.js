@@ -252,6 +252,7 @@ export async function redeemOffer({ userId, offerId, establishmentId, amount, pi
   const { error: usageError } = await supabase.from('offer_usage').insert({
     user_id: userId,
     offer_uuid: offerId,
+    offer_id: String(offerId),
     offer_type: offerTypeLegacy,
     used_at: usedAt,
   });
